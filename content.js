@@ -1,5 +1,5 @@
 /*
- * BistROBO project page: every word, number, and media path lives here.
+ * COOK·E project page: every word, number, and media path lives here.
  *
  * To change copy: edit the strings below. Inline <em> and <b> are allowed.
  * To add a video: put the file in media/ and set `src`, e.g.
@@ -48,15 +48,15 @@ window.CONTENT = {
     kicker: "Abstract",
     lead: "Are current embodied models ready for human–robot collaboration (HRC)?",
     body:
-      "We identify a notable gap in existing benchmarks: while reliable HRC requires robots to integrate manipulation, planning, and communication, current benchmarks assess these capabilities in isolation and rarely account for real-time inference latency. Consequently, it remains unclear how well current embodied models collaborate with humans in practice. To address this gap, we introduce BistROBO, a benchmark comprising five long-horizon collaborative kitchen tasks, each designed to evaluate diverse collaborative behaviors: sequential collaboration, parallel collaboration, fine-grained manipulation, time-dependent constraints, and shared-resource constraints. We adopt embodied agents as our primary baselines, as their strong reasoning and generalization capabilities enable them to operate across diverse and dynamic HRC scenarios without task-specific fine-tuning. Our experiments cover both simulated and real-world environments.",
+      "We identify a notable gap in existing benchmarks: while reliable HRC requires robots to integrate manipulation, planning, and communication, current benchmarks assess these capabilities in isolation and rarely account for real-time inference latency. Consequently, it remains unclear how well current embodied models collaborate with humans in practice. To address this gap, we introduce COOK·E, a benchmark comprising five long-horizon collaborative kitchen tasks, each designed to evaluate diverse collaborative behaviors: sequential collaboration, parallel collaboration, fine-grained manipulation, time-dependent constraints, and shared-resource constraints. We adopt embodied agents as our primary baselines, as their strong reasoning and generalization capabilities enable them to operate across diverse and dynamic HRC scenarios without task-specific fine-tuning. Our experiments cover both simulated and real-world environments.",
   },
 
   /* TEMP: stands in for the paper's teaser figure. */
   overview: {
     kicker: "Overview",
-    body: "BistROBO measures how well generalist embodied agents work with a human partner: <b>five collaborative kitchen tasks</b>, an <b>adaptive human simulator</b>, <b>four evaluation modes</b> that vary inference latency and communication, <b>metrics</b> that compare each robot team with one human and with two, and <b>real-world experiments</b> with real participants.",
-    title: "BistROBO overview",
-    caption: "<b>BistROBO overview.</b> Scroll to move through the four stages. Schematic.",
+    body: "COOK·E measures how well generalist embodied agents work with a human partner: <b>five collaborative kitchen tasks</b>, an <b>adaptive human simulator</b>, <b>four evaluation modes</b> that vary inference latency and communication, <b>metrics</b> that compare each robot team with one human and with two, and <b>real-world experiments</b> with real participants.",
+    title: "COOK·E overview",
+    caption: "<b>COOK·E overview.</b> Scroll to move through the four stages. Schematic.",
     stages: [
       {
         role: "Benchmark", sec: "Sec. 03", tone: "tomato", visual: "tasks",
@@ -112,7 +112,7 @@ window.CONTENT = {
     ],
     table: {
       caption:
-        "Only BistROBO jointly evaluates manipulation, planning, and communication with an adaptive human partner in real time.",
+        "Only COOK·E jointly evaluates manipulation, planning, and communication with an adaptive human partner in real time.",
       columns: [
         { group: "Human", name: "Partner" },
         { group: "Human", name: "Adaptive" },
@@ -160,14 +160,14 @@ window.CONTENT = {
           ],
         },
       ],
-      ours: ["BistROBO", "yyyyyyy"],
+      ours: ["COOK·E", "yyyyyyy"],
       legend: { y: "Full", h: "Partial", n: "None" },
     },
   },
 
   /* Shown inside 01 Motivation, after the comparison table. */
   benchmark: {
-    heading: "BistROBO: one kitchen, one goal, <em>two agents acting at once.</em>",
+    heading: "COOK·E: one kitchen, one goal, <em>two agents acting at once.</em>",
     body: "In each episode, a robot and a human act concurrently in a shared kitchen to accomplish a common goal. The robot gets the goal as one sentence, and both agents get the same recipe.",
     principles: [
       {

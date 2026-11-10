@@ -9,14 +9,14 @@
 
   /* ---------- Shared markup ---------- */
 
-  const face = (antenna) => `<span class="wm-o" aria-hidden="true"><svg viewBox="0 0 74 90">
-    ${antenna ? '<path d="M37 12V-2" stroke="currentColor" stroke-width="5"/><circle cx="37" cy="-3" r="6" fill="currentColor"/>' : ""}
-    <rect x="1" y="12" width="72" height="78" rx="23" fill="currentColor"/>
-    <g class="wm-eye" fill="var(--bg)"><circle cx="24" cy="44" r="6"/><circle cx="50" cy="44" r="6"/></g>
-    <path d="M26 62c6 6 16 6 22 0" fill="none" stroke="var(--bg)" stroke-width="5" stroke-linecap="round"/>
+  /* COOK·E logo (projectpage/cook-E.png, cut out by projectpage/make_cooke_logo.py): brown letters for the cream
+   * theme, cream letters for night mode and the red footer. The face's eyes are erased from the PNGs and drawn here
+   * so they can blink; their positions come from media/cooke-logo.json. */
+  const wordmark = () => `<span class="wm" role="img" aria-label="COOK·E"><svg viewBox="0 0 1400 248" aria-hidden="true">
+    <image class="wm-day" href="media/cooke-logo.png" width="1400" height="248"/>
+    <image class="wm-night" href="media/cooke-logo-ink.png" width="1400" height="248"/>
+    <g class="wm-eye" fill="#fefdfd"><ellipse cx="560.84" cy="97.38" rx="10.82" ry="18.03"/><ellipse cx="635.68" cy="97.38" rx="10.52" ry="18.03"/></g>
   </svg></span>`;
-
-  const wordmark = () => `<span class="wm" role="img" aria-label="BistROBO"><span class="wm-b">Bist</span><span class="wm-r">R</span>${face(false)}<span class="wm-r">B</span>${face(true)}</span>`;
 
   const awning = () => `<div class="awning" aria-hidden="true">${"<i></i>".repeat(20)}</div>`;
 
@@ -289,7 +289,7 @@
 
   /* ---------- Night mode ---------- */
 
-  const NIGHT_KEY = "bistrobo-night";
+  const NIGHT_KEY = "cooke-night";
   let night = true;
   try { night = localStorage.getItem(NIGHT_KEY) !== "off"; } catch { /* storage blocked: stay on the default */ }
 
