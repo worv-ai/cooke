@@ -37,7 +37,7 @@ window.CONTENT = {
       { label: "Video", href: null },
     ],
     /* TEMP */
-    media: { src: "media/hero.mp4", poster: "media/hero.jpg", label: "A human and a robot working at the same kitchen table" },
+    media: { src: "media/hero.jpg", label: "A human and a robot working at the same kitchen table" },
   },
 
   /*
