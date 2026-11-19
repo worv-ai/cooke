@@ -92,7 +92,7 @@
       <div class="ov-video">${placeholder(O.video.label, O.video.spec)}</div>
       <div class="ov-abs"><h3>${O.abstractTitle}</h3>${O.abstract.map((p) => `<p>${p}</p>`).join("")}</div>
     </div>
-    ${fig(O.teaser, "fig-teaser")}
+    ${window.TEASER ? TEASER.markup(C, { wordmark, marker, shape }) : fig(O.teaser, "fig-teaser")}
   </div></section>`;
 
   const BM = C.benchmark;
@@ -507,6 +507,7 @@
   /* ---------- Drawings and motion ---------- */
 
   FIG.live($("#md"));
+  if (window.TEASER) TEASER.wire($("#fig1"), C, { shape, num });
 
   const navEl = $(".nav");
   new IntersectionObserver(([e]) => navEl.classList.toggle("is-on", !e.isIntersecting), { rootMargin: "-80px 0px 0px 0px" }).observe($(".hero"));

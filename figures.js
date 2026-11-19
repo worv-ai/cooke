@@ -72,5 +72,6 @@ window.FIG = (() => {
     </div>`;
   };
 
-  return { live, modes };
+  // `cell` draws one mode's timeline on its own (teaser.js uses it for Figure 1d).
+  return { live, modes, cell };
 })();

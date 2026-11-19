@@ -72,6 +72,60 @@ window.CONTENT = {
       alt: "Paper Figure 1. (a) Five collaborative tasks: Sandwich, Canapé, Fruit Skewer, S'mores and Cleanup, plus a real-world photo. (b) Dynamic subtask allocation in a Sandwich episode. (c) The adaptive human partner: state tracking, decision making, validation and execution. (d) The four evaluation settings, latency-free or latency-aware with communication on or off. (e) Main result: with latency, no agent beats a human working alone. (f) The same failures in simulation and the real world: misplaced items, retries without asking and a robot that blocks the human.",
       caption: "<b>Figure 1.</b> COOK·E comprises five long-horizon collaborative kitchen tasks (a), in which robots allocate subtasks at run time (b) with an adaptive human partner (c). Four evaluation modes vary inference latency and communication (d). Frontier embodied agents do not yet outperform a human working alone on average (e), with the same failures in simulation and the real world (f).",
     },
+
+    /*
+     * Interactive copy of Figure 1 (teaser.js), shown in place of the image above, which stays one click away.
+     * Panel copy follows the figure. Tasks, human steps, modes, results and failures come from their own sections
+     * below. The frames in (b) and the image in (c) are cut from media/fig-teaser.webp (media/fig1-*.webp).
+     */
+    figure1: {
+      label: "Figure 1 view",
+      views: [["live", "Interactive"], ["paper", "Paper figure"]],
+      pause: "Pause motion",
+      play: "Play motion",
+      a: {
+        title: "Five Collaborative Tasks",
+        label: "Tasks",
+        solo: "human alone",
+        realNote: "real table shown",
+        real: { name: "Real world", tag: "real robot", badge: "REAL", src: "media/task-canape-real.webp" },
+      },
+      b: {
+        title: "Dynamic Subtask Allocation",
+        allocTitle: "Who takes it",
+        owners: { robot: "Robot", ask: "Robot asks the human", human: "Human" },
+        steps: [
+          { who: "robot", name: "Robot", t: "0:00", quote: "… I will get the two pickles and the sliced tomato ready.", src: "media/fig1-alloc-1.webp" },
+          { who: "robot", name: "Robot", t: "0:23", quote: "… could you grab a tomato slice … since it is too wide for my gripper?", src: "media/fig1-alloc-2.webp" },
+          { who: "human", name: "Human", t: "0:26", quote: "Okay, I'll get the tomato slice now.", src: "media/fig1-alloc-3.webp" },
+        ],
+        items: [
+          { name: "Two pickles", owners: ["robot", "robot", "robot"] },
+          { name: "Tomato slice", owners: ["robot", "ask", "human"] },
+        ],
+      },
+      c: {
+        title: "Adaptive Human Partner",
+        src: "media/fig1-human.webp",
+        alt: "The simulated human at the Fruit Skewer table, threading fruit onto a skewer beside the robot arm.",
+        names: ["State Tracking", "Decision Making", "Validation & Execution"],
+        short: ["task state, executable subtasks", "selects the next subtask", "checks, runs skills, recovers"],
+        examples: ["skewer 2: strawberry on → kiwi next", "→ thread kiwi onto skewer 2"],
+        chain: ["pick", "carry", "thread", "release"],
+      },
+      d: { title: "Evaluation Settings", rows: { on: "Comm. on", off: "Comm. off" } },
+      e: {
+        title: "Main Results",
+        claim: {
+          aware: "<em>With latency,</em> no agent beats a human working alone",
+          free: "<em>Even without latency,</em> no agent beats a human working alone",
+        },
+        sub: "mean over the five tasks",
+        alone: "human-alone",
+      },
+      f: { title: "Sim-to-Real Failure Consistency", sim: "Sim", real: "Real", marks: ["misplaced items", "retries blindly", "blocks the human"] },
+      skills: [["Manipulation", "Shared workspace"], ["Planning", "Subtask allocation"], ["Communication", "Action coordination"], ["Latency", "Real-time response"]],
+    },
   },
 
   benchmark: {
