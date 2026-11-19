@@ -13,7 +13,6 @@ body[data-theme="paper"] {
   color-scheme: light;
   background: #fbf6ef; color: #2b231f;
 }
-body[data-theme="paper"] .nav::before { background: linear-gradient(#fbf6ef 50%, rgba(251, 246, 239, 0)); }
 
 /* Numbers and short labels keep tabular figures in Inter. */
 body[data-theme="paper"] .sec-no, body[data-theme="paper"] .tag, body[data-theme="paper"] .task-facts dd,

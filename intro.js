@@ -1,9 +1,9 @@
 /* Door intro for the COOK·E page. A closed shopfront is drawn over the page: the sign on the door flips from
  * CLOSED to OPEN, the lights come on, the door swings in and the view walks through the doorway into the page.
  * The doorway is a real hole in the wall (see intro.css), so the page itself shows through the glass and the open door.
- * The shopfront carries no name and no awning of its own. While the intro runs, the page's awning is lifted above
- * the shopfront (html.intro-running, intro.css), so it drops in front of the wall as the visitor walks in and is
- * already in place when the shopfront fades. The logo and title come in once the visitor is inside.
+ * The shopfront carries no name and no awning of its own. While the intro runs, the page's awning nav (nav.js) is
+ * lifted above the shopfront (html.intro-running, intro.css), so it drops in front of the wall as the visitor walks in
+ * and is already in place when the shopfront fades. The logo, links and title come in once the visitor is inside.
  *
  * It plays on every load. A click, tap, key or scroll plays the rest at 4× speed, and so does "Skip intro".
  * It does not run with prefers-reduced-motion or without GSAP.

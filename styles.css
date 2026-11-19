@@ -55,7 +55,7 @@ body[data-theme="cream"] {
 }
 
 *, *::before, *::after { box-sizing: border-box; }
-html { font-size: clamp(15px, min(1.042vw, 1.667vh), 19px); scroll-padding-top: 4.5rem; -webkit-text-size-adjust: 100%; }
+html { font-size: clamp(15px, min(1.042vw, 1.667vh), 19px); scroll-padding-top: calc(var(--nav-band) + var(--valance-min) + 1rem); -webkit-text-size-adjust: 100%; }
 body {
   margin: 0; background: var(--bg); color: var(--fg);
   font: 400 var(--t-body)/1.6 var(--body); -webkit-font-smoothing: antialiased; overflow-x: hidden;
@@ -108,19 +108,42 @@ body[data-theme="ink"] .wm-day, body:not([data-theme="ink"]) .wm-night { display
 }
 .awning i:nth-child(even) { background: var(--cream); }
 
-/* ---------- Nav ---------- */
-.nav {
-  position: fixed; inset: 0 0 auto 0; z-index: 30; padding-block: .75rem; pointer-events: none;
-  opacity: 0; transform: translateY(-.5rem); transition: opacity .4s, transform .4s;
+/* ---------- Nav: the awning (nav.js) ----------
+ * Always on screen. A dark fascia (the shopfront colour from the door intro) carries the name, the section links and
+ * the Leaderboard link; the striped valance hangs from it. Deep at the top of a page, a narrow fringe once it scrolls.
+ * Fixed colours, the same in every theme. Pages leave room for it with --nav-h. */
+:root {
+  --nav-band: 3.25rem;
+  --valance: clamp(1.5rem, 3.2vw, 2.75rem);
+  --valance-min: .875rem;
+  --nav-h: calc(var(--nav-band) + var(--valance));
+  --nav-bg: #2b231f; --nav-fg: #f6efe3; --nav-muted: #cdbfad; --nav-accent: #e0492f;
 }
-.nav.is-on { opacity: 1; transform: none; pointer-events: auto; }
-.nav::before { content: ""; position: absolute; inset: 0 0 -1.25rem 0; z-index: -1; pointer-events: none; background: linear-gradient(var(--bg) 45%, transparent); }
-.nav-in { display: flex; align-items: center; gap: clamp(.75rem, 2vw, 1.5rem); }
-.nav-wm { margin-right: auto; text-decoration: none; }
-.nav .wm { font-size: 1.6rem; }
-.nav ul { display: flex; gap: clamp(.75rem, 1.6vw, 1.5rem); }
-.nav ul a { font: 500 var(--t-label)/1 var(--mono); letter-spacing: .05em; color: var(--muted); text-decoration: none; white-space: nowrap; }
-.nav ul a:hover, .nav ul a.is-active { color: var(--fg); }
+.nav { position: fixed; inset: 0 0 auto 0; z-index: 30; }
+.nav-band { position: relative; z-index: 3; background: var(--nav-bg); color: var(--nav-fg); }
+.nav-in { display: flex; align-items: center; gap: clamp(.75rem, 2vw, 1.75rem); height: var(--nav-band); }
+.nav-wm { flex: none; margin-right: auto; text-decoration: none; }
+.nav .wm { font-size: 1.7rem; }
+.nav .wm .wm-day { display: none; }
+.nav .wm .wm-night { display: inline; }
+.nav-links { display: flex; gap: clamp(.5rem, 1.5vw, 1.5rem); }
+.nav-links a { position: relative; display: block; padding-block: .55rem; font: 500 .8125rem/1 var(--body); color: var(--nav-muted); text-decoration: none; white-space: nowrap; transition: color .2s; }
+.nav-links a:hover, .nav-links a.is-active { color: var(--nav-fg); }
+.nav-links a::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 2px; border-radius: 2px; background: var(--nav-accent); transform: scaleX(0); transition: transform .25s; }
+.nav-links a.is-active::after { transform: scaleX(1); }
+.nav-lb {
+  flex: none; display: inline-flex; align-items: center; padding: .55rem 1rem; border-radius: 999px;
+  background: var(--nav-accent); color: #fff; font: 600 .8125rem/1 var(--body); text-decoration: none; white-space: nowrap; transition: background-color .2s, color .2s;
+}
+.nav-lb:hover { background: var(--nav-fg); color: var(--nav-bg); }
+.nav-lb[aria-current="page"] { background: var(--nav-fg); color: var(--nav-bg); }
+.nav-menu { display: none; }
+.nav :focus-visible { outline-color: var(--nav-fg); }
+.nav .awning { height: var(--valance); transition: height .35s ease; }
+/* Pale pink between the red stripes, as in the paper figure, so the valance reads against a cream page. */
+.nav .awning i:nth-child(even) { background: #f3d9cc; }
+.nav.is-compact .awning { height: var(--valance-min); }
+.nav .mode { color: var(--nav-muted); border-color: rgba(246, 239, 227, .3); }
 .mode {
   display: inline-flex; align-items: center; gap: .5rem; padding: .375rem .625rem; flex: none;
   font: 500 var(--t-label)/1 var(--mono); color: var(--muted); border: 1px solid var(--line); border-radius: 999px;
@@ -131,7 +154,7 @@ body[data-theme="ink"] .wm-day, body:not([data-theme="ink"]) .wm-night { display
 .mode[aria-checked="true"] i::after { transform: translateX(.75rem); background: #fff; }
 
 /* ---------- Hero (dark in the page style, in both themes) ---------- */
-.hero { --bg: #141210; --fg: #f6efe3; --muted: #d6ccbb; --line: #5a5046; background: var(--bg); color: var(--fg); padding-bottom: clamp(2.5rem, 5vw, 4rem); }
+.hero { --bg: #141210; --fg: #f6efe3; --muted: #d6ccbb; --line: #5a5046; background: var(--bg); color: var(--fg); padding-top: var(--nav-h); padding-bottom: clamp(2.5rem, 5vw, 4rem); }
 .hero-in { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: var(--col-gap); align-items: center; padding-top: clamp(2rem, 5vw, 4rem); }
 .hero-wm { font-size: clamp(3rem, 7vw, 6rem); line-height: .9; }
 .hero-exp { margin-top: .75rem; font: 400 var(--t-label)/1.4 var(--mono); letter-spacing: .06em; color: var(--muted); }
@@ -397,7 +420,29 @@ a.btn:hover { background: var(--fg); color: var(--bg); border-color: var(--fg); 
   .fail-text { grid-column: 1 / -1; }
   .rw-clips, .rw-tasks { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .rs-links { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .nav ul { display: none; }
+  /* The section links fold into a "Sections" menu that drops from the fascia. */
+  .nav-menu {
+    display: inline-flex; align-items: center; gap: .4rem; flex: none; padding: .45rem .75rem; border: 1px solid rgba(246, 239, 227, .35);
+    border-radius: 999px; color: var(--nav-fg); font: 600 .8125rem/1 var(--body);
+  }
+  .nav-menu svg { width: 1rem; height: 1rem; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; }
+  .nav-menu[aria-expanded="true"] { background: var(--nav-fg); color: var(--nav-bg); }
+  .nav-links {
+    display: none; position: absolute; top: var(--nav-band); right: max(16px, var(--gutter)); z-index: 4; min-width: 13rem;
+    padding: .375rem; border-radius: 0 0 12px 12px; background: var(--nav-bg); box-shadow: 0 12px 24px rgba(0, 0, 0, .25);
+  }
+  .nav.is-open .nav-links { display: grid; }
+  .nav-links a { padding: .7rem .75rem; border-radius: 8px; font-size: .9375rem; }
+  .nav-links a:hover { background: rgba(246, 239, 227, .08); }
+  .nav-links a::after { left: .75rem; right: auto; width: 1.25rem; bottom: .35rem; }
+}
+@media (max-width: 480px) {
+  :root { --nav-band: 3rem; }
+  .nav .wm { font-size: 1.4rem; }
+  .nav-in { gap: .5rem; }
+  .nav-menu span { display: none; }
+  .nav-menu { padding: .45rem .55rem; }
+  .nav-lb { padding: .5rem .8rem; }
 }
 @media (max-width: 640px) {
   .wrap { padding-inline: 16px; }

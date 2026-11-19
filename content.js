@@ -25,6 +25,39 @@ window.CONTENT = {
     pending: "At release",
   },
 
+  /* The awning nav (nav.js), on every page. `links` are the sections of index.html, in page order. */
+  nav: {
+    label: "Sections",
+    top: "Back to top",
+    home: "COOK·E project page",
+    links: [["Main result", "headline"], ["Benchmark", "benchmark"], ["Results", "results"], ["Failures", "failures"], ["Real world", "real"], ["Episodes", "gallery"], ["Resources", "resources"]],
+    leaderboard: "Leaderboard",
+  },
+
+  /*
+   * Leaderboard page (leaderboard.html, leaderboard.js). Numbers come from results.sb (medians over three rollouts) and
+   * results.hhB. Rows keep the order of results.agents until the reader sorts a column: the page itself ranks no one.
+   */
+  leaderboard: {
+    title: "COOK·E Leaderboard",
+    kicker: "Leaderboard",
+    claim: "Every agent on every task, in each of the four modes. <em>On the five-task mean, no agent beats a human working alone yet.</em>",
+    lede: "S is task efficiency on a scale where the human alone scores 0 and two humans score 1. B is the human's burden, where the human alone scores 1. Each value is the median over three rollouts, and the mean columns average the five tasks.",
+    modeLabel: "Mode",
+    metricLabel: "Task columns",
+    metrics: [["S", "Task efficiency S"], ["B", "Human burden B"]],
+    defaultMode: "aware-on",
+    cols: { agent: "Agent", s: "S, mean", b: "B, mean" },
+    sortHint: "Sort by this column",
+    refs: { title: "References", hh: "Two humans (H-H)", h: "Human alone (H)" },
+    order: "Rows follow the paper's agent order until you sort a column. The gap between agents matches the spread of one agent over its own rollouts, so no order here is a ranking.",
+    refNote: "The references set the scale: two humans score S = 1 and the human alone S = 0 and B = 1.",
+    submit: {
+      title: "Submit an agent",
+      body: "How to evaluate a new agent with the simulated human and submit its results will be posted here with the code release.",
+    },
+  },
+
   hero: {
     title: "Beyond Solo Tasks, Towards Human-Robot Collaboration in Long-Horizon Kitchen Tasks",
     expansion: "<b>CO</b>llaborative <b>O</b>pen <b>K</b>itchen-<b>E</b>valuation",

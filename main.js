@@ -16,14 +16,8 @@
 
   /* ---------- Shared markup ---------- */
 
-  // COOK·E logo. The face's eyes are drawn here so they can blink (positions from media/cooke-logo.json).
-  const wordmark = () => `<span class="wm" role="img" aria-label="COOK·E"><svg viewBox="0 0 1400 248" aria-hidden="true">
-    <image class="wm-day" href="media/cooke-logo.png" width="1400" height="248"/>
-    <image class="wm-night" href="media/cooke-logo-ink.png" width="1400" height="248"/>
-    <g class="wm-eye" fill="#fefdfd"><ellipse cx="560.84" cy="97.38" rx="10.82" ry="18.03"/><ellipse cx="635.68" cy="97.38" rx="10.52" ry="18.03"/></g>
-  </svg></span>`;
-
-  const awning = () => `<div class="awning" aria-hidden="true">${"<i></i>".repeat(20)}</div>`;
+  // COOK·E logo with blinking eyes, and the awning nav: both from nav.js, shared with leaderboard.html.
+  const wordmark = NAV.wordmark;
 
   const video = (m, { auto = true, controls = false, cls = "" } = {}) => `<video class="${cls}" src="${m.src}" poster="${m.poster || ""}" muted loop playsinline preload="${auto ? "metadata" : "none"}"${controls ? " controls" : ""}${auto ? " data-auto" : ""} aria-label="${m.label}"></video>`;
 
@@ -44,23 +38,16 @@
 
   const fig = (f, cls = "") => `<figure class="fig ${cls}"><img src="${f.src}" alt="${f.alt}" loading="lazy" decoding="async"><figcaption>${f.caption}</figcaption></figure>`;
 
-  /* Agent markers: one SVG shape per agent, hollow for communication off. */
-  const shape = (kind, x, y, r) => {
-    if (kind === "circle") return `<circle cx="${x}" cy="${y}" r="${r * 0.92}"/>`;
-    if (kind === "square") return `<rect x="${x - r * 0.82}" y="${y - r * 0.82}" width="${r * 1.64}" height="${r * 1.64}" rx="1.5"/>`;
-    if (kind === "triangle") return `<path d="M${x} ${y - r * 1.08}L${x + r} ${y + r * 0.72}L${x - r} ${y + r * 0.72}Z"/>`;
-    if (kind === "triangle-down") return `<path d="M${x} ${y + r * 1.08}L${x + r} ${y - r * 0.72}L${x - r} ${y - r * 0.72}Z"/>`;
-    return `<path d="M${x} ${y - r}L${x + r} ${y}L${x} ${y + r}L${x - r} ${y}Z"/>`; // diamond
-  };
-  const marker = (a, filled = true, size = 14) => `<svg class="mk" viewBox="0 0 ${size} ${size}" width="${size}" height="${size}" aria-hidden="true"><g fill="${filled ? a.color : "none"}" stroke="${a.color}" stroke-width="1.6">${shape(a.shape, size / 2, size / 2, size / 2 - 1.6)}</g></svg>`;
+  /* Agent markers: one SVG shape per agent, hollow for communication off (figures.js). */
+  const { shape, marker } = FIG;
 
   /* ---------- Sections ---------- */
 
-  const nav = [["Main result", "headline"], ["Benchmark", "benchmark"], ["Results", "results"], ["Failures", "failures"], ["Real world", "real"], ["Episodes", "gallery"], ["Resources", "resources"]];
+  const nav = C.nav.links;
 
+  // The hero has no awning of its own: the nav's valance hangs over it (nav.js).
   const H = C.hero;
   const hero = `<section class="hero" id="top" aria-labelledby="hero-title">
-    ${awning()}
     <div class="wrap hero-in">
       <div class="hero-text">
         <h1 class="hero-wm">${wordmark()}</h1>
@@ -251,11 +238,7 @@
 
   $("#app").innerHTML = `
     <a class="skip" href="#headline">Skip to content</a>
-    <nav class="nav" aria-label="Sections"><div class="wrap nav-in">
-      <a class="nav-wm" href="#top" aria-label="Back to top">${wordmark()}</a>
-      <ul>${nav.map(([l, id]) => `<li><a href="#${id}">${l}</a></li>`).join("")}</ul>
-      ${PAPER ? "" : `<button class="mode" id="mode" type="button" role="switch" aria-label="Night mode" aria-checked="true"><span class="mode-label">Night</span><i aria-hidden="true"></i></button>`}
-    </div></nav>
+    ${NAV.markup(C, "home", PAPER ? "" : `<button class="mode" id="mode" type="button" role="switch" aria-label="Night mode" aria-checked="true"><span class="mode-label">Night</span><i aria-hidden="true"></i></button>`)}
     <main>${hero}${headline}${overview}${benchmark}${results}${failures}${real}${gallery}${resources}</main>`;
 
   /* ---------- Equations: KaTeX as MathML (no stylesheet needed) ---------- */
@@ -509,27 +492,31 @@
   FIG.live($("#md"));
   if (window.TEASER) TEASER.wire($("#fig1"), C, { shape, num });
 
-  const navEl = $(".nav");
-  new IntersectionObserver(([e]) => navEl.classList.toggle("is-on", !e.isIntersecting), { rootMargin: "-80px 0px 0px 0px" }).observe($(".hero"));
-  const links = Object.fromEntries(nav.map(([, id]) => [id, $(`.nav a[href="#${id}"]`)]));
+  NAV.wire();
+  const links = Object.fromEntries(nav.map(([, id]) => [id, $(`.nav-links a[href="#${id}"]`)]));
   const spy = new IntersectionObserver((entries) => entries.forEach((e) => links[e.target.id].classList.toggle("is-active", e.isIntersecting)), { rootMargin: "-45% 0px -50% 0px" });
   nav.forEach(([, id]) => spy.observe(document.getElementById(id)));
 
   if (window.gsap && window.ScrollTrigger) {
     gsap.registerPlugin(ScrollTrigger);
     gsap.matchMedia().add("(prefers-reduced-motion: no-preference)", () => {
-      const awningIn = (vars) => gsap.from(".hero .awning i", { scaleY: 0, duration: 0.6, ease: "power3.out", stagger: { each: 0.015, from: "center" }, ...vars });
+      // The awning nav comes down (fascia, then the valance unfurls), then the name, links and hero come in.
+      const awningIn = (vars) => gsap.timeline(vars)
+        .from(".nav", { yPercent: -100, duration: 0.45, ease: "power3.out" })
+        .from(".nav-awning i", { scaleY: 0, duration: 0.6, ease: "power3.out", stagger: { each: 0.012, from: "center" } }, "-=.2");
+      const navText = (vars) => gsap.from(".nav-in > *", { autoAlpha: 0, duration: 0.5, ease: "power2.out", stagger: 0.06, ...vars });
       const heroIn = (vars) => gsap.from(".hero-text > *, .hero-clip", { autoAlpha: 0, y: 12, duration: 0.6, ease: "power3.out", stagger: 0.05, ...vars });
       const intro = window.COOKE_INTRO;
       if (intro) {
-        // With the door intro (intro.js): the awning drops in front of the shopfront as the visitor walks through
-        // the doorway, and the logo, title and video come in once they are inside.
+        // With the door intro (intro.js): the awning nav drops in front of the shopfront as the visitor walks through
+        // the doorway, and the logo, links, title and video come in once they are inside.
         const awning = awningIn({ paused: true });
+        const text = navText({ paused: true });
         const rest = heroIn({ paused: true });
         intro.entering.then(() => awning.play());
-        intro.entered.then(() => rest.play());
+        intro.entered.then(() => { text.play(); rest.play(); });
       } else {
-        gsap.timeline().add(awningIn()).add(heroIn(), "-=.3");
+        gsap.timeline().add(awningIn()).add(navText(), "-=.3").add(heroIn(), "<");
       }
       gsap.set("[data-r]", { autoAlpha: 0, y: 14 });
       ScrollTrigger.batch("[data-r]", {

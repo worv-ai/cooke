@@ -92,9 +92,9 @@ html.intro-pending body::before { content: ""; position: fixed; inset: 0; z-inde
 .intro-face.is-closed { background: var(--wall); color: var(--cream); }
 .intro-face.is-open { background: var(--cream); color: var(--door); transform: rotateY(180deg); }
 
-/* While the intro runs, the page's own awning sits above the shopfront, so it drops in front of the wall as the
- * visitor walks in (main.js plays the drop). Nothing above .hero makes a stacking context, so z-index reaches the root. */
-html.intro-running .hero .awning { z-index: 1001; }
+/* While the intro runs, the page's awning nav (nav.js) sits above the shopfront, so it drops in front of the wall as
+ * the visitor walks in (main.js plays the drop). The nav is fixed at the root, so z-index reaches the root. */
+html.intro-running .nav { z-index: 1001; }
 
 /* ---------- Lamps (no awning or name on the shopfront itself) ---------- */
 .intro-lamp { top: calc(var(--floor) - var(--dh) * .86); width: calc(var(--dw) * .15); }

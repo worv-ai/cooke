@@ -72,6 +72,18 @@ window.FIG = (() => {
     </div>`;
   };
 
+  /* ---------- Agent markers: one SVG shape per agent, hollow for communication off ---------- */
+
+  const shape = (kind, x, y, r) => {
+    if (kind === "circle") return `<circle cx="${x}" cy="${y}" r="${r * 0.92}"/>`;
+    if (kind === "square") return `<rect x="${x - r * 0.82}" y="${y - r * 0.82}" width="${r * 1.64}" height="${r * 1.64}" rx="1.5"/>`;
+    if (kind === "triangle") return `<path d="M${x} ${y - r * 1.08}L${x + r} ${y + r * 0.72}L${x - r} ${y + r * 0.72}Z"/>`;
+    if (kind === "triangle-down") return `<path d="M${x} ${y + r * 1.08}L${x + r} ${y - r * 0.72}L${x - r} ${y - r * 0.72}Z"/>`;
+    return `<path d="M${x} ${y - r}L${x + r} ${y}L${x} ${y + r}L${x - r} ${y}Z"/>`; // diamond
+  };
+  const marker = (a, filled = true, size = 14) => `<svg class="mk" viewBox="0 0 ${size} ${size}" width="${size}" height="${size}" aria-hidden="true"><g fill="${filled ? a.color : "none"}" stroke="${a.color}" stroke-width="1.6">${shape(a.shape, size / 2, size / 2, size / 2 - 1.6)}</g></svg>`;
+
   // `cell` draws one mode's timeline on its own (teaser.js uses it for Figure 1d).
-  return { live, modes, cell };
+  // `shape` and `marker` draw agent markers (main.js, teaser.js, leaderboard.js).
+  return { live, modes, cell, shape, marker };
 })();
