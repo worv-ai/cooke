@@ -79,6 +79,10 @@
       <div class="ov-video">${placeholder(O.video.label, O.video.spec)}</div>
       <div class="ov-abs"><h3>${O.abstractTitle}</h3>${O.abstract.map((p) => `<p>${p}</p>`).join("")}</div>
     </div>
+  </div></section>`;
+
+  // Figure 1 has its own band right under the hero, above the main result: interactive (teaser.js), or the image.
+  const figure1 = `<section class="sec-fig1" id="figure1" aria-label="Figure 1"><div class="wrap">
     ${window.TEASER ? TEASER.markup(C, { wordmark, marker, shape }) : fig(O.teaser, "fig-teaser")}
   </div></section>`;
 
@@ -239,7 +243,7 @@
   $("#app").innerHTML = `
     <a class="skip" href="#headline">Skip to content</a>
     ${NAV.markup(C, "home", PAPER ? "" : `<button class="mode" id="mode" type="button" role="switch" aria-label="Night mode" aria-checked="true"><span class="mode-label">Night</span><i aria-hidden="true"></i></button>`)}
-    <main>${hero}${headline}${overview}${benchmark}${results}${failures}${real}${gallery}${resources}</main>`;
+    <main>${hero}${figure1}${headline}${overview}${benchmark}${results}${failures}${real}${gallery}${resources}</main>`;
 
   /* ---------- Equations: KaTeX as MathML (no stylesheet needed) ---------- */
 

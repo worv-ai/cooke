@@ -107,7 +107,8 @@ window.CONTENT = {
     },
 
     /*
-     * Interactive copy of Figure 1 (teaser.js), shown in place of the image above, which stays one click away.
+     * Interactive copy of Figure 1 (teaser.js), in its own band right under the hero, above the main result.
+     * The image above stays one click away ("Paper figure").
      * Panel copy follows the figure. Tasks, human steps, modes, results and failures come from their own sections
      * below. The frames in (b) and the image in (c) are cut from media/fig-teaser.webp (media/fig1-*.webp).
      */
