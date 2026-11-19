@@ -1,6 +1,7 @@
 /* Renders the page from content.js, then wires up plots, video and motion. Copy changes belong in content.js.
  * index.html uses the paper style (styles-paper.css, light only) and sets <body data-variant="paper">.
- * Without that attribute the page style (ink / cream themes with a night switch) applies. */
+ * Without that attribute the page style (ink / cream themes with a night switch) applies.
+ * intro.js runs first and plays the door intro; the hero entrance below waits for it. */
 (() => {
   const C = window.CONTENT;
   const $ = (s, r = document) => r.querySelector(s);
@@ -516,9 +517,19 @@
   if (window.gsap && window.ScrollTrigger) {
     gsap.registerPlugin(ScrollTrigger);
     gsap.matchMedia().add("(prefers-reduced-motion: no-preference)", () => {
-      gsap.timeline({ defaults: { ease: "power3.out" } })
-        .from(".hero .awning i", { scaleY: 0, duration: 0.6, stagger: { each: 0.015, from: "center" } })
-        .from(".hero-text > *, .hero-clip", { autoAlpha: 0, y: 12, duration: 0.6, stagger: 0.05 }, "-=.3");
+      const awningIn = (vars) => gsap.from(".hero .awning i", { scaleY: 0, duration: 0.6, ease: "power3.out", stagger: { each: 0.015, from: "center" }, ...vars });
+      const heroIn = (vars) => gsap.from(".hero-text > *, .hero-clip", { autoAlpha: 0, y: 12, duration: 0.6, ease: "power3.out", stagger: 0.05, ...vars });
+      const intro = window.COOKE_INTRO;
+      if (intro) {
+        // With the door intro (intro.js): the awning drops in front of the shopfront as the visitor walks through
+        // the doorway, and the logo, title and video come in once they are inside.
+        const awning = awningIn({ paused: true });
+        const rest = heroIn({ paused: true });
+        intro.entering.then(() => awning.play());
+        intro.entered.then(() => rest.play());
+      } else {
+        gsap.timeline().add(awningIn()).add(heroIn(), "-=.3");
+      }
       gsap.set("[data-r]", { autoAlpha: 0, y: 14 });
       ScrollTrigger.batch("[data-r]", {
         start: "top 94%", once: true,

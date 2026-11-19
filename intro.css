@@ -1,0 +1,146 @@
+/* COOK·E door intro (intro.js). A shopfront drawn over the page: the door sign flips from CLOSED to OPEN, the lights
+ * come on, the door swings in and the view walks through the doorway into the page.
+ * The doorway is a hole in the wall (the wall is the doorway's box-shadow), so the real page shows through the glass
+ * and the open door. Fixed illustration colours taken from the paper style; light only, like styles-paper.css.
+ * Sizes follow the door: --dh is its height, --dw its width, and every part is a fraction of one of them. */
+
+/* Until intro.js draws the shopfront, the page hides behind the wall colour (class set by the inline script in index.html). */
+html.intro-pending body::before { content: ""; position: fixed; inset: 0; z-index: 1001; background: #2b231f; }
+
+.intro {
+  --wall: #2b231f; --trim: #5b4031; --trim-hi: #74563f; --door: #b8432c; --door-dk: #8f321f;
+  --brass: #d9a441; --brass-dk: #a07022; --cream: #fbf6ef; --chalk: #efe8dc; --chalk-hi: #f2cf7d; --slate: #34413a;
+  --wood: #8a6a4f; --leaf: #788b69; --leaf-dk: #5d6f50; --leaf-hi: #8a9c79; --clay: #a5523a;
+  --dh: min(58vh, 110vw);
+  --dw: calc(var(--dh) * .5);
+  --t: calc(var(--dh) * .026);
+  --floor: 84%;
+  position: fixed; inset: 0; z-index: 1000; overflow: hidden;
+  color: var(--cream); font-family: "Inter", system-ui, sans-serif;
+  cursor: pointer; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent;
+}
+@supports (height: 1dvh) { .intro { --dh: min(58dvh, 110vw); } }
+.intro-scene { position: absolute; inset: 0; will-change: transform; }
+.intro-scene > * { position: absolute; }
+
+/* ---------- Wall, doorway and pavement ---------- */
+.intro-way {
+  left: calc(50% - var(--dw) / 2); top: calc(var(--floor) - var(--dh)); width: var(--dw); height: var(--dh);
+  box-shadow: 0 0 0 var(--t) var(--trim), 0 0 0 calc(var(--t) + 2px) var(--trim-hi), 0 0 0 200vmax var(--wall);
+  perspective: calc(var(--dh) * 2.4);
+}
+.intro-dim, .intro-glow { position: absolute; inset: 0; }
+.intro-dim { background: rgba(24, 19, 16, .74); }
+.intro-glow { opacity: 0; background: radial-gradient(130% 75% at 50% 18%, rgba(255, 214, 150, .5), rgba(255, 176, 96, .22) 75%); }
+
+.intro-floor { left: 0; right: 0; top: var(--floor); bottom: 0; background: linear-gradient(#3d322b, #241d19); border-top: 3px solid #4d3e33; }
+.intro-step {
+  left: calc(50% - var(--dw) * .65); top: var(--floor); width: calc(var(--dw) * 1.3); height: calc(var(--dh) * .028);
+  background: #6e5a4a; border-radius: 0 0 3px 3px; box-shadow: 0 3px 0 rgba(0, 0, 0, .25);
+}
+.intro-spill {
+  left: calc(50% - var(--dw) * 1.5); top: calc(var(--floor) + var(--dh) * .028); bottom: 0; width: calc(var(--dw) * 3); opacity: 0;
+  clip-path: polygon(33.3% 0, 66.7% 0, 100% 100%, 0 100%);
+  background: linear-gradient(rgba(255, 206, 136, .42), rgba(255, 206, 136, 0) 80%);
+}
+
+/* ---------- The door (hinge on the left, opens inward) ---------- */
+.intro-door {
+  /* 1px over the opening on every side, so no lit seam shows round the closed door. */
+  position: absolute; inset: -1px; transform-origin: 0 50%; border-radius: 2px;
+  /* Four painted rails around a see-through window. */
+  background:
+    linear-gradient(var(--door) 0 0) top / 100% 7% no-repeat,
+    linear-gradient(var(--door) 0 0) bottom / 100% 43% no-repeat,
+    linear-gradient(var(--door) 0 0) left / 12% 100% no-repeat,
+    linear-gradient(var(--door) 0 0) right / 12% 100% no-repeat;
+}
+.intro-door > * { position: absolute; display: block; }
+.intro-glass {
+  top: 7%; left: 12%; right: 12%; height: 50%;
+  box-shadow: inset 0 0 0 calc(var(--dw) * .022) var(--door-dk), inset 0 calc(var(--dw) * .03) calc(var(--dw) * .05) rgba(0, 0, 0, .25);
+  background: linear-gradient(118deg, rgba(255, 255, 255, .16) 0 14%, transparent 14% 26%, rgba(255, 255, 255, .08) 26% 31%, transparent 31%);
+  -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+}
+.intro-panel {
+  left: 18%; right: 18%; top: 63%; height: 24%; border-radius: 2px;
+  box-shadow: inset 0 0 0 calc(var(--dw) * .02) var(--door-dk), inset calc(var(--dw) * .03) calc(var(--dw) * .03) 0 rgba(255, 255, 255, .06);
+}
+.intro-handle { right: 3.2%; top: 58.5%; width: calc(var(--dw) * .055); height: calc(var(--dh) * .075); border-radius: 99px; background: linear-gradient(90deg, var(--brass), var(--brass-dk)); }
+.intro-lever {
+  position: absolute; right: 20%; top: 20%; width: calc(var(--dw) * .17); height: calc(var(--dw) * .032);
+  border-radius: 99px; background: linear-gradient(var(--brass), var(--brass-dk)); transform-origin: calc(100% - var(--dw) * .016) 50%;
+}
+.intro-kick { left: 5%; right: 5%; bottom: 2.2%; height: 4.5%; border-radius: 2px; background: linear-gradient(var(--brass), var(--brass-dk)); opacity: .9; }
+.intro-shade { inset: 0; opacity: 0; background: linear-gradient(90deg, rgba(0, 0, 0, .15), rgba(0, 0, 0, .55)); }
+.intro-bell { position: absolute; right: 7%; top: 0; width: calc(var(--dw) * .1); height: auto; overflow: visible; }
+
+/* The sign hangs on a cord from a hook on the glass and turns about the cord. */
+.intro-hang { left: 9%; right: 9%; top: 4%; transform-origin: 50% 0; perspective: calc(var(--dw) * 2.5); }
+.intro-hook { display: block; width: calc(var(--dw) * .045); aspect-ratio: 1; margin: 0 auto; border-radius: 50%; background: var(--brass); box-shadow: inset 0 -2px 0 var(--brass-dk); }
+.intro-cord { display: block; width: 100%; height: calc(var(--dw) * .13); margin-top: calc(var(--dw) * -.02); overflow: visible; }
+.intro-cord path { fill: none; stroke: #e9dcc8; stroke-width: 1.5; vector-effect: non-scaling-stroke; }
+.intro-card { position: relative; aspect-ratio: 2 / 1.08; transform-style: preserve-3d; }
+.intro-face {
+  position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: calc(var(--dw) * .014);
+  border-radius: calc(var(--dw) * .03); backface-visibility: hidden; -webkit-backface-visibility: hidden;
+  box-shadow: 0 calc(var(--dw) * .02) calc(var(--dw) * .05) rgba(0, 0, 0, .35);
+}
+.intro-face::before { content: ""; position: absolute; inset: calc(var(--dw) * .022); border: 1.5px solid currentColor; border-radius: calc(var(--dw) * .018); opacity: .45; }
+.intro-face small { font: 500 calc(var(--dw) * .05)/1 "Inter", system-ui, sans-serif; letter-spacing: .02em; }
+.intro-face b { font: 800 calc(var(--dw) * .1)/1 "Inter", system-ui, sans-serif; letter-spacing: .08em; padding-left: .08em; }
+.intro-face.is-closed { background: var(--wall); color: var(--cream); }
+.intro-face.is-open { background: var(--cream); color: var(--door); transform: rotateY(180deg); }
+
+/* While the intro runs, the page's own awning sits above the shopfront, so it drops in front of the wall as the
+ * visitor walks in (main.js plays the drop). Nothing above .hero makes a stacking context, so z-index reaches the root. */
+html.intro-running .hero .awning { z-index: 1001; }
+
+/* ---------- Lamps (no awning or name on the shopfront itself) ---------- */
+.intro-lamp { top: calc(var(--floor) - var(--dh) * .86); width: calc(var(--dw) * .15); }
+.intro-lamp.is-l { left: calc(50% - var(--dw) * .76 - var(--t)); }
+.intro-lamp.is-r { left: calc(50% + var(--dw) * .61 + var(--t)); }
+.intro-lamp svg { position: relative; display: block; width: 100%; height: auto; }
+.intro-halo {
+  position: absolute; left: 50%; top: 60%; width: calc(var(--dw) * .9); aspect-ratio: 1; transform: translate(-50%, -50%);
+  border-radius: 50%; background: radial-gradient(closest-side, rgba(255, 206, 130, .38), rgba(255, 206, 130, 0)); opacity: 0;
+}
+.intro-lamp .lamp-glass { fill: #f6d9a6; opacity: .3; }
+
+/* ---------- Pavement props (wide screens only): a menu board and a potted bush ---------- */
+.intro-menu { left: calc(50% + var(--dw) * .92 + var(--t)); bottom: calc(100% - var(--floor) - var(--dh) * .05); width: calc(var(--dw) * .7); }
+.intro-board {
+  padding: calc(var(--dw) * .06) calc(var(--dw) * .07); background: var(--slate); color: var(--chalk);
+  border: calc(var(--dw) * .028) solid var(--wood); border-radius: 3px; box-shadow: 0 6px 14px rgba(0, 0, 0, .3);
+}
+.intro-board b { display: block; font: 700 calc(var(--dw) * .052)/1.2 "Inter", system-ui, sans-serif; letter-spacing: .1em; text-transform: uppercase; color: var(--chalk-hi); }
+.intro-board ul { margin: calc(var(--dw) * .03) 0 0; padding: 0; list-style: none; display: grid; gap: calc(var(--dw) * .01); }
+.intro-board li { font: 500 calc(var(--dw) * .05)/1.25 "Inter", system-ui, sans-serif; }
+.intro-board hr { margin: calc(var(--dw) * .04) 0 calc(var(--dw) * .035); border: 0; border-top: 1.5px dashed rgba(239, 232, 220, .5); }
+.intro-board small { display: block; margin-top: calc(var(--dw) * .035); font: 500 calc(var(--dw) * .04)/1.2 "Inter", system-ui, sans-serif; letter-spacing: .04em; color: var(--chalk-hi); opacity: .85; }
+.intro-legs { display: flex; justify-content: space-between; padding-inline: 12%; height: calc(var(--dh) * .11); }
+.intro-legs i { display: block; width: calc(var(--dw) * .03); background: var(--wood); border-radius: 0 0 2px 2px; transform-origin: top; }
+.intro-legs i:first-child { transform: rotate(6deg); }
+.intro-legs i:last-child { transform: rotate(-6deg); }
+
+.intro-plant { left: calc(50% - var(--dw) * 1.38 - var(--t)); bottom: calc(100% - var(--floor) - var(--dh) * .05); width: calc(var(--dw) * .46); aspect-ratio: 1 / 1.25; }
+.intro-plant i { position: absolute; display: block; }
+.intro-plant .leaf { aspect-ratio: 1; border-radius: 50%; background: var(--leaf); }
+.intro-plant .is-a { left: 6%; top: 22%; width: 52%; background: var(--leaf-dk); }
+.intro-plant .is-b { right: 4%; top: 16%; width: 56%; }
+.intro-plant .is-c { left: 24%; top: 0; width: 52%; background: var(--leaf-hi); }
+.intro-plant .pot { left: 15%; right: 15%; bottom: 0; height: 40%; background: linear-gradient(90deg, var(--clay), #8b4430); clip-path: polygon(0 0, 100% 0, 88% 100%, 12% 100%); }
+.intro-plant .rim { left: 11%; right: 11%; bottom: 34%; height: 9%; border-radius: 3px; background: #b65e43; }
+
+@media (max-width: 760px), (max-aspect-ratio: 5 / 4) {
+  .intro-menu, .intro-plant { display: none; }
+}
+
+/* ---------- Skip ---------- */
+.intro-skip {
+  position: absolute; right: max(16px, env(safe-area-inset-right, 0px)); bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  padding: .55rem .9rem; border: 1px solid rgba(251, 246, 239, .35); border-radius: 999px; background: rgba(43, 35, 31, .55);
+  color: var(--cream); font: 600 .75rem/1 "Inter", system-ui, sans-serif; letter-spacing: .04em; cursor: pointer;
+}
+.intro-skip:hover { background: rgba(251, 246, 239, .12); }
+.intro-skip:focus-visible { outline: 2px solid var(--brass); outline-offset: 3px; }

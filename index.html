@@ -12,14 +12,25 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="styles-paper.css">
+  <link rel="stylesheet" href="intro.css">
+  <script>
+    /* Door intro: keep the page behind the shopfront colour until intro.js draws the door (3 s at most). */
+    (function () {
+      if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      var d = document.documentElement;
+      d.classList.add("intro-pending");
+      setTimeout(function () { d.classList.remove("intro-pending"); }, 3000);
+    })();
+  </script>
 </head>
 <body data-theme="paper" data-variant="paper">
   <div id="app"></div>
   <noscript><p style="padding:24px">COOK·E: a benchmark for human-robot collaboration in long-horizon kitchen tasks. This page needs JavaScript.</p></noscript>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
   <script src="content.js"></script>
-  <script src="figures.js"></script>
   <script src="vendor/gsap.min.js"></script>
+  <script src="intro.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+  <script src="figures.js"></script>
   <script src="vendor/ScrollTrigger.min.js"></script>
   <script src="main.js"></script>
 </body>
