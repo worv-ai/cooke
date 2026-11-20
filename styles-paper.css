@@ -1,0 +1,70 @@
+/* COOK·E paper style (index.html). Loads after styles.css and swaps tokens, fonts and headers so the page
+ * reads like the paper's teaser: cream cards, ink #2b2220, terracotta #B8432C headings, pink panel-header bars,
+ * Inter throughout. The neutrals sit halfway between the paper's cream and a blush white (less yellow). Light only: every color is set here explicitly, nothing follows the system theme. */
+body[data-theme="paper"] {
+  --bg: #faf4f0; --fg: #2b2220; --muted: #6a5951; --line: #e8d9d1; --surface: #ffffff;
+  --tomato: #b8432c; --cream: #faf4f0; --bar: #f3e1da; --good: #2f6b47; --bad: #b8432c;
+  --plot-bg: #ffffff; --plot-line: #ecdfd8;
+  --display: "Inter", system-ui, sans-serif;
+  --body: "Inter", system-ui, sans-serif;
+  --mono: "Inter", system-ui, sans-serif;
+  --head-font: "Inter", system-ui, sans-serif;
+  --r-m: 14px;
+  color-scheme: light;
+  background: #faf4f0; color: #2b2220;
+}
+
+/* Numbers and short labels keep tabular figures in Inter. */
+body[data-theme="paper"] .sec-no, body[data-theme="paper"] .tag, body[data-theme="paper"] .task-facts dd,
+body[data-theme="paper"] .ep-nums dd, body[data-theme="paper"] .stat b { font-variant-numeric: tabular-nums; }
+body[data-theme="paper"] .nav ul a, body[data-theme="paper"] .tag, body[data-theme="paper"] .ep-mode,
+body[data-theme="paper"] .g-lbl, body[data-theme="paper"] .task-facts dt, body[data-theme="paper"] .hs-steps small,
+body[data-theme="paper"] .mt-card h4 small, body[data-theme="paper"] .ov-abs h3, body[data-theme="paper"] .ph-tag { letter-spacing: .02em; font-weight: 600; }
+
+/* Hero: cream, brown wordmark under the awning, as in the teaser. */
+body[data-theme="paper"] .hero { --bg: #faf4f0; --fg: #2b2220; --muted: #6a5951; --line: #e2d2c8; background: #faf4f0; color: #2b2220; }
+body[data-theme="paper"] .hero .wm-day { display: inline; }
+body[data-theme="paper"] .hero .wm-night { display: none; }
+body[data-theme="paper"] .hero-title { font-weight: 700; letter-spacing: -.015em; }
+body[data-theme="paper"] .hero-exp b { color: #b8432c; }
+body[data-theme="paper"] .btn { background: #ffffff; border-color: #e2d2c8; font-weight: 600; }
+body[data-theme="paper"] a.btn:hover { background: #b8432c; border-color: #b8432c; color: #ffffff; }
+body[data-theme="paper"] .hero-clip .frame { box-shadow: 0 0 0 1px #e8d9d1; }
+
+/* Section headers: a pink bar with a terracotta title, like the teaser's panel headers. */
+body[data-theme="paper"] .sec-head h2 {
+  gap: .5rem; padding: .7rem 1.1rem; border-radius: 12px; background: #f3e1da; color: #b8432c;
+  font: 700 clamp(1.25rem, 1.05rem + .8vw, 1.75rem)/1.2 "Inter", system-ui, sans-serif; letter-spacing: -.01em;
+}
+body[data-theme="paper"] .sec-no { color: #b8432c; font-weight: 700; font-size: inherit; transform: none; }
+body[data-theme="paper"] .sec-no::before { content: "("; }
+body[data-theme="paper"] .sec-no::after { content: ")"; }
+body[data-theme="paper"] .claim { margin-top: 1.1rem; color: #2b2220; font: 700 var(--t-sub)/1.3 "Inter", system-ui, sans-serif; letter-spacing: -.01em; }
+body[data-theme="paper"] .claim em { font-style: normal; color: #b8432c; }
+body[data-theme="paper"] .sub { font-weight: 700; color: #b8432c; }
+body[data-theme="paper"] .lede, body[data-theme="paper"] .note { color: #6a5951; }
+
+/* Cards: white on cream with a hairline, like the teaser's panels. */
+body[data-theme="paper"] .stat, body[data-theme="paper"] .task, body[data-theme="paper"] .mt-card,
+body[data-theme="paper"] .fail, body[data-theme="paper"] .ep, body[data-theme="paper"] .finding,
+body[data-theme="paper"] .rs-link, body[data-theme="paper"] .plot-card, body[data-theme="paper"] .md { background: #ffffff; border: 1px solid #e8d9d1; }
+body[data-theme="paper"] .stat b { font-weight: 800; color: #b8432c; letter-spacing: -.02em; }
+body[data-theme="paper"] .task h4, body[data-theme="paper"] .mt-card h4, body[data-theme="paper"] .fail h3,
+body[data-theme="paper"] .ep-meta b, body[data-theme="paper"] .rs-link b, body[data-theme="paper"] .finding h4,
+body[data-theme="paper"] .pending h3, body[data-theme="paper"] .ph-title { font-weight: 700; letter-spacing: -.01em; }
+body[data-theme="paper"] .task-head { margin: -.875rem -.875rem 0; padding: .6rem .875rem; background: #f3e1da; border-radius: 13px 13px 0 0; }
+body[data-theme="paper"] .task h4 { color: #b8432c; }
+body[data-theme="paper"] .chip { background: transparent; color: #6a5951; padding: 0; font-weight: 600; text-transform: none; font-size: .8125rem; }
+body[data-theme="paper"] .task-ch { color: #b8432c; font-weight: 600; font-size: .8125rem; }
+body[data-theme="paper"] .mt-sym { font: italic 700 1.5rem/1 "Inter", system-ui, sans-serif; color: #b8432c; }
+body[data-theme="paper"] .hs-blocked { background: #ffffff; }
+body[data-theme="paper"] .ph { background: repeating-linear-gradient(135deg, #ffffff 0 18px, #f6ece7 18px 36px); }
+body[data-theme="paper"] .ov-video, body[data-theme="paper"] .frame { background: #f1e6e0; }
+body[data-theme="paper"] .ep .frame, body[data-theme="paper"] .hero-clip .frame { background: #1c1815; }
+body[data-theme="paper"] .seg.is-chips button { border-color: #e2d2c8; color: #6a5951; background: #ffffff; }
+body[data-theme="paper"] .seg.is-chips button[aria-pressed="true"] { background: #2b2220; color: #ffffff; border-color: #2b2220; }
+body[data-theme="paper"] .bib { background: #ffffff; border: 1px solid #e8d9d1; color: #6a5951; font-family: ui-monospace, "SFMono-Regular", Menlo, monospace; }
+body[data-theme="paper"] .pending { background: #ffffff; }
+body[data-theme="paper"] .foot { background: #b8432c; color: #ffffff; }
+body[data-theme="paper"] .foot .wm-day { display: none; }
+body[data-theme="paper"] .foot .wm-night { display: inline; }
