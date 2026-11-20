@@ -3,7 +3,7 @@
  * S and B, then one task per column (S or B). Numbers and copy come from leaderboard-data.js; the footer from
  * content.js. Rows keep the paper's agent order until the reader sorts a column. A first click puts the better
  * values first (high S, low B), a second click reverses, a third returns to the paper's order. The two references
- * stay at the bottom. Night mode follows the same rule and remembered choice as the project page.
+ * stay at the bottom. The page always uses the light theme.
  */
 (() => {
   const C = window.CONTENT;
@@ -39,7 +39,6 @@
     <header class="lb-top"><div class="wrap lb-top-in">
       <a class="lb-home" href="index.html" aria-label="COOK·E project page">${wordmark()}</a>
       <a class="lb-back" href="index.html">← Project page</a>
-      <button class="mode" id="mode" type="button" role="switch" aria-label="Night mode" aria-checked="true"><span class="mode-label">Night mode</span><i aria-hidden="true"></i><b id="mode-state">On</b></button>
     </div></header>
     <main>
       <section class="pad lb" id="leaderboard"><div class="wrap">
@@ -62,27 +61,8 @@
     </main>
     <footer class="foot"><div class="wrap foot-in">${wordmark()}<p>${C.resources.footer}</p></div></footer>`;
 
-  /* ---------- Night mode (the same rule and stored choice as main.js) ---------- */
-
-  const NIGHT_KEY = "cooke-night";
-  const systemDark = matchMedia("(prefers-color-scheme: dark)");
-  let chosen = null;
-  try { chosen = localStorage.getItem(NIGHT_KEY); } catch { /* storage blocked: follow the system */ }
-  let night = chosen ? chosen === "on" : systemDark.matches;
-  const applyTheme = () => {
-    document.body.dataset.theme = night ? "ink" : "cream";
-    $("#mode").setAttribute("aria-checked", night);
-    $("#mode-state").textContent = night ? "On" : "Off";
-    $('meta[name="theme-color"]').content = night ? "#141210" : "#f4f2f1";
-  };
-  $("#mode").addEventListener("click", () => {
-    night = !night;
-    chosen = night === systemDark.matches ? null : night ? "on" : "off";
-    try { if (chosen) localStorage.setItem(NIGHT_KEY, chosen); else localStorage.removeItem(NIGHT_KEY); } catch { /* not remembered */ }
-    applyTheme();
-  });
-  systemDark.addEventListener("change", (e) => { if (!chosen) { night = e.matches; applyTheme(); } });
-  applyTheme();
+  /* Always the light theme: the leaderboard has no night mode. */
+  document.body.dataset.theme = "cream";
 
   /* ---------- Table ---------- */
 
