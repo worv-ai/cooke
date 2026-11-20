@@ -156,7 +156,7 @@
 
   // The demo video, right under the hero (the Video button points here). It plays only when the reader starts it.
   const DM = C.demo;
-  // Full width, edge to edge, with no heading: the body starts below it.
+  // Centred at 75% of the page width, with no heading: the body starts below it.
   const demos = `<section class="dm" id="demo" aria-label="${DM.kicker}">
     <video src="${DM.src}" poster="${DM.poster}" controls playsinline preload="metadata" aria-label="${DM.label}"></video>
     ${DM.note ? `<p class="dm-note" lang="ko">${DM.note}</p>` : ""}

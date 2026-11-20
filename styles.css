@@ -726,10 +726,11 @@ body[data-theme="cream"] .hero .wm-night { display: none; }
 .rwr-points b { color: var(--fg); font-weight: 600; }
 
 /* Demo candidates (temporary review section). */
-/* Demo video: full width, edge to edge, straight under the hero. */
-.dm { background: #000; }
-.dm video { display: block; width: 100%; height: auto; }
-.dm-note { padding: .75rem var(--gutter); background: var(--bg); text-align: center; font: 500 .875rem/1.4 var(--body); color: var(--muted); }
+/* Demo video: centred at 75% of the page width, straight under the hero. */
+.dm { padding-top: clamp(2rem, 4vw, 3.5rem); }
+.dm video { display: block; width: 75%; height: auto; margin-inline: auto; border-radius: var(--r-m); background: #000; }
+@media (max-width: 640px) { .dm video { width: 100%; border-radius: 0; } }
+.dm-note { padding: .75rem var(--gutter); text-align: center; font: 500 .875rem/1.4 var(--body); color: var(--muted); }
 /* About three times the usual section gap between the demo video and the abstract. */
 .dm + .pad { padding-top: clamp(9rem, 18vw, 16rem); }
 
@@ -803,7 +804,7 @@ body[data-theme="cream"] .hero .wm-night { display: none; }
 
 /* Side rail: the top bar turns into a column once there is room for one. */
 @media (min-width: 1280px) {
-  main > section:not(.hero):not(.dm) { padding-left: var(--rail); } /* the demo video stays full width */
+  main > section:not(.hero):not(.dm) { padding-left: var(--rail); } /* the demo video is centred on the whole page */
   .nav { inset: 0 auto 0 0; width: var(--rail); padding: 1.5rem 0 1.5rem 1.5rem; transform: translateX(-.5rem); }
   .nav::before { display: none; }
   .nav.is-on.is-end { opacity: 0; pointer-events: none; }
