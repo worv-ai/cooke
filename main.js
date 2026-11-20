@@ -340,12 +340,14 @@
       <figure class="rws">${rwSetup(RW.setup.labels)}<figcaption>${RW.setup.caption}</figcaption></figure>
       <div class="rwc">${[RW.compare.same, RW.compare.diff].map(([t, items], i) => `<div class="${i ? "is-diff" : ""}"><h3>${t}</h3><ul>${items.map((x) => `<li>${x}</li>`).join("")}</ul></div>`).join("")}</div>
     </div>
-    <figure class="rwo" data-r>
-      <figcaption><b>${RW.order.title}</b></figcaption>
-      ${rwOrder(RW.order)}
-      <p>${RW.order.note}</p>
-    </figure>
-    <ul class="rwr-points">${RW.points.map((x) => `<li>${x}</li>`).join("")}</ul>
+    <div class="rwo-row" data-r>
+      <figure class="rwo">
+        <figcaption><b>${RW.order.title}</b></figcaption>
+        ${rwOrder(RW.order)}
+        <p>${RW.order.note}</p>
+      </figure>
+      <ul class="rwr-points">${RW.points.map((x) => `<li>${x}</li>`).join("")}</ul>
+    </div>
     <p class="kr-note">${RW.note}</p>
     <div class="rw-block" data-r>
       <div class="rw-head"><h3>Real-world footage</h3><span class="badge">Stand-in clips</span></div>

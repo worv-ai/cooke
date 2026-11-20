@@ -110,9 +110,9 @@ Object.assign(window.CONTENT, {
       note: "The order is largely preserved. Only the two hardest tasks swap: Fruit Skewer, which demands the most precise manipulation, becomes the hardest in the real world.",
     },
     points: [
-      "<b>The same failures.</b> Slow decisions leave the arm in the participant's reach, imprecise manipulation misplaces items that the participant corrects, and agents retry failed actions instead of asking for help. These failures arise from the agents themselves rather than from artifacts of the simulated partner.",
-      "<b>Consistent with simulation.</b> Across all 40 combinations, real and simulated scores are strongly correlated, largely reflecting the shared task difficulty; the order of agents within a task agrees less consistently.",
-      "<b>Two differences.</b> GPT-6 Astra reduces the participant's burden in Canapé but not that of the simulated human, suggesting that the simulated human reacts more strongly to obstruction. The real robot holds its pose while the model computes.",
+      "<b>Same failures.</b> Slow decisions leave the arm in reach, misplaced items need correcting, and agents retry instead of asking for help.",
+      "<b>Consistent with simulation.</b> Real and simulated scores correlate strongly across the 40 combinations, mostly through task difficulty.",
+      "<b>Two differences.</b> GPT-6 Astra lowers the participant's burden in Canapé but not the simulated human's, and the real robot holds its pose while the model computes.",
     ],
     note: "Given the small number of participants and trials, the paper regards this evaluation as preliminary.",
   },

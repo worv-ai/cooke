@@ -948,7 +948,10 @@ body[data-theme="ink"] .rt-table td.is-help { background: color-mix(in srgb, #ee
 .rwc .is-diff h3 { color: var(--tomato); }
 .rwc ul { display: grid; gap: .375rem; margin-top: .625rem; }
 .rwc li { padding-left: .875rem; border-left: 2px solid var(--line); font-size: var(--t-small); }
-.rwo { margin: var(--block) 0 0; max-width: 34rem; }
+.rwo-row { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 1.5rem clamp(1.5rem, 4vw, 3rem); align-items: center; margin-top: var(--block); }
+.rwo { margin: 0; }
+.rwo-row .rwr-points { margin-top: 0; }
+@media (max-width: 1000px) { .rwo-row { grid-template-columns: minmax(0, 1fr); } }
 .rwo figcaption b { font: var(--display-w) var(--t-sub)/1.15 var(--display); letter-spacing: -.01em; }
 .rwo-svg { display: block; width: 100%; height: auto; margin-top: 1rem; overflow: visible; }
 .rwo p { margin-top: .75rem; font-size: var(--t-small); color: var(--muted); }
