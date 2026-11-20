@@ -3,19 +3,23 @@
  *
  * To change copy: edit the strings below. Inline <em> and <b> are allowed.
  * To add a video: put the file in media/ and set `src`, e.g.
- *   media: { src: "media/fruit-skewer.mp4", poster: "media/fruit-skewer.jpg", label: "..." }
+ *   media: { src: "media/tasks_3-fruit-skewer_free-on_argon.mp4", poster: "media/tasks_3-fruit-skewer_free-on_argon.jpg", label: "..." }
+ * Media names start with the page section that shows them (hero_, overview_, tasks_, real-world_), then the task
+ * number and name in the paper's order, the mode (free/aware = latency, on/off = communication) and the agent.
+ * media/demovideo/ holds the demo-video drafts, media/unused/ the files no page uses.
  * While `src` is empty the page shows a placeholder using `label` and `spec`.
  * A link with `href: null` renders as disabled and shows `pending`.
  * Figures carry no captions except the paper's own (Table 1).
  * Short labels inside the animated diagrams live in figures.js.
- * Page order: abstract, overview, 01 Motivation (with the benchmark and the human simulator),
- * 02 Tasks (task players with the evaluation modes and rollouts), 03 Metrics (plot, then formulas).
+ * Page order: hero, demo candidates (temporary), abstract, key results, overview, 01 Motivation (with the
+ * benchmark and the human simulator), 02 Tasks (task players), 03 Metrics (S, B and W), 04 Results,
+ * 05 Why robots fail, 06 Real world, resources. Copy for key results and 04–06 is in content-results.js.
  *
  * TEMP FIGURES: the paper's figures are still placeholders, so the figures are drawn from the
  * paper text and the task configs. Replace them when the final figures exist. The task-player
  * timeline is a schematic and says so.
- * TEMP COPY: the paper's task sections are unfinished, so the task descriptions of Sandwich,
- * Canapé, and Marshmallow come from the task configs. Check them against the final paper.
+ * Task names and order follow the submitted paper (Sandwich, Canapé, Fruit Skewer, S'mores, Cleanup).
+ * The abstract is the paper's. Results, failures and real-world copy live in content-results.js.
  *
  * Task facts, evaluation settings and results follow the code merged from integrate/hrc-all-tasks
  * (configs/evaluation, configs/scenario_scripts, docs/runbooks). Results are the Fruit Skewer v5c
@@ -29,26 +33,31 @@
 window.CONTENT = {
   hero: {
     title: "Beyond Solo Tasks, Towards Human-Robot Collaboration in Long-Horizon Kitchen Tasks",
+    expansion: "<b>CO</b>llaborative <b>O</b>pen <b>K</b>itchen-<b>E</b>valuation",
     authors: "Authors withheld during anonymous review",
     pending: "After review",
     links: [
       { label: "Paper", href: null },
       { label: "Code", href: null },
-      { label: "Video", href: null },
+      { label: "Video", href: "#demo" },
     ],
-    /* TEMP */
-    media: { src: "media/hero.jpg", label: "A human and a robot working at the same kitchen table" },
+    /* The link under the buttons (leaderboard.html). */
+    leaderboard: { label: "Leaderboard", note: "Every agent, every task, four modes", href: "leaderboard.html" },
+    /* Silent loop behind the title: the five tasks and one real-world run (demo candidate A). Stand-in footage. */
+    /* ?v= changes the URL whenever the file is replaced, so browsers do not keep showing a cached copy. */
+    media: { src: "media/hero_loop.mp4?v=3", poster: "media/hero_loop.jpg?v=3", autoplay: true, label: "Five simulated kitchen tasks and one real-world run, looping" },
   },
 
   /*
    * Verbatim from the draft abstract. The final sentence stands in for the
    * draft's unfinished "key findings" sentences: replace it with the final text.
    */
+  /* Verbatim from the submitted paper's abstract (28664.pdf). */
   abstract: {
     kicker: "Abstract",
-    lead: "Are current embodied models ready for human–robot collaboration (HRC)?",
+    lead: "Are current embodied policies ready to collaborate with real humans?",
     body:
-      "We identify a notable gap in existing benchmarks: while reliable HRC requires robots to integrate manipulation, planning, and communication, current benchmarks assess these capabilities in isolation and rarely account for real-time inference latency. Consequently, it remains unclear how well current embodied models collaborate with humans in practice. To address this gap, we introduce COOK·E, a benchmark comprising five long-horizon collaborative kitchen tasks, each designed to evaluate diverse collaborative behaviors: sequential collaboration, parallel collaboration, fine-grained manipulation, time-dependent constraints, and shared-resource constraints. We adopt embodied agents as our primary baselines, as their strong reasoning and generalization capabilities enable them to operate across diverse and dynamic HRC scenarios without task-specific fine-tuning. Our experiments cover both simulated and real-world environments.",
+      "While reliable human–robot collaboration (HRC) requires the joint evaluation of robot manipulation, planning, communication, and latency, existing benchmarks typically evaluate these capabilities in human-free environments, with scripted partners, or in simplified setups, and they neglect inference latency. Consequently, the ability of current embodied policies to collaborate with humans in practice remains unclear. We introduce <b>COOK·E</b> (<b>CO</b>llaborative <b>O</b>pen <b>K</b>itchen-<b>E</b>valuation), a benchmark comprising five long-horizon kitchen tasks spanning sequential and parallel collaboration, fine-grained manipulation, time-dependent constraints, and shared-resource constraints. Evaluations of frontier generalist embodied policies, including GPT-6 Astra, Gemini 4 Argon, Claude Opus 5.5, and Claude Fable 5.2, show that human–robot teams underperform a human working alone on average, in both simulation and the real world. Collaborative failures arise not from a single capability bottleneck but from the compounding effects of imprecise manipulation, insufficient planning, and high latency, which collectively obstruct shared workspaces and cause errors that require human recovery. Our metrics capture task efficiency (completion time and task progress) and human burden (time spent on subtasks), providing a comprehensive assessment of task performance and the impact of robot assistance on human workload. We will publicly release COOK·E.",
   },
 
   /* TEMP: stands in for the paper's teaser figure. */
@@ -167,7 +176,7 @@ window.CONTENT = {
 
   /* Shown inside 01 Motivation, after the comparison table. */
   benchmark: {
-    heading: "COOK·E: one kitchen, one goal, <em>two agents acting at once.</em>",
+    heading: "<b>COOK·E</b>: one kitchen, one goal, <em>two agents acting at once.</em>",
     body: "In each episode, a robot and a human act concurrently in a shared kitchen to accomplish a common goal. The robot gets the goal as one sentence, and both agents get the same recipe.",
     principles: [
       {
@@ -207,8 +216,13 @@ window.CONTENT = {
     /* The simulator, in short (the paper's Sec. 05). */
     human: {
       title: "Human simulator",
-      flow: [["Observe", "human"], ["Propose", "human"], ["Validate", "cool"], ["Execute", "cool"]],
-      body: "The human is a full-body avatar driven by a vision-language model (Qwen3.5-9B) and a custom state engine. From its own view, the dialogue, the recipe and the subtasks the engine offers, the model proposes a next subtask and an optional message. The engine checks the proposal against the task state and runs it as a verified whole-body skill, or sends it back. The partner therefore adapts (it takes over abandoned subtasks, answers questions, steps back when the robot is in the way) yet stays reproducible.",
+      lead: "A simulated person that <em>adapts like a partner and replays like a script.</em>",
+      steps: [
+        ["Observe", "human", "Its own camera view, the dialogue and the recipe."],
+        ["Propose", "human", "A vision-language model (Qwen3.5-9B) picks the next subtask, and a message if needed."],
+        ["Validate", "cool", "A state engine checks the subtask against the task state."],
+        ["Execute", "cool", "The engine runs it as a verified whole-body skill, or sends it back."],
+      ],
     },
   },
 
@@ -269,7 +283,7 @@ window.CONTENT = {
         name: "Sandwich",
         behavior: "Sequential collaboration",
         line: "Make the daughter's sandwich layer by layer; ketchup and hot sauce sit in two identical red bottles.",
-        poster: "media/task-sandwich.jpg",
+        poster: "media/overview_task-1-sandwich.jpg",
         clips: { free: "sandwich-free-on-argon", aware: "sandwich-aware-on-argon" },
         sync: { intro: 2 },
         art: { kind: "sandwich", title: "Finished: one example order" },
@@ -289,10 +303,28 @@ window.CONTENT = {
         },
       },
       {
+        name: "Canapé",
+        behavior: "Parallel collaboration",
+        line: "Make six canapés on three plates; each agent works from its own ingredients, in any order.",
+        poster: "media/overview_task-2-canape.jpg",
+        clips: { free: "canape-free-on-astra", aware: "canape-aware-on-argon" },
+        sync: { intro: 2, rounds: 6 },
+        art: { kind: "canape", title: "Finished: two canapés on each plate" },
+        flow: {
+          title: "One canapé",
+          steps: [
+            ["Base", "Cracker or cucumber slice"],
+            ["Middle", "Herb cheese, feta, or cheese square"],
+            ["Topping", "Salmon, shrimp, or ham"],
+          ],
+          repeat: "Repeat for all 6 canapés, in any order",
+        },
+      },
+      {
         name: "Fruit Skewer",
         behavior: "Fine-grained manipulation",
         line: "Make four fruit skewers, one per family member, each threaded in the order the recipe gives.",
-        poster: "media/task-skewer.jpg",
+        poster: "media/overview_task-3-fruit-skewer.jpg",
         clips: { free: "fruit-free-on-argon", aware: "fruit-aware-on-argon" },
         sync: { intro: 2, rounds: 4 },
         art: { kind: "skewer", title: "Finished: four skewers on the plate" },
@@ -309,28 +341,10 @@ window.CONTENT = {
         },
       },
       {
-        name: "Canapé",
-        behavior: "Parallel collaboration",
-        line: "Make six canapés on three plates; each agent works from its own ingredients, in any order.",
-        poster: "media/task-canape.jpg",
-        clips: { free: "canape-free-on-astra", aware: "canape-aware-on-argon" },
-        sync: { intro: 2, rounds: 6 },
-        art: { kind: "canape", title: "Finished: two canapés on each plate" },
-        flow: {
-          title: "One canapé",
-          steps: [
-            ["Base", "Cracker or cucumber slice"],
-            ["Middle", "Herb cheese, feta, or cheese square"],
-            ["Topping", "Salmon, shrimp, or ham"],
-          ],
-          repeat: "Repeat for all 6 canapés, in any order",
-        },
-      },
-      {
-        name: "Marshmallow",
+        name: "S'mores",
         behavior: "Time-dependent constraints",
-        line: "Toast marshmallows over one heater and take each off while golden, before it burns.",
-        poster: "media/task-marshmallow.jpg",
+        line: "Make three s'mores: toast each marshmallow over the heater and take it off once its top is brown, before it melts and falls.",
+        poster: "media/overview_task-4-smores.jpg",
         clips: { free: "marshmallow-free-on" },
         sync: { intro: 2 },
         art: { kind: "marshmallow", title: "Each marshmallow has a time window" },
@@ -348,10 +362,10 @@ window.CONTENT = {
         },
       },
       {
-        name: "Table Cleanup",
+        name: "Cleanup",
         behavior: "Shared-resource constraints",
         line: "Clear the table after a meal, sharing one tray, cup, bin, brush and towel by the household's rules.",
-        poster: "media/task-cleanup.jpg",
+        poster: "media/overview_task-5-cleanup.jpg",
         clips: { free: "cleanup-free-on", aware: "cleanup-aware-on" },
         sync: { intro: 2 },
         art: { kind: "cleanup", title: "The table at the start" },
@@ -382,7 +396,8 @@ window.CONTENT = {
   metrics: {
     kicker: "Metrics",
     heading: "Progress measured against <em>one human and two.</em>",
-    body: "Each human–robot run is compared with the human simulator alone and with two copies of it on the same seed.",
+    /* Wording of the references and the value stops follows the paper (Sec. 3.4). */
+    body: "We compare every human–robot team (H-R) with two human references: <b>human-alone (H)</b> and <b>two humans (H-H)</b>.",
     badge: "Preliminary",
     /* Fruit Skewer v5c (25 runs) and Canapé v3 (4 runs); two-human burden from the reference files
      * of Table Cleanup (0.38), Fruit Skewer (0.50–0.54) and Sandwich (0.66). */
@@ -435,25 +450,26 @@ window.CONTENT = {
           ],
         },
         { id: "sandwich", name: "Sandwich" },
-        { id: "cleanup", name: "Table Cleanup" },
+        { id: "cleanup", name: "Cleanup" },
       ],
       soon: "no runs yet",
     },
     score: {
-      name: "Collaboration score S",
-      short: "How much of a second human's help the robot gives.",
+      name: "Task efficiency S",
+      short: "How much sooner the work gets done, on a scale from one human (0) to two (1).",
       body: "Compares the area under the task-progress curve with both references. Because it integrates progress over time, it rewards early contributions and penalizes delays.",
       /* LaTeX, rendered with KaTeX. */
       tex: [
         String.raw`S = \frac{\mathrm{AUC} - \mathrm{AUC}_{\text{human}}}{\mathrm{AUC}_{\text{two humans}} - \mathrm{AUC}_{\text{human}}}`,
         String.raw`\mathrm{AUC} = \frac{1}{T}\int_0^{T} p(t)\,dt`,
       ],
-      where: "p(t): task progress; T: twice the human-only completion time.",
+      where: "p(t): task progress, from 0 to 1; T: twice the completion time of H.",
+      better: "Higher is better",
+      /* [value, meaning, tone, reference it matches] */
       stops: [
-        ["S = 1", "As much help as a second human", "robot"],
-        ["0 < S < 1", "Robot helped", "robot"],
-        ["S = 0", "No net effect", "mute"],
-        ["S < 0", "Robot slowed the human down", "tomato"],
+        ["S = 1", "matches H-H", "robot", "Two humans"],
+        ["S = 0", "matches H", "mute", "Human-alone"],
+        ["S < 0", "less progress over time than the human-alone baseline", "tomato"],
       ],
     },
     burden: {
@@ -462,11 +478,24 @@ window.CONTENT = {
       body: "The human's active working time plus the work still remaining at the end of the episode, divided by the human-only active working time.",
       tex: [String.raw`B = \frac{H + V(s_{\text{end}})}{H_{\text{human}}}`],
       where: "H: the human's active time; V(s): the time the human alone still needs from state s.",
+      better: "Lower is better",
       stops: [
-        ["B ≈ 0.5", "As with a second human", "robot"],
-        ["B < 1", "Robot took work off the human", "robot"],
-        ["B = 1", "As much work as alone", "mute"],
-        ["B > 1", "Robot created extra work", "tomato"],
+        ["B ≈ 0.5", "for H-H", "robot", "Two humans"],
+        ["B < 1", "when the robot takes work off the human", "robot"],
+        ["B = 1", "for H", "mute", "Human-alone"],
+      ],
+    },
+    delay: {
+      name: "Human delayed time W",
+      short: "The time the human loses because of the robot.",
+      body: "The human delayed time caused by the robot, including time spent being blocked by the robot's arm, waiting for an item or action that only the robot can provide, and fixing errors caused by the robot.",
+      tex: [String.raw`W = W_{\text{blocked}} + W_{\text{waiting}} + W_{\text{fixing}}`],
+      where: "Reported as a proportion of H's completion time. Counting stops at the robot's last action; idle time with no work left is excluded.",
+      better: "Lower is better",
+      stops: [
+        ["Blocked", "The arm is where the human must reach", "tomato"],
+        ["Waiting", "For an item the robot holds", "human"],
+        ["Fixing", "Errors the robot caused", "robot"],
       ],
     },
   },
@@ -482,8 +511,8 @@ window.CONTENT = {
     "sandwich-free-on-argon": {
       robot: "Argon",
       meta: "Gemini 4 Argon with the simulated human · public recipe · recorded at 4×",
-      src: "media/sandwich-free-on-argon.mp4",
-      poster: "media/sandwich-free-on-argon.jpg",
+      src: "media/tasks_1-sandwich_free-on_argon.mp4",
+      poster: "media/tasks_1-sandwich_free-on_argon.jpg",
       label: "Sandwich, latency off, communication on, seen through the robot's head camera",
       view: "Robot head camera",
       speeds: [[0.25, "1×"], [0.5, "2×"], [1, "4×"]],
@@ -521,8 +550,8 @@ window.CONTENT = {
     "sandwich-aware-on-argon": {
       robot: "Argon",
       meta: "Gemini 4 Argon with the simulated human · public recipe · recorded at 4×",
-      src: "media/sandwich-aware-on-argon.mp4",
-      poster: "media/sandwich-aware-on-argon.jpg",
+      src: "media/tasks_1-sandwich_aware-on_argon.mp4",
+      poster: "media/tasks_1-sandwich_aware-on_argon.jpg",
       label: "Sandwich, latency on, communication on, seen through the robot's head camera",
       view: "Robot head camera",
       speeds: [[0.25, "1×"], [0.5, "2×"], [1, "4×"]],
@@ -551,8 +580,8 @@ window.CONTENT = {
     "canape-free-on-astra": {
       robot: "Astra",
       meta: "GPT-6 Astra with the simulated human · public recipe · recorded at 4×",
-      src: "media/canape-free-on-astra.mp4",
-      poster: "media/canape-free-on-astra.jpg",
+      src: "media/tasks_2-canape_free-on_astra.mp4",
+      poster: "media/tasks_2-canape_free-on_astra.jpg",
       label: "Canapé, latency off, communication on, seen through the robot's head camera",
       view: "Robot head camera",
       speeds: [[0.25, "1×"], [0.5, "2×"], [1, "4×"]],
@@ -587,8 +616,8 @@ window.CONTENT = {
     "canape-aware-on-argon": {
       robot: "Argon",
       meta: "Gemini 4 Argon with the simulated human · public recipe · recorded at 4×",
-      src: "media/canape-aware-on-argon.mp4",
-      poster: "media/canape-aware-on-argon.jpg",
+      src: "media/tasks_2-canape_aware-on_argon.mp4",
+      poster: "media/tasks_2-canape_aware-on_argon.jpg",
       label: "Canapé, latency on, communication on, seen through the robot's head camera",
       view: "Robot head camera",
       speeds: [[0.25, "1×"], [0.5, "2×"], [1, "4×"]],
@@ -607,8 +636,8 @@ window.CONTENT = {
     "fruit-free-on-argon": {
       robot: "Argon",
       meta: "Gemini 4 Argon with the simulated human · public recipe · recorded at 4×",
-      src: "media/fruit-free-on-argon.mp4",
-      poster: "media/fruit-free-on-argon.jpg",
+      src: "media/tasks_3-fruit-skewer_free-on_argon.mp4",
+      poster: "media/tasks_3-fruit-skewer_free-on_argon.jpg",
       label: "Fruit Skewer, latency off, communication on, seen through the robot's head camera",
       view: "Robot head camera",
       speeds: [[0.25, "1×"], [0.5, "2×"], [1, "4×"]],
@@ -642,8 +671,8 @@ window.CONTENT = {
     "fruit-aware-on-argon": {
       robot: "Argon",
       meta: "Gemini 4 Argon with the simulated human · public recipe · recorded at 4×",
-      src: "media/fruit-aware-on-argon.mp4",
-      poster: "media/fruit-aware-on-argon.jpg",
+      src: "media/tasks_3-fruit-skewer_aware-on_argon.mp4",
+      poster: "media/tasks_3-fruit-skewer_aware-on_argon.jpg",
       label: "Fruit Skewer, latency on, communication on, seen through the robot's head camera",
       view: "Robot head camera",
       speeds: [[0.25, "1×"], [0.5, "2×"], [1, "4×"]],
@@ -677,9 +706,9 @@ window.CONTENT = {
     "marshmallow-free-on": {
       robot: "Argon",
       meta: "Gemini 4 Argon with the simulated human · public recipe · recorded at 4×",
-      src: "media/marshmallow-free-on.mp4",
-      poster: "media/marshmallow-free-on.jpg",
-      label: "Marshmallow (s'mores), latency off, communication on, seen through the robot's head camera",
+      src: "media/tasks_4-smores_free-on_argon.mp4",
+      poster: "media/tasks_4-smores_free-on_argon.jpg",
+      label: "S'mores, latency off, communication on, seen through the robot's head camera",
       view: "Robot head camera",
       speeds: [[0.25, "1×"], [0.5, "2×"], [1, "4×"]],
       who: { human: "Human", robot: "Robot" },
@@ -712,9 +741,9 @@ window.CONTENT = {
     "cleanup-free-on": {
       robot: "Astra",
       meta: "GPT-6 Astra with the simulated human · public recipe · recorded at 4×",
-      src: "media/cleanup-free-on.mp4",
-      poster: "media/cleanup-free-on.jpg",
-      label: "Table Cleanup, latency off, communication on, seen through the robot's head camera",
+      src: "media/tasks_5-cleanup_free-on_astra.mp4",
+      poster: "media/tasks_5-cleanup_free-on_astra.jpg",
+      label: "Cleanup, latency off, communication on, seen through the robot's head camera",
       view: "Robot head camera",
       speeds: [[0.25, "1×"], [0.5, "2×"], [1, "4×"]],
       who: { human: "Human", robot: "Robot" },
@@ -957,9 +986,9 @@ window.CONTENT = {
     "cleanup-aware-on": {
       robot: "Argon",
       meta: "Gemini 4 Argon with the simulated human · public recipe · recorded at 4×",
-      src: "media/cleanup-aware-on.mp4",
-      poster: "media/cleanup-aware-on.jpg",
-      label: "Table Cleanup, latency on, communication on, seen through the robot's head camera",
+      src: "media/tasks_5-cleanup_aware-on_argon.mp4",
+      poster: "media/tasks_5-cleanup_aware-on_argon.jpg",
+      label: "Cleanup, latency on, communication on, seen through the robot's head camera",
       view: "Robot head camera",
       speeds: [[0.25, "1×"], [0.5, "2×"], [1, "4×"]],
       who: { human: "Human", robot: "Robot" },
@@ -1005,14 +1034,14 @@ window.CONTENT = {
    */
   real: {
     kicker: "Real-World Experiments",
-    body: "We are also running the tasks in a real kitchen, with real participants working beside a bimanual robot. The clips show the frames the robot's model saw, from its head camera.",
+    body: "Earlier footage from the robot's head camera, shown until the clips of the reported trials are ready.",
     badge: "In progress",
     speed: "32×",
     items: [
-      { name: "Sandwich", robot: "Gemini 4 Argon", src: "media/real-sandwich.mp4", poster: "media/real-sandwich.jpg" },
-      { name: "Fruit Skewer", robot: "GPT-6 Astra", src: "media/real-fruit.mp4", poster: "media/real-fruit.jpg" },
-      { name: "Canapé", robot: "Gemini 4 Argon", src: "media/real-canape.mp4", poster: "media/real-canape.jpg" },
-      { name: "Table Cleanup", robot: "GPT-6 Astra", src: "media/real-cleanup.mp4", poster: "media/real-cleanup.jpg" },
+      { name: "Sandwich", robot: "Gemini 4 Argon", src: "media/real-world_1-sandwich_argon.mp4", poster: "media/real-world_1-sandwich_argon.jpg" },
+      { name: "Fruit Skewer", robot: "GPT-6 Astra", src: "media/real-world_3-fruit-skewer_astra.mp4", poster: "media/real-world_3-fruit-skewer_astra.jpg" },
+      { name: "Canapé", robot: "Gemini 4 Argon", src: "media/real-world_2-canape_argon.mp4", poster: "media/real-world_2-canape_argon.jpg" },
+      { name: "Cleanup", robot: "GPT-6 Astra", src: "media/real-world_5-cleanup_astra.mp4", poster: "media/real-world_5-cleanup_astra.jpg" },
     ],
   },
 

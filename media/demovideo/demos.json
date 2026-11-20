@@ -1,0 +1,41 @@
+{
+  "items": [
+    {
+      "id": "hero-loop",
+      "title": "Hero loop",
+      "kind": "Hero slot · 16 s silent loop",
+      "src": "media/hero_loop.mp4",
+      "poster": "media/hero_loop.jpg",
+      "duration": 16.0,
+      "notes": "A 3×2 grid of the five tasks plus one real-world tile, with small task labels, looping without a visible seam. Episode clips from cjh/updates (labels cropped) and the real-world Canapé clip, all stand-in footage."
+    },
+    {
+      "id": "thesis-first",
+      "title": "Conclusion first",
+      "kind": "Main demo · ~95 s, captions",
+      "src": "media/demo_video.mp4",
+      "poster": "media/demo_video.jpg",
+      "duration": 94.8,
+      "notes": "Opens with “Who finishes first?”, answers it (the person alone, 74 of 80 settings), then the four skills, the five tasks, the simulated human, the four modes, the three failure modes, the latency numbers, the real world and an end card. No staged comparison: the opening clip is a real team episode with its caption."
+    },
+    {
+      "id": "one-episode",
+      "title": "One episode, followed",
+      "kind": "Main demo · ~57 s, live panel",
+      "src": "media/demovideo/one-episode.mp4",
+      "poster": "media/demovideo/one-episode.jpg",
+      "duration": 57.0,
+      "notes": "Follows one latency-aware Canapé episode (Claude Opus 5.5) with a live panel and a person/robot timeline. Activity lanes and the robot-still counter are measured from motion in the video, not from logs; captions were checked against the frames and the episode note."
+    },
+    {
+      "id": "numbers",
+      "title": "The numbers",
+      "kind": "Teaser · 32 s, kinetic type",
+      "src": "media/demovideo/numbers.mp4",
+      "poster": "media/demovideo/numbers.jpg",
+      "duration": 32.0,
+      "notes": "Five key numbers from the paper, one at a time, over blurred and dimmed task footage, ending on the logo. Short enough for social posts or a talk opener."
+    }
+  ],
+  "note": "A (hero loop) is now media/hero_loop.mp4 in the hero; B (thesis first) is media/demo_video.mp4 in the Demo section. C and D stay here unused."
+}

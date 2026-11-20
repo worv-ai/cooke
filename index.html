@@ -9,18 +9,43 @@
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 74 74'%3E%3Crect width='74' height='74' rx='22' fill='%23e0492f'/%3E%3Ccircle cx='24' cy='32' r='6' fill='%23141210'/%3E%3Ccircle cx='50' cy='32' r='6' fill='%23141210'/%3E%3Cpath d='M26 50c6 6 16 6 22 0' fill='none' stroke='%23141210' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=Instrument+Sans:wght@400..600&family=JetBrains+Mono:wght@400;500&family=Outfit:wght@700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&family=Geist+Mono:wght@400;500&family=Outfit:wght@700&family=Inter:wght@500;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=20261120r">
+  <link rel="stylesheet" href="intro.css?v=20261120r">
+  <script>
+    /* Door intro: keep the page behind the shopfront colour until intro.js draws the door (3 s at most). */
+    /* Set window.COOKE_INTRO_OFF = true here to skip the intro while editing the page. */
+    (function () {
+      if (window.COOKE_INTRO_OFF || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      var d = document.documentElement;
+      d.classList.add("intro-pending");
+      setTimeout(function () { d.classList.remove("intro-pending"); }, 3000);
+    })();
+  </script>
 </head>
 <body data-theme="ink">
+  <script>
+    /* Night mode before the page draws, so a light system setting gets no dark flash (main.js keeps it in sync). */
+    (function () {
+      var c = null;
+      try { c = localStorage.getItem("cooke-night"); } catch (e) {}
+      var night = c ? c === "on" : matchMedia("(prefers-color-scheme: dark)").matches;
+      document.body.dataset.theme = night ? "ink" : "cream";
+    })();
+  </script>
   <div id="app"></div>
   <noscript><p style="padding:24px">COOK·E: a benchmark for human-robot collaboration in long-horizon kitchen tasks. This page needs JavaScript.</p></noscript>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
-  <script src="content.js"></script>
-  <script src="figures.js"></script>
+  <script src="content.js?v=20261120r"></script>
+  <script src="content-results.js?v=20261120r"></script>
+  <script src="leaderboard-data.js?v=20261120r"></script>
+  <script src="leaderboard-rollouts.js?v=20261120r"></script>
+  <script src="results-table-data.js?v=20261120r"></script>
+  <script src="figures.js?v=20261120r"></script>
   <script src="vendor/gsap.min.js"></script>
+  <script src="intro.js?v=20261120r"></script>
   <script src="vendor/ScrollTrigger.min.js"></script>
-  <script src="main.js"></script>
+  <script src="main.js?v=20261120r"></script>
 </body>
 </html>

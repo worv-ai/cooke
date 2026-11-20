@@ -1,0 +1,58 @@
+/* Leaderboard page (leaderboard.html, leaderboard.js). Loads after styles.css and reuses its themes, logo, section
+ * head, segmented buttons, night-mode switch and footer. The table follows the theme like the rest of the page. */
+.skip { position: absolute; left: 1rem; top: -3rem; z-index: 50; padding: .5rem .75rem; border-radius: var(--r-s); background: var(--fg); color: var(--bg); }
+.skip:focus { top: 1rem; }
+.lb-top { position: sticky; top: 0; z-index: 10; padding-block: 1rem; background: linear-gradient(var(--bg) 70%, transparent); }
+.lb-top-in { display: flex; align-items: center; gap: clamp(1rem, 2vw, 1.75rem); }
+.lb-home { margin-right: auto; text-decoration: none; }
+.lb-top .wm { font-size: 1.75rem; }
+.lb-back { font: 500 var(--t-label)/1 var(--mono); letter-spacing: .06em; color: var(--muted); text-decoration: none; white-space: nowrap; transition: color .2s; }
+.lb-back:hover { color: var(--fg); }
+.lb { padding-top: clamp(1.5rem, 3vw, 2.5rem); }
+
+.lb-ctl { display: grid; gap: .625rem; margin-top: 2rem; }
+.lb-row { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; }
+.lb-row .seg-label { width: 8rem; padding-left: 0; }
+.lb-card { margin-top: 1.25rem; padding: clamp(.75rem, 2vw, 1.25rem); border: 1px solid var(--line); border-radius: var(--r-m); background: var(--surface); }
+.lb-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+.lb-table { width: 100%; min-width: 50rem; border-collapse: collapse; font: 400 .875rem/1.3 var(--body); font-variant-numeric: tabular-nums; }
+.lb-table caption { padding-bottom: .75rem; text-align: left; font: 400 var(--t-label)/1.4 var(--mono); color: var(--muted); }
+.lb-table th, .lb-table td { padding: .6rem .65rem; border-bottom: 1px solid var(--line); text-align: right; white-space: nowrap; }
+.lb-table thead th { padding-block: .35rem; border-bottom: 1.5px solid var(--fg); vertical-align: bottom; font-size: .78rem; font-weight: 600; }
+.lb-table th:first-child { position: sticky; left: 0; z-index: 1; text-align: left; background: var(--surface); }
+.lb-table thead button { display: inline-flex; align-items: center; gap: .3rem; padding: .3rem .4rem; border-radius: 6px; font-weight: 600; transition: background .2s, color .2s; }
+.lb-table thead button:hover { background: var(--surface-2); }
+.lb-table thead button i { width: .8em; font-style: normal; color: var(--muted); }
+.lb-table th[aria-sort="ascending"] button, .lb-table th[aria-sort="descending"] button { background: color-mix(in srgb, var(--tomato) 16%, transparent); color: var(--tomato); }
+.lb-table th[aria-sort="ascending"] button i, .lb-table th[aria-sort="descending"] button i { color: var(--tomato); }
+.lb-table tbody th { font-weight: 600; }
+.lb-table tbody th .mk { margin-right: .5rem; vertical-align: -2px; }
+.lb-table tbody tr:hover th, .lb-table tbody tr:hover td { box-shadow: inset 0 0 0 100vmax color-mix(in srgb, var(--fg) 4%, transparent); }
+
+/* Cell tints: worse than the human alone in red, better in green; the strength (--a) comes from leaderboard.js. */
+.lb-table td.is-worse { background: color-mix(in srgb, var(--tomato) var(--a), transparent); }
+.lb-table td.is-better { background: color-mix(in srgb, #3f9a66 var(--a), transparent); }
+
+.lb-s span { display: inline-block; min-width: 3.2rem; }
+.lb-rng { display: block; margin-top: .2rem; font: 400 .6875rem/1 var(--mono); color: var(--muted); letter-spacing: -.01em; }
+.lb-bar { position: relative; display: inline-block; width: 5rem; height: .55rem; margin-right: .5rem; vertical-align: middle; border-radius: 2px; background: var(--surface-2); }
+.lb-bar i { position: absolute; top: 0; bottom: 0; border-radius: 2px; }
+.lb-bar i.is-neg { background: var(--tomato); }
+.lb-bar i.is-pos { background: #3f9a66; }
+.lb-bar b { position: absolute; top: -3px; bottom: -3px; width: 1.5px; background: var(--fg); }
+
+.lb-ref th[scope="rowgroup"] { padding-top: 1.1rem; font: 500 .6875rem/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.lb-ref tr + tr th, .lb-ref td { color: var(--muted); font-weight: 500; }
+.lb-ref tr:last-child th, .lb-ref tr:last-child td { border-bottom: 0; }
+.lb-note { margin-top: .75rem; max-width: var(--measure); font-size: .8125rem; color: var(--muted); }
+
+.lb-submit { margin-top: 2rem; max-width: 40rem; padding: 1.25rem 1.5rem; border: 1px dashed var(--line); border-radius: var(--r-m); }
+.lb-submit h3 { margin-top: .75rem; font: var(--display-w) var(--t-sub)/1.2 var(--display); }
+.lb-submit p { margin-top: .5rem; color: var(--muted); }
+.lb-tag { display: inline-block; padding: .25rem .5rem; border: 1px solid var(--tomato); border-radius: 999px; font: 500 .6875rem/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--tomato); }
+
+@media (max-width: 640px) {
+  .lb-row .seg-label { width: 100%; }
+  .lb-back { display: none; }
+}
