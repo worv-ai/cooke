@@ -27,6 +27,7 @@
 
   --gutter: clamp(1rem, 4vw, 3.5rem);
   --max: 74rem;
+  --rail: 13.5rem;
   --measure: 44rem;
   --col-gap: clamp(1.25rem, 3vw, 3rem);
   --r-s: .5rem;
@@ -100,13 +101,17 @@ body[data-theme="ink"] .wm-day, body:not([data-theme="ink"]) .wm-night { display
 .hero .wm-night { display: inline; }
 .wm-eye { transform-box: fill-box; transform-origin: center; animation: blink 5s infinite; }
 @keyframes blink { 0%, 94%, 100% { transform: scaleY(1); } 97% { transform: scaleY(.1); } }
-.awning { display: flex; width: 100%; height: clamp(1.5rem, 3.2vw, 2.75rem); position: relative; z-index: 2; }
+/* Flat stripes in the logo's red and a warm white. Each scallop carries a darker edge instead of a shadow. */
+.awning {
+  --aw-a: #ca3a2b; --aw-a-edge: #a52d21; --aw-b: #fffaf5; --aw-b-edge: #e9d6ca;
+  display: flex; width: 100%; height: clamp(1.5rem, 3.2vw, 2.75rem); position: relative; z-index: 2;
+}
 .awning i {
   flex: 1; display: block; transform-origin: top;
   border-radius: 0 0 50% 50% / 0 0 clamp(.625rem, 1.2vw, 1.125rem) clamp(.625rem, 1.2vw, 1.125rem);
-  background: var(--tomato); box-shadow: inset 0 14px 18px -12px rgba(0, 0, 0, .35);
+  background: var(--aw-a); border-bottom: 2px solid var(--aw-a-edge);
 }
-.awning i:nth-child(even) { background: var(--cream); }
+.awning i:nth-child(even) { background: var(--aw-b); border-bottom-color: var(--aw-b-edge); }
 
 /* ---------- Nav: the awning (nav.js) ----------
  * Always on screen. A dark fascia (the shopfront colour from the door intro) carries the name, the section links and
@@ -140,9 +145,47 @@ body[data-theme="ink"] .wm-day, body:not([data-theme="ink"]) .wm-night { display
 .nav-menu { display: none; }
 .nav :focus-visible { outline-color: var(--nav-fg); }
 .nav .awning { height: var(--valance); transition: height .35s ease; }
-/* Pale pink between the red stripes, as in the paper figure, so the valance reads against a cream page. */
-.nav .awning i:nth-child(even) { background: #f3d9cc; }
+/* Home: no fascia. The valance hangs from a slim rail at the top of the page, and the "Sections" button floats under it. */
+html:has(.nav.is-home) { --nav-band: 0rem; }
+.nav.is-home .awning { border-top: .25rem solid var(--aw-a-edge); box-sizing: content-box; }
+.nav.is-home .nav-sections { position: absolute; top: calc(100% + .5rem); right: max(1rem, env(safe-area-inset-right, 0px)); }
+.nav.is-home .nav-menu {
+  display: inline-flex; align-items: center; gap: .4rem; padding: .5rem .8rem; border-radius: 999px;
+  background: var(--nav-bg); color: var(--nav-fg); font: 600 .8125rem/1 var(--body);
+}
+.nav.is-home .nav-menu svg { width: 1rem; height: 1rem; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; }
+.nav.is-home .nav-menu[aria-expanded="true"] { background: var(--nav-fg); color: var(--nav-bg); }
+.nav.is-home .nav-links {
+  display: none; position: absolute; top: calc(100% + .375rem); right: 0; z-index: 4; min-width: 13rem;
+  padding: .375rem; border-radius: 12px; background: var(--nav-bg); box-shadow: 0 12px 24px rgba(0, 0, 0, .25);
+}
+.nav.is-home.is-open .nav-links { display: grid; }
+.nav.is-home .nav-links a { padding: .7rem .75rem; border-radius: 8px; font-size: .9375rem; }
+.nav.is-home .nav-links a:hover { background: rgba(246, 239, 227, .08); }
+.nav.is-home .nav-links a::after { left: .75rem; right: auto; width: 1.25rem; bottom: .35rem; }
 .nav.is-compact .awning { height: var(--valance-min); }
+/* ---------- Side rail (home): the section links, in the left margin ----------
+ * As on the earlier page: from 1280px the page keeps a wide margin on both sides (--rail) and a narrower text column,
+ * and the section links sit in the left margin as a hairline list with a red mark on the current section.
+ * The rail comes in once the hero has scrolled away and steps aside for the footer (nav.js).
+ * Below 1280px a floating "Sections" button under the valance opens the same links. */
+.rail { display: none; }
+@media (min-width: 1280px) {
+  body:has(.rail) { --gutter: var(--rail); --max: calc(60rem + 2 * var(--rail)); }
+  .nav.is-home .nav-sections { display: none; }
+  .rail {
+    display: flex; align-items: center; position: fixed; inset: 0 auto 0 0; z-index: 29; width: var(--rail);
+    padding: calc(var(--nav-band) + var(--valance-min) + 1.5rem) 1.5rem 1.5rem 1.75rem; pointer-events: none;
+    opacity: 0; visibility: hidden; transform: translateX(-.5rem); transition: opacity .4s, transform .4s, visibility .4s;
+  }
+  .rail.is-on { opacity: 1; visibility: visible; transform: none; }
+  .rail.is-on.is-end { opacity: 0; visibility: hidden; }
+  .rail ul { display: grid; width: 100%; border-left: 1px solid var(--line); pointer-events: auto; }
+  .rail a { position: relative; display: block; padding: .4375rem 0 .4375rem .875rem; font: 400 .8125rem/1.2 var(--body); color: var(--muted); text-decoration: none; transition: color .2s; }
+  .rail a::before { content: ""; position: absolute; left: -1px; top: .25rem; bottom: .25rem; width: 2px; background: var(--tomato); transform: scaleY(0); transition: transform .25s; }
+  .rail a.is-active::before { transform: none; }
+  .rail a:hover, .rail a.is-active { color: var(--fg); }
+}
 .nav .mode { color: var(--nav-muted); border-color: rgba(246, 239, 227, .3); }
 .mode {
   display: inline-flex; align-items: center; gap: .5rem; padding: .375rem .625rem; flex: none;
@@ -154,10 +197,18 @@ body[data-theme="ink"] .wm-day, body:not([data-theme="ink"]) .wm-night { display
 .mode[aria-checked="true"] i::after { transform: translateX(.75rem); background: #fff; }
 
 /* ---------- Hero (dark in the page style, in both themes) ---------- */
-.hero { --bg: #141210; --fg: #f6efe3; --muted: #d6ccbb; --line: #5a5046; background: var(--bg); color: var(--fg); padding-top: var(--nav-h); padding-bottom: clamp(2.5rem, 5vw, 4rem); }
-.hero-in { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: var(--col-gap); align-items: center; padding-top: clamp(2rem, 5vw, 4rem); }
+/* The hero fills the first screen, so nothing below it shows as the door intro opens onto the page.
+ * Two columns, centred in the screen: the name and links on the left, the demo video on the right.
+ * It keeps the page's normal margins: the side rail only comes in once the hero has scrolled away. */
+.hero {
+  --bg: #141210; --fg: #f6efe3; --muted: #d6ccbb; --line: #5a5046; background: var(--bg); color: var(--fg);
+  --gutter: clamp(1rem, 4vw, 3.5rem); --max: 74rem;
+  display: grid; align-items: center;
+  min-height: 100vh; min-height: 100svh; padding-top: var(--nav-h); padding-bottom: clamp(2.5rem, 5vw, 4rem);
+}
+.hero-in { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: var(--col-gap); align-items: center; padding-top: clamp(1rem, 3vw, 2rem); }
 .hero-wm { font-size: clamp(3rem, 7vw, 6rem); line-height: .9; }
-.hero-exp { margin-top: .75rem; font: 400 var(--t-label)/1.4 var(--mono); letter-spacing: .06em; color: var(--muted); }
+.hero-exp { margin-top: 1rem; font: 400 calc(var(--t-label) * 1.5)/1.4 var(--mono); letter-spacing: .06em; color: var(--muted); }
 .hero-exp b { color: var(--tomato); font-weight: 600; }
 .hero-title { margin-top: 1rem; font: 400 clamp(1.25rem, 1rem + 1vw, 1.85rem)/1.25 var(--display); letter-spacing: -.01em; text-wrap: balance; }
 .hero-authors { margin-top: 1rem; font: 400 var(--t-label)/1.4 var(--mono); color: var(--muted); }

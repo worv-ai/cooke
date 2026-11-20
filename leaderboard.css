@@ -13,7 +13,7 @@
 .lb-table thead button { display: inline-flex; align-items: center; gap: .3rem; padding: .3rem .4rem; border-radius: 6px; color: var(--plot-ink); font-weight: 600; }
 .lb-table thead button:hover { background: #f4ece3; }
 .lb-table thead button i { width: .8em; font-style: normal; color: var(--plot-muted); }
-.lb-table th[aria-sort="ascending"] button, .lb-table th[aria-sort="descending"] button { background: #f4e4dc; color: #b8432c; }
+.lb-table th[aria-sort="ascending"] button, .lb-table th[aria-sort="descending"] button { background: #f3e1da; color: #b8432c; }
 .lb-table th[aria-sort="ascending"] button i, .lb-table th[aria-sort="descending"] button i { color: #b8432c; }
 .lb-table tbody th { font-weight: 600; }
 .lb-table tbody th .mk { margin-right: .5rem; vertical-align: -2px; }

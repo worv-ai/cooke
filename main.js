@@ -47,6 +47,7 @@
 
   // The hero has no awning of its own: the nav's valance hangs over it (nav.js).
   const H = C.hero;
+  // Two-column hero that fills the first screen: the name and links on the left, the demo video on the right.
   const hero = `<section class="hero" id="top" aria-labelledby="hero-title">
     <div class="wrap hero-in">
       <div class="hero-text">
@@ -497,8 +498,9 @@
   if (window.TEASER) TEASER.wire($("#fig1"), C, { shape, num });
 
   NAV.wire();
-  const links = Object.fromEntries(nav.map(([, id]) => [id, $(`.nav-links a[href="#${id}"]`)]));
-  const spy = new IntersectionObserver((entries) => entries.forEach((e) => links[e.target.id].classList.toggle("is-active", e.isIntersecting)), { rootMargin: "-45% 0px -50% 0px" });
+  // The current section is marked in the band's menu and in the side rail.
+  const links = Object.fromEntries(nav.map(([, id]) => [id, $$(`.nav-links a[href="#${id}"], .rail a[href="#${id}"]`)]));
+  const spy = new IntersectionObserver((entries) => entries.forEach((e) => links[e.target.id].forEach((a) => a.classList.toggle("is-active", e.isIntersecting))), { rootMargin: "-45% 0px -50% 0px" });
   nav.forEach(([, id]) => spy.observe(document.getElementById(id)));
 
   if (window.gsap && window.ScrollTrigger) {
@@ -508,7 +510,7 @@
       const awningIn = (vars) => gsap.timeline(vars)
         .from(".nav", { yPercent: -100, duration: 0.45, ease: "power3.out" })
         .from(".nav-awning i", { scaleY: 0, duration: 0.6, ease: "power3.out", stagger: { each: 0.012, from: "center" } }, "-=.2");
-      const navText = (vars) => gsap.from(".nav-in > *", { autoAlpha: 0, duration: 0.5, ease: "power2.out", stagger: 0.06, ...vars });
+      const navText = (vars) => gsap.from(".nav-sections", { autoAlpha: 0, duration: 0.5, ease: "power2.out", stagger: 0.06, ...vars });
       const heroIn = (vars) => gsap.from(".hero-text > *, .hero-clip", { autoAlpha: 0, y: 12, duration: 0.6, ease: "power3.out", stagger: 0.05, ...vars });
       const intro = window.COOKE_INTRO;
       if (intro) {

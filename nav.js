@@ -1,8 +1,10 @@
 /*
- * The site's nav, shared by index.html and leaderboard.html: the awning. A dark fascia carries the name, the
- * section links and the Leaderboard link, and the striped valance hangs from it. The valance is deep at the top of a
- * page and folds up to a narrow fringe once the page scrolls (styles.css, "Nav"). Below 1000px the section links
- * fold into a "Sections" menu. Labels live in content.js (nav).
+ * The site's nav, shared by index.html and leaderboard.html: the awning.
+ * Home: only the striped valance hangs from the top of the page, deep at the top and a narrow fringe once the page
+ * scrolls. The section links sit in a rail in the left margin from 1280px, and behind a floating "Sections" button
+ * below that. The Leaderboard link is one of the hero's buttons.
+ * Leaderboard: a dark fascia above the valance carries the name, the section links and the Leaderboard link.
+ * Styles are in styles.css ("Nav", "Side rail"). Labels live in content.js (nav).
  */
 window.NAV = (() => {
   // COOK·E logo. The face's eyes are drawn here so they can blink (positions from media/cooke-logo.json).
@@ -19,17 +21,24 @@ window.NAV = (() => {
     const N = C.nav;
     const home = page === "home";
     const href = (id) => (home ? `#${id}` : `index.html#${id}`);
-    return `<header class="nav">
-      <div class="nav-band"><div class="wrap nav-in">
-        <a class="nav-wm" href="${home ? "#top" : "index.html"}" aria-label="${home ? N.top : N.home}">${wordmark()}</a>
-        <nav class="nav-sections" aria-label="${N.label}">
+    // Home, from 1280px: the section links leave the band for a rail in the left margin (styles.css, "Side rail").
+    const rail = home ? `<nav class="rail" aria-label="${N.label}"><ul>${N.links.map(([l, id]) => `<li><a href="#${id}"><span>${l}</span></a></li>`).join("")}</ul></nav>` : "";
+    const sections = `<nav class="nav-sections" aria-label="${N.label}">
           <button class="nav-menu" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="${N.label}">${menuIcon}<span>${N.label}</span></button>
           <ul class="nav-links" id="nav-links">${N.links.map(([l, id]) => `<li><a href="${href(id)}">${l}</a></li>`).join("")}</ul>
-        </nav>
-        <a class="nav-lb" href="leaderboard.html"${home ? "" : ' aria-current="page"'}>${N.leaderboard}</a>
+        </nav>`;
+    const awning = `<div class="awning nav-awning" aria-hidden="true">${"<i></i>".repeat(24)}</div>`;
+    // Home has no fascia: only the valance hangs from the top of the page. The Leaderboard link is one of the hero's
+    // buttons (content.js), and below 1280px a floating "Sections" button stands in for the rail.
+    if (home) return `<header class="nav is-home">${awning}${sections}</header>${rail}`;
+    return `<header class="nav">
+      <div class="nav-band"><div class="wrap nav-in">
+        <a class="nav-wm" href="index.html" aria-label="${N.home}">${wordmark()}</a>
+        ${sections}
+        <a class="nav-lb" href="leaderboard.html" aria-current="page">${N.leaderboard}</a>
         ${extra}
       </div></div>
-      <div class="awning nav-awning" aria-hidden="true">${"<i></i>".repeat(24)}</div>
+      ${awning}
     </header>`;
   };
 
@@ -47,6 +56,12 @@ window.NAV = (() => {
     el.querySelector(".nav-links").addEventListener("click", (e) => { if (e.target.closest("a")) set(false); });
     document.addEventListener("keydown", (e) => { if (e.key === "Escape" && el.classList.contains("is-open")) { set(false); btn.focus(); } });
     document.addEventListener("click", (e) => { if (!el.contains(e.target)) set(false); });
+    // The side rail comes in once the hero has mostly left the screen, and steps aside for the footer.
+    const rail = document.querySelector(".rail");
+    const hero = document.querySelector(".hero");
+    const foot = document.querySelector(".foot");
+    if (rail && hero) new IntersectionObserver(([e]) => rail.classList.toggle("is-on", !e.isIntersecting), { threshold: 0.4 }).observe(hero);
+    if (rail && foot) new IntersectionObserver(([e]) => rail.classList.toggle("is-end", e.isIntersecting)).observe(foot);
   };
 
   return { wordmark, markup, wire };
