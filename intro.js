@@ -6,13 +6,20 @@
  * and is already in place when the shopfront fades. The logo, links and title come in once the visitor is inside.
  *
  * It plays on every load. A click, tap, key or scroll plays the rest at 4× speed, and so does "Skip intro".
- * It does not run with prefers-reduced-motion or without GSAP.
+ * It does not run with prefers-reduced-motion, without GSAP, or while window.COOKE_INTRO_OFF is set (index.html).
  * Hand-off to main.js: window.COOKE_INTRO.entering resolves as the walk through the doorway starts (the awning drops),
  * and .entered when it ends (logo, title and video come in). Copy on the menu board comes from content.js. */
 (() => {
   const root = document.documentElement;
   const unpend = () => root.classList.remove("intro-pending");
-  if (matchMedia("(prefers-reduced-motion: reduce)").matches || !window.gsap) { unpend(); return; }
+  if (window.COOKE_INTRO_OFF || matchMedia("(prefers-reduced-motion: reduce)").matches || !window.gsap) { unpend(); return; }
+
+  // The door always opens onto the top of the page: a reload must not bring back the last scroll position, and a
+  // section link (#results) is followed only once the intro has ended (see finish).
+  try { history.scrollRestoration = "manual"; } catch { /* not supported */ }
+  const toTop = () => scrollTo(0, 0);
+  toTop();
+  addEventListener("load", toTop, { once: true });
 
   const C = window.CONTENT || {};
   const tasks = C.benchmark?.tasks || [];
@@ -128,6 +135,9 @@
     tl.kill();
     el.remove();
     if (meta && themeColor) meta.content = themeColor;
+    removeEventListener("load", toTop);
+    const target = location.hash.length > 1 && document.getElementById(decodeURIComponent(location.hash.slice(1)));
+    if (target) target.scrollIntoView();
   };
 
   /* ---------- Timeline ---------- */

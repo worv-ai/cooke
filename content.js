@@ -69,6 +69,7 @@ window.CONTENT = {
       { label: "Video", href: null },
       { label: "Data", href: null },
       { label: "BibTeX", href: null },
+      { label: "Leaderboard", href: "leaderboard.html" },
     ],
     clip: {
       src: "media/hero-four-modes.mp4",
