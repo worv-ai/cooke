@@ -2,14 +2,17 @@
  * Leaderboard data (leaderboard.html, leaderboard.js). Copied unchanged from content.js on cjh/updates
  * (leaderboard, results.agents, results.sb, results.hhB, results.sbNote, benchmark.tasks, gallery.modeNames), where
  * the numbers are checked against the paper's facts.json. sb[task][mode][agent] is [S, B], the median over three
- * rollouts; sb.average is the five-task mean. Update both files together if the numbers change.
+ * rollouts; sb.average is the five-task mean. Update both files together if the numbers change. The per-rollout
+ * values (paper set, API) are in leaderboard-rollouts.js; the medians and the copy were checked against them on 2026-11-20.
  */
 window.LEADERBOARD = {
   "copy": {
     "title": "COOK·E Leaderboard",
     "kicker": "Leaderboard",
     "claim": "Every agent on every task, in each of the four modes. <em>On the five-task mean, no agent beats a human working alone yet.</em>",
-    "lede": "S is task efficiency on a scale where the human alone scores 0 and two humans score 1. B is the human's burden, where the human alone scores 1. Each value is the median over three rollouts, and the mean columns average the five tasks.",
+    "lede": "S is task efficiency on a scale where the human alone scores 0 and two humans score 1. B is the human's burden, where the human alone scores 1. Each value is the median over three rollouts, with the lowest and highest rollout below it; the mean columns average the five tasks.",
+    "rolloutsTitle": "Each rollout",
+    "oneRollout": "one rollout",
     "modeLabel": "Mode",
     "metricLabel": "Task columns",
     "metrics": [

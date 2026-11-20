@@ -11,10 +11,10 @@
 
   /* COOK·E logo (projectpage/cook-E.png, cut out by projectpage/make_cooke_logo.py): brown letters for the cream
    * theme, cream letters for night mode and the red footer. The face's eyes are erased from the PNGs and drawn here
-   * so they can blink; their positions come from media/cooke-logo.json. */
+   * so they can blink; their positions come from media/hero_logo-eyes.json. */
   const wordmark = () => `<span class="wm" role="img" aria-label="COOK·E"><svg viewBox="0 0 1400 248" aria-hidden="true">
-    <image class="wm-day" href="media/cooke-logo.png" width="1400" height="248"/>
-    <image class="wm-night" href="media/cooke-logo-ink.png" width="1400" height="248"/>
+    <image class="wm-day" href="media/hero_logo.png" width="1400" height="248"/>
+    <image class="wm-night" href="media/hero_logo-night.png" width="1400" height="248"/>
     <g class="wm-eye" fill="#fefdfd"><ellipse cx="560.84" cy="97.38" rx="10.82" ry="18.03"/><ellipse cx="635.68" cy="97.38" rx="10.52" ry="18.03"/></g>
   </svg></span>`;
 
@@ -22,9 +22,9 @@
 
   const media = (m) => {
     if (m.src) {
-      const isVideo = /\.(mp4|webm|mov)$/i.test(m.src);
+      const isVideo = /\.(mp4|webm|mov)(\?|$)/i.test(m.src);
       const el = isVideo
-        ? `<video src="${m.src}" ${m.poster ? `poster="${m.poster}"` : ""} muted loop playsinline preload="metadata" aria-label="${m.label}"></video>`
+        ? `<video src="${m.src}" ${m.poster ? `poster="${m.poster}"` : ""} muted loop playsinline ${m.autoplay ? 'autoplay preload="auto"' : 'preload="metadata"'} aria-label="${m.label}"></video>`
         : `<img src="${m.src}" alt="${m.label}" loading="lazy">`;
       const style = m.ratio ? ` style="aspect-ratio:${m.ratio}"` : "";
       return `<div class="media${m.plate ? " is-plate" : ""}"${style}>${el}</div>`;
@@ -99,8 +99,10 @@
 
   /* [label, id, section number, also shown in the short top bar] */
   const navItems = [
-    ["Abstract", "abstract", 0, true], ["Overview", "overview", 0, true], ["Motivation", "gap", 1, true],
-    ["Tasks", "tasks", 2, true], ["Metrics", "metrics", 3, true], ["Resources", "resources", 0, true],
+    ["Demo", "demo", 0, false], ["Abstract", "abstract", 0, true], ["Overview", "overview", 0, false],
+    ["Motivation", "gap", 1, false], ["Tasks", "tasks", 2, true], ["Metrics", "metrics", 3, false],
+    ["Results", "results", 4, true], ["Why robots fail", "failures", 5, true], ["Real world", "real", 6, true],
+    ["Resources", "resources", 0, false],
   ];
 
   const matrix = (() => {
@@ -117,7 +119,6 @@
       ${g.rows.map(([n, s]) => `<tr><td>${n}</td>${cells(s)}</tr>`).join("")}
     `).join("");
     return `<div class="matrix">
-      <p class="matrix-cap"><b>Table 1.</b> ${t.caption}</p>
       <div class="matrix-scroll"><table>
         <thead>
           <tr class="m-grp"><th></th>${grouped.map((g) => `<th colspan="${g.span}">${g.name}</th>`).join("")}</tr>
@@ -130,6 +131,7 @@
         </tbody>
       </table></div>
       <div class="matrix-legend">${["y", "h", "n"].map((k) => `<span>${glyph(k)}${t.legend[k]}</span>`).join("")}</div>
+      <p class="matrix-cap"><b>Table 1.</b> ${t.caption}</p>
     </div>`;
   })();
 
@@ -138,6 +140,7 @@
     ${awning()}
     <div class="hero-body wrap">
       <h1>${wordmark()}</h1>
+      <p class="hero-exp">${C.hero.expansion || "<b>CO</b>llaborative <b>O</b>pen <b>K</b>itchen-<b>E</b>valuation"}</p>
       <p class="hero-title">${C.hero.title}</p>
       <p class="hero-authors">${C.hero.authors}</p>
       <div class="btns">${C.hero.links.map((l) => button(l, C.hero.pending)).join("")}</div>
@@ -149,6 +152,27 @@
   const abstract = `<section class="pad" id="abstract"><div class="wrap">
     ${head({ title: C.abstract.kicker, claim: C.abstract.lead })}
     <p class="abs-body">${C.abstract.body}</p>
+  </div></section>`;
+
+  // The demo video, right under the hero (the Video button points here). It plays only when the reader starts it.
+  const DM = C.demo;
+  // Full width, edge to edge, with no heading: the body starts below it.
+  const demos = `<section class="dm" id="demo" aria-label="${DM.kicker}">
+    <video src="${DM.src}" poster="${DM.poster}" controls playsinline preload="metadata" aria-label="${DM.label}"></video>
+    ${DM.note ? `<p class="dm-note" lang="ko">${DM.note}</p>` : ""}
+  </section>`;
+
+  const KR = C.keyResults;
+  // Key results as a race: one line per team, filled at the team's average pace (raceLines() below).
+  const keyResults = `<section class="pad kr" id="key-results"><div class="wrap">
+    <h2 class="kr-title">${KR.kicker}</h2>
+    <p class="kr-claim">${KR.claim}</p>
+    <ol class="kr-race" id="kr-race">${KR.lanes.map((l, i) => `<li class="${i > 1 ? "is-robot" : ""}">
+      <span class="kr-lbl">${l}</span>
+      <span class="kr-track"><i></i></span>
+      <b class="kr-rank"></b>
+    </li>`).join("")}</ol>
+    <p class="kr-note">${KR.note} <button type="button" class="kr-replay" id="kr-replay">↻ ${KR.replay}</button></p>
   </div></section>`;
 
   const overview = `<section class="pad" id="overview"><div class="wrap">
@@ -168,11 +192,9 @@
       ${schematic(FIG.decision.html(B.decision))}
       <dl class="setup" aria-label="${B.setup.title}">${B.setup.rows.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join("")}</dl>
       <div class="hsim" id="human-sim">
-        <div>
-          <h3>${B.human.title}</h3>
-          <ol class="hsim-flow">${B.human.flow.map(([step, tone]) => `<li class="t-${tone}">${step}</li>`).join("")}</ol>
-        </div>
-        <p>${B.human.body}</p>
+        <h3>${B.human.title}</h3>
+        <p class="hsim-lead">${B.human.lead}</p>
+        <ol class="hsim-steps">${B.human.steps.map(([name, tone, line], i) => `<li class="t-${tone}"><b><span>${pad(i + 1)}</span>${name}</b><p>${line}</p></li>`).join("")}</ol>
       </div>
     </div>
   </div></section>`;
@@ -200,46 +222,133 @@
   </div></section>`;
 
   const tex = (list) => list.map((src) => `<div class="tex" data-tex="${src}">${src}</div>`).join("");
+  // A card per metric: which direction is better, then the formula, then the values that match the two references
+  // (human-alone H, two humans H-H), set apart from the rest.
   const metricCard = (m) => `<article class="mt-card">
     <h3>${m.name}</h3>
+    ${m.better ? `<p class="mt-dir">${/Higher/.test(m.better) ? "↑" : "↓"} ${m.better}</p>` : ""}
     <p class="mt-short">${m.short}</p>
     ${tex(m.tex)}
     <p class="mt-where">${m.where}</p>
-    <ul class="stops">${m.stops.map(([k, v, tone]) => `<li class="t-${tone}"><b>${k}</b><span>${v}</span></li>`).join("")}</ul>
+    <ul class="stops">${m.stops.map(([k, v, tone, ref]) => `<li class="t-${tone}${ref ? " is-ref" : ""}"><b>${k}</b><span>${ref ? `<em>${ref}</em>` : ""}${v}</span></li>`).join("")}</ul>
   </article>`;
-  const SC = C.metrics.scatter;
   const metrics = `<section class="pad" id="metrics"><div class="wrap">
     ${head({ n: 3, title: C.metrics.kicker, claim: C.metrics.heading, body: C.metrics.body })}
-    <div class="sc" data-r>
-      <div class="sc-top">
-        <h3>${SC.title}<span class="badge">${C.metrics.badge}</span></h3>
-        <div class="axis-ctl">
-          <div class="seg is-sm" id="sc-mode" role="group" aria-label="Evaluation mode">
-            ${Object.entries(SC.modes).map(([k, label], i) => `<button type="button" data-v="${k}" aria-pressed="${i === 0}">${label}</button>`).join("")}
-          </div>
-          <div class="seg is-sm" id="sc-comm" role="group" aria-label="Communication">
-            ${Object.entries(SC.comms).map(([k, label], i) => `<button type="button" data-v="${k}" aria-pressed="${i === 0}">${label}</button>`).join("")}
-          </div>
-        </div>
-      </div>
-      <p class="sc-corner">${SC.corner}</p>
-      <svg class="sc-plot" id="sc-plot" viewBox="0 0 760 420" role="img" aria-label="Collaboration score against human burden for each run"></svg>
-      <ul class="sc-legend" id="sc-legend">
-        ${[...new Map(SC.tasks.flatMap((t) => t.series || []).map((s) => [s.name, s])).values()].map((s) => `<li class="t-${s.tone}"><i class="is-sq"></i>${s.name}</li>`).join("")}
-        <li class="t-robot"><i class="is-dm"></i>Two humans</li>
-        <li class="t-mute"><i class="is-dm"></i>Human alone</li>
-        <li class="sc-note" id="sc-empty" hidden></li>
-      </ul>
-      <div class="sc-tasks" id="sc-tasks" role="group" aria-label="Task">
-        ${SC.tasks.map((t, i) => t.series
-          ? `<button type="button" class="sc-task" data-v="${i}" aria-pressed="${i === 0}">${t.name}<small>${t.series.reduce((n, s) => n + Object.values(s.runs).reduce((a, r) => a + r.length, 0), 0)} runs</small></button>`
-          : `<span class="sc-task is-off">${t.name}<small>${SC.soon}</small></span>`).join("")}
-      </div>
-      <p class="sc-find">${C.metrics.findings}</p>
+    <div class="mt-grid is-3">${metricCard(C.metrics.score)}${metricCard(C.metrics.burden)}${metricCard(C.metrics.delay)}</div>
+  </div></section>`;
+
+  // 04 Results: one table of medians (results-table-data.js). Rows: each agent at both latencies; columns: S, B and W
+  // with communication off, then on. Cells where the robot helps (S > 0 and B < 1) take the paper's shading.
+  const RS2 = C.results;
+  const RT = window.RESULTS_TABLE;
+  const sgn = (v) => v.toFixed(2).replace("-", "−");
+  const rtCell = (c) => {
+    if (!c) return `<td class="rt-na" colspan="3">${RS2.table.na}</td>`;
+    const [S, B, W, n] = c;
+    const help = S > 0 && B < 1 ? " is-help" : "";
+    return `<td class="rt-s${help}" title="${n} runs">${sgn(S)}</td><td class="${help.trim()}">${B.toFixed(2)}</td><td class="rt-w${help}">${W == null ? "–" : `${Math.round(W * 100)}%`}</td>`;
+  };
+  const rtRows = RT ? RT.groups.map((g) => `<tr class="rt-group"><th colspan="8" scope="rowgroup">${g.name}</th></tr>
+    ${g.rows.map((r) => r.pending
+      ? `<tr class="rt-pending"><th scope="row">${r.name}</th><td colspan="7">${RS2.table.running}</td></tr>`
+      : RS2.lat.map(([k, label], i) => `<tr class="${i ? "rt-2nd" : ""}">${i ? "" : `<th scope="row" rowspan="2">${r.name}</th>`}<td class="rt-lat">${label}</td>${rtCell(r.cells[`${k}-off`])}${rtCell(r.cells[`${k}-on`])}</tr>`).join("")).join("")}`).join("") : "";
+  const results = `<section class="pad" id="results"><div class="wrap">
+    ${head({ n: 4, title: RS2.kicker, claim: RS2.claim, body: RS2.body })}
+    <div class="rt" data-r>
+      <div class="rt-scroll"><table class="rt-table">
+        <thead>
+          <tr><th rowspan="2" scope="col">${RS2.table.agent}</th><th rowspan="2" scope="col">${RS2.latLabel}</th><th colspan="3" scope="colgroup">${RS2.labels.off}</th><th colspan="3" scope="colgroup">${RS2.labels.on}</th></tr>
+          <tr>${[0, 1].map(() => RS2.table.cols.map(([k, dir]) => `<th scope="col">${k} <i>${dir}</i></th>`).join("")).join("")}</tr>
+        </thead>
+        <tbody class="rt-ref">
+          <tr><th scope="row">${RS2.labels.h}</th><td class="rt-lat">${RS2.table.ref}</td>${[0, 1].map(() => `<td>0.00</td><td>1.00</td><td>0%</td>`).join("")}</tr>
+          <tr><th scope="row">${RS2.labels.hh}</th><td class="rt-lat">${RS2.table.ref}</td>${[0, 1].map(() => `<td>1.00</td><td>${RT ? RT.hhB.toFixed(2) : "–"}</td><td>–</td>`).join("")}</tr>
+        </tbody>
+        <tbody>${rtRows}</tbody>
+      </table></div>
+      <p class="rt-note">${RS2.table.note}${RT && RT.pending.length ? ` <b>${RT.pending.join(", ")}: ${RS2.table.pending}</b>` : ""}</p>
     </div>
-    <div class="mt-grid">${metricCard(C.metrics.score)}${metricCard(C.metrics.burden)}</div>
+    <ul class="rs-takeaways">${RS2.takeaways.map((t) => `<li>${t}</li>`).join("")}</ul>
+  </div></section>`;
+
+  const FL = C.failures;
+  const W = FL.w;
+  const failures = `<section class="pad" id="failures"><div class="wrap">
+    ${head({ n: 5, title: FL.kicker, claim: FL.claim, body: FL.body })}
+    <div class="panel wb" data-r>
+      <div class="panel-head"><h3>${W.title}</h3></div>
+      <p class="wb-lede">${W.body}</p>
+      <ul class="wb-legend">${W.names.map((n, i) => `<li class="t-${W.tones[i]}"><i></i>${n}</li>`).join("")}</ul>
+      <div class="wb-rows" id="wb-rows">
+        ${W.rows.map(([lat, comm, parts]) => `<div class="wb-row">
+          <span class="wb-lbl"><b>${lat}</b>${comm}</span>
+          <div class="wb-track">${parts.map((v, i) => `<i class="t-${W.tones[i]}" data-w="${v}" title="${W.names[i]}: ${v}%">${v >= 6 ? `<span>${v.toFixed(0)}</span>` : ""}</i>`).join("")}</div>
+          <span class="wb-sum">${parts.reduce((a, b) => a + b, 0).toFixed(0)}%</span>
+        </div>`).join("")}
+        <div class="wb-axis" aria-hidden="true"><span></span><div>${[0, 20, 40, 60].map((v) => `<b style="left:${(v / 60) * 100}%">${v}%</b>`).join("")}</div><span></span></div>
+      </div>
+      <p class="wb-note">${W.note}</p>
+    </div>
+    <div class="fl-grid">${FL.items.map((it) => `<article class="fl-card" data-r>
+      <h3>${it.name}</h3>
+      <p class="fl-stat"><b>${it.stat}</b><span>${it.statLabel}</span></p>
+      <p class="fl-body">${it.body}</p>
+    </article>`).join("")}</div>
+  </div></section>`;
+
+  // 06 Real world: the setup from above (after the paper's Fig. 7), in the same soft style as the decision-loop kitchen.
+  const rwSetup = (L) => {
+    const cap = (x1, y1, x2, y2) => `<path class="k-cap-o" d="M${x1} ${y1}L${x2} ${y2}"/><path class="k-cap-i" d="M${x1} ${y1}L${x2} ${y2}"/>`;
+    return `<svg class="rws-svg" viewBox="0 0 400 250" role="img" aria-label="${L.robot} on the left and the ${L.human.toLowerCase()} on the right, both reaching into the ${L.space.toLowerCase()}; a ${L.head.toLowerCase()} above the robot and ${L.wrist.toLowerCase()} on its grippers.">
+      <rect class="rws-table" x="100" y="46" width="200" height="164" rx="10"/>
+      <text class="rws-in" x="200" y="203">${L.space}</text>
+      <rect class="rws-item" x="176" y="100" width="48" height="26" rx="5"/><circle class="rws-item" cx="176" cy="160" r="9"/><circle class="rws-item" cx="224" cy="160" r="9"/>
+      <g class="k-arm t-robot">${cap(62, 108, 138, 100)}<circle class="rws-cam" cx="142" cy="100" r="3.5"/></g>
+      <g class="k-arm t-robot">${cap(62, 156, 146, 164)}<circle class="rws-cam" cx="150" cy="165" r="3.5"/></g>
+      <rect class="k-body t-robot" x="40" y="86" width="24" height="92" rx="8"/>
+      <rect class="rws-head" x="45" y="64" width="14" height="10" rx="2"/>
+      <g class="k-arm is-human t-human">${cap(328, 112, 266, 104)}<circle class="k-hand" cx="264" cy="104" r="6"/></g>
+      <g class="k-arm is-human t-human">${cap(328, 152, 258, 160)}<circle class="k-hand" cx="256" cy="160" r="6"/></g>
+      <rect class="k-body t-human" x="324" y="98" width="22" height="66" rx="11"/>
+      <circle class="k-head t-human" cx="335" cy="131" r="9"/>
+      <text class="rws-lbl" x="52" y="198">${L.robot.replace(" robot", "")}</text><text class="rws-lbl rws-sub" x="52" y="212">robot</text>
+      <text class="rws-lbl" x="335" y="198">${L.human}</text>
+      <path class="rws-lead" d="M52 64V42"/><text class="rws-lbl rws-sub" x="52" y="36">${L.head}</text>
+      <path class="rws-lead" d="M142 95V42"/><text class="rws-lbl rws-sub" x="142" y="36">${L.wrist}</text>
+    </svg>`;
+  };
+  // 06 Real world: task difficulty in simulation and the real world, least affected on top; lines join each task.
+  const rwOrder = (O) => {
+    const y = (i) => 44 + i * 34;
+    const L = 200, R = 330; // right edge of the simulation names, left edge of the real-world names
+    const lines = O.sim.map((t, i) => { const j = O.real.indexOf(t); return `<path class="rwo-line${i !== j ? " is-swap" : ""}" d="M${L + 10} ${y(i) - 4}C${(L + R) / 2} ${y(i) - 4} ${(L + R) / 2} ${y(j) - 4} ${R - 10} ${y(j) - 4}"/>`; }).join("");
+    return `<svg class="rwo-svg" viewBox="0 0 460 210" role="img" aria-label="${O.note}">
+      <text class="rwo-h" x="${L}" y="16" text-anchor="end">${O.cols[0]}</text><text class="rwo-h" x="${R}" y="16">${O.cols[1]}</text>
+      ${lines}
+      ${O.sim.map((t, i) => `<text class="rwo-t${O.real.indexOf(t) !== i ? " is-swap" : ""}" x="${L}" y="${y(i)}" text-anchor="end">${t}</text>`).join("")}
+      ${O.real.map((t, j) => `<text class="rwo-t${O.sim.indexOf(t) !== j ? " is-swap" : ""}" x="${R}" y="${y(j)}">${t}</text>`).join("")}
+      <text class="rwo-k" x="0" y="${y(0)}">${O.top}</text><text class="rwo-k" x="0" y="${y(4)}">${O.bottom}</text>
+      <path class="rwo-arrow" d="M8 ${y(0) + 10}V${y(4) - 16}"/><path class="rwo-arrow" d="M4 ${y(4) - 21}L8 ${y(4) - 15}L12 ${y(4) - 21}"/>
+    </svg>`;
+  };
+
+  const RW = C.realWorld;
+  const real = `<section class="pad" id="real"><div class="wrap">
+    ${head({ n: 6, title: RW.kicker, claim: RW.claim, body: RW.body, badge: RW.badge })}
+    <ul class="kr-stats is-2">${RW.stats.map((x) => `<li data-r><b>${x.value}</b><span>${x.label}</span></li>`).join("")}</ul>
+    <div class="rwx" data-r>
+      <figure class="rws">${rwSetup(RW.setup.labels)}<figcaption>${RW.setup.caption}</figcaption></figure>
+      <div class="rwc">${[RW.compare.same, RW.compare.diff].map(([t, items], i) => `<div class="${i ? "is-diff" : ""}"><h3>${t}</h3><ul>${items.map((x) => `<li>${x}</li>`).join("")}</ul></div>`).join("")}</div>
+    </div>
+    <figure class="rwo" data-r>
+      <figcaption><b>${RW.order.title}</b></figcaption>
+      ${rwOrder(RW.order)}
+      <p>${RW.order.note}</p>
+    </figure>
+    <ul class="rwr-points">${RW.points.map((x) => `<li>${x}</li>`).join("")}</ul>
+    <p class="kr-note">${RW.note}</p>
     <div class="rw-block" data-r>
-      <div class="rw-head"><h3>${C.real.kicker}</h3><span class="badge">${C.real.badge}</span></div>
+      <div class="rw-head"><h3>Real-world footage</h3><span class="badge">Stand-in clips</span></div>
       <p class="lede">${C.real.body}</p>
       <div class="rw-slider">
         <div class="rw-stage">
@@ -271,7 +380,7 @@
       <ul>${navItems.map(([l, id, n, top]) => `<li${top ? "" : ' class="is-minor"'}><a href="#${id}">${n ? `<b>${pad(n)}</b>` : ""}<span>${l}</span></a></li>`).join("")}</ul>
       <button class="mode" id="mode" type="button" role="switch" aria-label="Night mode" aria-checked="true"><span class="mode-label">Night mode</span><i aria-hidden="true"></i><b id="mode-state">On</b></button>
     </div></nav>
-    <main>${hero}${abstract}${overview}${gap}${tasks}${metrics}${resources}</main>`;
+    <main>${hero}${demos}${abstract}${keyResults}${overview}${gap}${tasks}${metrics}${results}${failures}${real}${resources}</main>`;
 
   /* ---------- Equations ---------- */
 
@@ -378,12 +487,15 @@
 
   /* ---------- Video playback only while visible ---------- */
 
+  // Safari only autoplays a video that is muted as a property, which markup set by innerHTML does not always give.
+  const playMuted = (v) => { v.muted = true; return v.play().catch(() => {}); };
+  // Videos start on their own as they scroll into view and pause when they leave; one the reader paused stays paused.
   const videoObserver = new IntersectionObserver((entries) => {
     entries.forEach((e) => {
       if (!e.isIntersecting) e.target.pause();
-      else if (!e.target.dataset.held) e.target.play().catch(() => {});
+      else if (!e.target.dataset.held) playMuted(e.target);
     });
-  }, { threshold: 0.25 });
+  }, { threshold: 0.35 });
 
   /* ---------- Task players ---------- */
 
@@ -468,7 +580,7 @@
       ctx.fillText(TL.lanes.robot, 0, ry + laneH / 2);
 
       // Human: work still ahead is faint, work done is solid.
-      ctx.fillStyle = color("--human");
+      ctx.fillStyle = color("--f-human");
       for (const [a, b] of humanBlocks) {
         const e = Math.min(b, TL.span);
         ctx.globalAlpha = 0.18;
@@ -480,19 +592,17 @@
       // marks each pause for an answer with a red tick.
       if (k.lat === "aware") {
         for (let t = 0; t < sim; t += period) {
-          ctx.fillStyle = color("--muted");
-          ctx.globalAlpha = 0.5;
+          ctx.fillStyle = color("--f-think");
           bar(X(t) + 1, ry, X(Math.min(t + TL.latency, sim)) - X(t) - 2, laneH * 0.42);
-          ctx.globalAlpha = 1;
           if (sim > t + TL.latency) {
-            ctx.fillStyle = color("--robot");
+            ctx.fillStyle = color("--f-robot");
             bar(X(t + TL.latency), ry + laneH * 0.5, X(Math.min(t + TL.latency + Math.min(TL.motion, period), sim)) - X(t + TL.latency), laneH * 0.5);
           }
         }
       } else {
-        ctx.fillStyle = color("--robot");
+        ctx.fillStyle = color("--f-robot");
         bar(X(0), ry, X(sim) - X(0), laneH);
-        ctx.fillStyle = color("--tomato");
+        ctx.fillStyle = color("--f-tomato");
         for (let t = 0; t <= sim; t += TL.every) ctx.fillRect(X(t) - 0.75, ry - 2, 1.5, laneH + 4);
       }
       const frozen = k.lat === "free" && thinking;
@@ -524,7 +634,8 @@
         play: $(".ro-play", el), track: $(".ro-track", el), speed: $(".tp-speed", el),
         lat: T.switches.lat.options[0][0],
         clip: null, video: null, length: intro + (steps + 1) * STEP + HOLD,
-        clock: 0, held: reduced, rate: 1, phase: null, shown: 0, said: 0, readText: "",
+        // Videos start on their own even with reduced motion (the reader can pause them); only the drawn clock stays still.
+        clock: 0, held: false, rate: 1, phase: null, shown: 0, said: 0, readText: "",
       };
     });
 
@@ -617,7 +728,7 @@
         k.held = !(k.video ? k.video.paused : k.held);
         if (k.video) {
           if (k.held) { k.video.dataset.held = "1"; k.video.pause(); }
-          else { delete k.video.dataset.held; k.video.play().catch(() => {}); }
+          else { delete k.video.dataset.held; playMuted(k.video); }
         }
         state(k);
       });
@@ -643,13 +754,22 @@
       k.phase = null;
       if (k.video) {
         k.video.currentTime = 0;
-        if (!k.held) k.video.play().catch(() => {});
+        if (!k.held) playMuted(k.video);
       }
       show(k);
     };
 
     let visible = false;
     new IntersectionObserver(([e]) => { visible = e.isIntersecting; }, { threshold: 0.05 }).observe($(".tasks-panel"));
+    // About a screen before the player arrives, buffer the shown task's video so it starts as soon as it is in view.
+    let near = false;
+    const buffer = () => {
+      const k = tasks.find((x) => !x.el.hidden);
+      if (!near || !k || !k.video || k.video.preload === "auto") return;
+      k.video.preload = "auto";
+      if (k.video.readyState === 0 && k.video.paused) k.video.load(); // load() restarts a video, so never on one that plays
+    };
+    new IntersectionObserver(([e]) => { near = e.isIntersecting; buffer(); }, { rootMargin: "100% 0px" }).observe($(".tasks-panel"));
 
     let prev = performance.now();
     const loop = (now) => {
@@ -657,7 +777,8 @@
       prev = now;
       const k = tasks.find((x) => !x.el.hidden);
       if (k && visible) {
-        if (!k.video && !k.held) k.clock = (k.clock + dt * k.rate) % k.length;
+        if (!k.video && !k.held && !reduced) k.clock = (k.clock + dt * k.rate) % k.length;
+        buffer();
         show(k);
       }
       requestAnimationFrame(loop);
@@ -669,108 +790,68 @@
 
   // Points start on "Human alone" and move out the first time the plot comes into view. The mode
   // switches move them; the task chips change the task. The axes fit the points shown.
-  (function scatter() {
-    const sc = C.metrics.scatter;
-    const svg = $("#sc-plot");
-    const NS = "http://www.w3.org/2000/svg";
-    const P = { l: 64, r: 24, t: 24, b: 62, w: 760, h: 420 };
-    const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
-    let mode = Object.keys(sc.modes)[0];
-    let comm = Object.keys(sc.comms)[0];
-    let task = sc.tasks[0];
-    let started = reduced;
-    let solo;
-    let pair;
-    let series;
-
-    const axes = document.createElementNS(NS, "g");
-    const layer = document.createElementNS(NS, "g");
-    svg.append(axes, layer);
-
-    // One element per point; the same element moves when the mode changes.
-    const make = (cls, tone, shape, text) => {
-      const g = document.createElementNS(NS, "g");
-      g.setAttribute("class", `sc-pt ${cls} t-${tone}`);
-      g.innerHTML = (shape === "dm" ? '<path d="M0 -9L9 0L0 9L-9 0Z"/>' : '<rect x="-7.5" y="-7.5" width="15" height="15" rx="2"/>')
-        + `<text x="13" y="4">${text}</text>`;
-      layer.append(g);
-      return g;
+  /* ---------- Key results: the race ----------
+   * Time to finish relative to one person alone (1): two people take T_HH / T_H; a team with a robot takes
+   * 1 − S · (1 − T_HH / T_H). Both are averaged over the five tasks and four agents with communication on, latency-free
+   * and latency-aware. Every line fills at its own pace; the rank shows when it finishes. */
+  (function raceLines() {
+    const D = window.LEADERBOARD;
+    const ol = $("#kr-race");
+    const ids = D.tasks.map((t) => t.id);
+    const mean = (a) => a.reduce((x, y) => x + y, 0) / a.length;
+    const ratio = (t) => KR.ref[t][1] / KR.ref[t][0];
+    const team = (m) => mean(ids.flatMap((t) => D.sb[t][m].map(([S]) => 1 - S * (1 - ratio(t)))));
+    const times = [mean(ids.map(ratio)), 1, team("free-on"), team("aware-on")];
+    const order = times.map((_, i) => i).sort((a, b) => times[a] - times[b]);
+    const lis = [...ol.children];
+    lis.forEach((li, i) => {
+      li.style.setProperty("--t", times[i].toFixed(3));
+      li.querySelector(".kr-rank").textContent = KR.ranks[order.indexOf(i)];
+    });
+    const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const SEC = 3; // seconds for one person alone
+    let timers = [];
+    const run = () => {
+      timers.forEach(clearTimeout);
+      ol.classList.remove("is-run");
+      lis.forEach((li) => li.classList.remove("is-done"));
+      void ol.offsetWidth; // restart the transitions
+      ol.classList.add("is-run");
+      timers = lis.map((li, i) => setTimeout(() => li.classList.add("is-done"), still ? 0 : times[i] * SEC * 1000));
     };
-    const build = () => {
-      layer.innerHTML = "";
-      solo = make("is-ref", "mute", "dm", "Human alone");
-      pair = task.pair.map((p, j) => make("is-ref", "robot", "dm", j ? "" : "Two humans"));
-      series = task.series.map((s) => Array.from({ length: 3 }, () => make("is-run", s.tone, "sq", "")));
-    };
-
-    const niceStep = (span) => (span > 5 ? 1 : span > 2 ? 0.5 : 0.25);
-    const draw = () => {
-      const key = `${mode}-${comm}`;
-      const runs = task.series.map((s) => s.runs[key] || []);
-      const all = runs.flat();
-      const sMin = Math.min(-1, ...all.map(([s]) => s));
-      const bMax = Math.max(1.25, ...all.map(([, b]) => b));
-      const y0 = Math.floor(sMin * 2) / 2 - 0.25;
-      const y1 = 1.25;
-      const x0 = 0.4;
-      const x1 = Math.ceil(bMax * 4) / 4 + 0.1;
-      const X = (b) => P.l + ((b - x0) / (x1 - x0)) * (P.w - P.l - P.r);
-      const Y = (s) => P.t + ((y1 - s) / (y1 - y0)) * (P.h - P.t - P.b);
-      const ys = [];
-      for (let v = 1; v >= y0; v -= niceStep(y1 - y0)) ys.push(+v.toFixed(2));
-      const xs = [];
-      for (let v = 0.5; v <= x1; v += 0.25) xs.push(+v.toFixed(2));
-      axes.innerHTML = `
-        ${ys.map((v) => `<path class="sc-grid${v === 0 ? " is-zero" : ""}" d="M${P.l} ${Y(v)}H${P.w - P.r}"/><text class="sc-tick" x="${P.l - 10}" y="${Y(v) + 4}" text-anchor="end">${minus(v, Number.isInteger(v) ? 0 : 2)}</text>`).join("")}
-        ${xs.map((v) => `<path class="sc-grid${v === 1 ? " is-zero" : ""}" d="M${X(v)} ${P.t}V${P.h - P.b}"/><text class="sc-tick" x="${X(v)}" y="${P.h - P.b + 20}" text-anchor="middle">${v.toFixed(2)}</text>`).join("")}
-        <text class="sc-axis" x="${P.l}" y="${P.t - 8}">${sc.y} ↑</text>
-        <text class="sc-axis" x="${(P.l + P.w - P.r) / 2}" y="${P.h - 14}" text-anchor="middle">${sc.x}</text>`;
-      const at = (el, b, s, show, delay) => {
-        el.style.transitionDelay = delay;
-        el.style.transform = started ? `translate(${X(b)}px, ${Y(s)}px)` : `translate(${X(1)}px, ${Y(0)}px)`;
-        el.style.opacity = show && started ? 1 : 0;
-      };
-      at(solo, task.solo[1], task.solo[0], true, "0ms");
-      solo.style.opacity = 1;
-      pair.forEach((el, j) => at(el, task.pair[j][1], task.pair[j][0], true, "0ms"));
-      const notes = task.note ? [task.note] : [];
-      series.forEach((els, i) => {
-        const list = runs[i];
-        if (!list.length) notes.push(`${task.series[i].name}: ${sc.empty}`);
-        els.forEach((el, j) => {
-          const run = list[j];
-          el.querySelector("text").textContent = run ? `s${run[2]}` : "";
-          el.querySelector("title")?.remove();
-          if (run) {
-            const t = document.createElementNS(NS, "title");
-            t.textContent = `${task.name}, ${task.series[i].name}, ${sc.modes[mode].toLowerCase()}, ${sc.comms[comm].toLowerCase()}, seed ${run[2]}: S = ${minus(run[0])}, B = ${run[1].toFixed(2)}`;
-            el.append(t);
-          }
-          at(el, run ? run[1] : 1, run ? run[0] : 0, Boolean(run), `${(i * 3 + j) * 90}ms`);
-        });
-      });
-      const note = $("#sc-empty");
-      note.hidden = !notes.length;
-      note.textContent = notes.join(" · ");
-    };
-    segment($("#sc-mode"), (v) => { mode = v; draw(); });
-    segment($("#sc-comm"), (v) => { comm = v; draw(); });
-    segment($("#sc-tasks"), (v) => { task = sc.tasks[Number(v)]; build(); draw(); });
-    build();
-    draw();
-    if (!started) {
-      new IntersectionObserver(([e], obs) => {
-        if (!e.isIntersecting) return;
-        obs.disconnect();
-        started = true;
-        draw();
-      }, { threshold: 0.35 }).observe(svg);
-    }
+    ol.style.setProperty("--sec", `${SEC}s`);
+    if (still) run();
+    else new IntersectionObserver(([e], obs) => { if (e.isIntersecting) { obs.disconnect(); run(); } }, { threshold: 0.6 }).observe(ol);
+    $("#kr-replay").addEventListener("click", run);
   })();
 
-  /* ---------- Real-world slider ---------- */
+  /* ---------- 05 Why robots fail: W bars grow on first view ---------- */
+  (function wBars() {
+    const segs = $$("#wb-rows .wb-track i");
+    const MAX = 60;
+    const grow = () => segs.forEach((el, i) => {
+      el.style.transitionDelay = `${Math.floor(i / 3) * 120 + (i % 3) * 60}ms`;
+      el.style.width = `${(Number(el.dataset.w) / MAX) * 100}%`;
+    });
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) { grow(); return; }
+    new IntersectionObserver(([e], obs) => {
+      if (!e.isIntersecting) return;
+      obs.disconnect();
+      grow();
+    }, { threshold: 0.35 }).observe($("#wb-rows"));
+  })();
 
-  // One clip at a time; each plays to its end and hands over to the next.
+  /* ---------- Demo candidates (temporary): every draft listed in media/demovideo/demos.json ---------- */
+  // The hero loop starts at once, behind the intro door, and pauses only while the hero is scrolled away.
+  const heroVideo = $(".hero-media video");
+  if (heroVideo) {
+    heroVideo.autoplay = true;
+    heroVideo.preload = "auto";
+    playMuted(heroVideo);
+    heroVideo.addEventListener("canplay", () => { if (heroVideo.paused) playMuted(heroVideo); }, { once: true });
+    videoObserver.observe(heroVideo);
+  }
+
   (function realSlider() {
     const slides = $$(".rw-slide");
     const dots = $(".rw-dots");
@@ -784,7 +865,7 @@
       $$("button", dots).forEach((b, j) => b.setAttribute("aria-pressed", j === at));
       const v = $("video", slides[at]);
       v.currentTime = 0;
-      v.play().catch(() => {});
+      playMuted(v);
     };
     slides.forEach((el) => {
       const v = $("video", el);
@@ -801,8 +882,9 @@
   gsap.registerPlugin(ScrollTrigger);
 
   const nav = $(".nav");
+  // The rail (and the narrow-screen bar) appears once the full-width demo video has passed, so it never covers it.
   ScrollTrigger.create({
-    trigger: ".hero", start: "bottom 10%",
+    trigger: $("#demo") ? "#demo" : ".hero", start: "bottom 10%",
     onEnter: () => nav.classList.add("is-on"),
     onLeaveBack: () => nav.classList.remove("is-on"),
   });

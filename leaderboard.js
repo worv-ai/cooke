@@ -16,8 +16,8 @@
 
   // The project page's logo (main.js), with blinking eyes.
   const wordmark = () => `<span class="wm" role="img" aria-label="COOK·E"><svg viewBox="0 0 1400 248" aria-hidden="true">
-    <image class="wm-day" href="media/cooke-logo.png" width="1400" height="248"/>
-    <image class="wm-night" href="media/cooke-logo-ink.png" width="1400" height="248"/>
+    <image class="wm-day" href="media/hero_logo.png" width="1400" height="248"/>
+    <image class="wm-night" href="media/hero_logo-night.png" width="1400" height="248"/>
     <g class="wm-eye" fill="#fefdfd"><ellipse cx="560.84" cy="97.38" rx="10.82" ry="18.03"/><ellipse cx="635.68" cy="97.38" rx="10.52" ry="18.03"/></g>
   </svg></span>`;
 
@@ -109,8 +109,19 @@
     return ` class="${d < 0 ? "is-worse" : "is-better"}" style="--a:${a.toFixed(1)}%"`;
   };
 
+  // Under each task value: the lowest and highest rollout (leaderboard-rollouts.js), all of them on hover.
+  const R = D.rollouts;
+  const spread = (t, i, m) => {
+    const vs = R && R[t][mode][i] ? R[t][mode][i].map((p) => p[m]) : [];
+    if (!vs.length) return ["", ""];
+    const title = ` title="${L.rolloutsTitle}: ${vs.map((v) => num(v)).join(", ")}"`;
+    const text = vs.length === 1 ? L.oneRollout : `${num(Math.min(...vs))} … ${num(Math.max(...vs))}`;
+    return [title, `<small class="lb-rng">${text}</small>`];
+  };
+
   const rows = () => D.agents.map((a, i) => ({
     a,
+    i,
     mean: D.sb.average[mode][i],
     task: Object.fromEntries(T.map((t) => [t.id, D.sb[t.id][mode][i]])),
   }));
@@ -136,7 +147,7 @@
         <th scope="row">${marker(r.a, filled)}${r.a.name}</th>
         <td${cls(tint(r.mean[0], "S"), "lb-s")}>${bar(r.mean[0])}<span>${num(r.mean[0])}</span></td>
         <td${tint(r.mean[1], "B")}>${num(r.mean[1])}</td>
-        ${T.map((t) => { const v = r.task[t.id][m]; return `<td${tint(v, metric)}>${num(v)}</td>`; }).join("")}
+        ${T.map((t) => { const v = r.task[t.id][m]; const [title, rng] = spread(t.id, r.i, m); return `<td${tint(v, metric)}${title}><span>${num(v)}</span>${rng}</td>`; }).join("")}
       </tr>`).join("")}</tbody>
       <tbody class="lb-ref">
         <tr><th scope="rowgroup" colspan="${3 + T.length}">${L.refs.title}</th></tr>

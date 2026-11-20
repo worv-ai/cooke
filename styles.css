@@ -22,6 +22,8 @@
   --human: #f2a33a;
   --robot: #62c08d;
   --cool: #8db7d4;
+  /* Fills for figures (bars, lanes, timelines). Text keeps the tones above; the light theme brightens only these. */
+  --f-tomato: #e0492f; --f-human: #f2a33a; --f-robot: #62c08d; --f-cool: #8db7d4; --f-think: #6b6157;
 
   --gutter: clamp(1rem, 4vw, 3.5rem);
   --max: 74rem;
@@ -63,6 +65,7 @@ body[data-theme="cream"] {
   --bg: var(--paper); --fg: #1b1817; --muted: #524b48;
   --line: #d3cecb; --surface: #eae7e5; --surface-2: #e1dddb;
   --tomato: #c23a22; --human: #a8620a; --robot: #1f7f55; --cool: #3a6a8c;
+  --f-tomato: #ec5b3e; --f-human: #f5a524; --f-robot: #2cb67d; --f-cool: #3d9be9; --f-think: #cbc5c1;
 }
 *, *::before, *::after { box-sizing: border-box; }
 html {
@@ -266,7 +269,7 @@ a.btn:hover { background: var(--fg); color: var(--bg); border-color: var(--fg); 
 .gap-list p { color: var(--muted); font-size: var(--t-small); }
 
 .matrix { margin-top: var(--block); }
-.matrix-cap { font-size: var(--t-small); line-height: 1.5; color: var(--muted); max-width: var(--measure); margin-bottom: 1rem; text-wrap: balance; }
+.matrix-cap { font-size: var(--t-small); line-height: 1.5; color: var(--muted); max-width: var(--measure); margin-top: 1rem; text-wrap: balance; }
 .matrix-cap b { font-weight: 600; color: var(--fg); }
 .matrix-scroll, .rs-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 .matrix table { border-collapse: collapse; width: 100%; min-width: 42rem; font: 400 .8125rem/1 var(--mono); }
@@ -291,12 +294,10 @@ a.btn:hover { background: var(--fg); color: var(--bg); border-color: var(--fg); 
 .bm { margin-top: calc(var(--block) * 1.25); padding-top: var(--block); border-top: 1px solid var(--line); }
 .bm-claim { max-width: 32em; font: 400 var(--t-sub)/1.25 var(--display); letter-spacing: -.01em; text-wrap: balance; }
 .bm-claim em { font-style: italic; color: var(--tomato); }
+.bm-claim b { font-weight: 700; }
 .bm .lede { margin-top: .75rem; }
 .hsim { display: grid; grid-template-columns: var(--split-rev); gap: 1rem var(--col-gap); margin-top: var(--block); padding: clamp(1rem, 2.4vw, 1.5rem); background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-l); }
 .hsim h3 { font: var(--display-w) var(--t-sub)/1.15 var(--display); letter-spacing: -.01em; }
-.hsim-flow { display: flex; flex-wrap: wrap; gap: .5rem 1.25rem; margin-top: .875rem; }
-.hsim-flow li { position: relative; padding: .3125rem .5rem; border: 1px solid var(--tone); border-radius: .375rem; font: 500 .75rem/1 var(--mono); color: var(--tone); }
-.hsim-flow li + li::before { content: "→"; position: absolute; left: -1.125rem; width: 1rem; text-align: center; color: var(--muted); }
 .hsim p { font-size: var(--t-small); color: var(--muted); }
 
 /* Tiles share rows across a set, so labels, titles, and text line up. */
@@ -448,35 +449,6 @@ a.btn:hover { background: var(--fg); color: var(--bg); border-color: var(--fg); 
 .rw-block .rw-slider { margin-top: 1.25rem; }
 
 /* Metrics: collaboration against burden, then the formulas */
-.sc { margin-top: var(--block); background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-l); padding: clamp(1rem, 2.4vw, 2rem); }
-.sc-top { display: flex; flex-wrap: wrap; gap: .75rem; justify-content: space-between; align-items: center; }
-.sc-top h3 { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem .75rem; font: var(--display-w) var(--t-sub)/1.15 var(--display); letter-spacing: -.01em; }
-.sc-top h3 .badge { margin-top: 0; }
-.sc-corner { margin-top: .25rem; font: 400 var(--t-label)/1.4 var(--mono); color: var(--muted); }
-.sc-plot { display: block; width: 100%; height: auto; margin-top: .75rem; overflow: visible; }
-.sc-grid { stroke: var(--line); stroke-width: 1; }
-.sc-grid.is-zero { stroke: var(--muted); stroke-dasharray: 3 4; }
-.sc-tick { font: 400 10.5px var(--mono); fill: var(--muted); }
-.sc-axis { font: 500 11.5px var(--body); fill: var(--fg); }
-.sc-pt { transition: transform .9s var(--ease), opacity .4s; }
-.sc-pt path, .sc-pt rect { fill: none; stroke: var(--tone); stroke-width: 2.5; }
-.sc-pt.is-run rect { fill: color-mix(in srgb, var(--tone) 22%, transparent); }
-.sc-pt text { font: 500 10.5px var(--mono); fill: var(--fg); paint-order: stroke; stroke: var(--surface); stroke-width: 4px; stroke-linejoin: round; }
-.sc-legend { display: flex; flex-wrap: wrap; gap: .375rem 1.25rem; margin-top: .5rem; font: 400 .8125rem/1.4 var(--mono); color: var(--muted); }
-.sc-legend li { display: inline-flex; align-items: center; gap: .5rem; }
-.sc-legend i { width: .75rem; height: .75rem; border: 2px solid var(--tone); }
-.sc-legend i.is-sq { border-radius: 2px; background: color-mix(in srgb, var(--tone) 22%, transparent); }
-.sc-legend i.is-dm { transform: rotate(45deg) scale(.85); }
-.sc-legend .sc-note { color: var(--tomato); }
-.sc-tasks { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: 1rem; padding-top: 1rem; border-top: 1px dashed var(--line); }
-.sc-task { display: inline-flex; align-items: baseline; gap: .5rem; padding: .4375rem .75rem; border: 1px solid var(--line); border-radius: var(--r-s); font: 500 .8125rem/1 var(--body); color: var(--muted); }
-.sc-task small { font: 400 .6875rem/1 var(--mono); }
-button.sc-task { cursor: pointer; transition: border-color .2s, background .2s, color .2s; }
-button.sc-task:hover { border-color: var(--muted); }
-.sc-task[aria-pressed="true"] { border-color: var(--tomato); background: color-mix(in srgb, var(--tomato) 12%, transparent); color: var(--fg); }
-.sc-task.is-off { opacity: .6; }
-.sc-find { margin-top: 1rem; padding-left: .875rem; border-left: 2px solid var(--tomato); font-size: var(--t-small); color: var(--muted); max-width: 48rem; }
-.sc + .mt-grid { margin-top: var(--tile-gap); }
 
 /* Metrics */
 .mt-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem var(--tile-gap); margin-top: var(--block); align-items: stretch; }
@@ -591,6 +563,14 @@ body[data-theme="cream"] .hero .wm-night { display: none; }
 .k-arm.is-human { transform-origin: right center; }
 .is-live .k-arm { animation: reach 5s ease-in-out infinite; }
 .is-live .k-arm.is-human { animation-name: reach-back; animation-delay: -1.6s; }
+.is-live .k-arm.is-two { animation-delay: -2.5s; }
+.is-live .k-arm.is-human.is-two { animation-delay: -4.1s; }
+.k-body { fill: color-mix(in srgb, var(--tone) 28%, var(--bg)); stroke: var(--tone); stroke-width: 1.5; }
+.k-arm .k-cap-o { stroke: var(--tone); stroke-width: 12; }
+.k-arm .k-cap-i { stroke: color-mix(in srgb, var(--tone) 28%, var(--bg)); stroke-width: 9; }
+.k-arm .k-grip { stroke: var(--tone); stroke-width: 3; }
+.k-arm .k-hand { fill: color-mix(in srgb, var(--tone) 28%, var(--bg)); stroke: var(--tone); stroke-width: 1.5; }
+.k-head { fill: var(--tone); }
 .dl-stage svg { display: block; width: 100%; height: auto; overflow: visible; }
 
 /* Overview. Stacked by default: each stage's text, then its drawing. */
@@ -666,6 +646,103 @@ body[data-theme="cream"] .hero .wm-night { display: none; }
 }
 
 /* Each drawing animates when its stage comes on. */
+/* ---------- Sections from the paper's results (content-results.js) ---------- */
+
+/* Hero: the paper's conclusion in one line. */
+.hero-exp { margin-top: .875rem; font: 400 calc(var(--t-label) * 1.5)/1.4 var(--mono); letter-spacing: .06em; color: var(--muted); }
+.hero-exp b { color: var(--tomato); font-weight: 600; }
+
+/* Key results: three numbers right after the abstract. */
+.kr { padding-top: 0; }
+.kr-title { font: 500 var(--t-label)/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.kr-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--tile-gap); margin-top: 1rem; }
+.kr-stats.is-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: var(--block); }
+.kr-stats li { display: grid; align-content: start; gap: .625rem; min-width: 0; padding: clamp(1rem, 2.4vw, 1.5rem); background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-l); }
+.kr-stats b { font: var(--display-w) clamp(1.75rem, 1.3rem + 1.6vw, 2.75rem)/1 var(--display); letter-spacing: -.025em; color: var(--tomato); font-variant-numeric: tabular-nums; }
+.kr-stats span { font-size: var(--t-small); color: var(--muted); }
+.kr-note { margin-top: .875rem; font: 400 var(--t-label)/1.5 var(--mono); color: var(--muted); max-width: var(--measure); }
+
+/* Key results: the race. Thin lines, people in ink, robot teams in tomato. */
+.kr-claim { margin-top: .875rem; max-width: 36em; font: 500 var(--t-lead)/1.5 var(--body); text-wrap: balance; }
+.kr-claim em { font-style: normal; color: var(--tomato); }
+.kr-race { display: grid; gap: .25rem; margin-top: 1.5rem; max-width: 52rem; }
+.kr-race li { --c: var(--fg); display: grid; grid-template-columns: 15.5rem minmax(0, 1fr) 2.25rem; gap: 1rem; align-items: center; min-height: 1.75rem; }
+.kr-race li.is-robot { --c: var(--tomato); }
+.kr-lbl { font-size: .875rem; color: var(--muted); transition: color .3s; }
+.kr-race li.is-done .kr-lbl { color: var(--fg); }
+.kr-track { position: relative; height: .5rem; }
+.kr-track::before { content: ""; position: absolute; left: 0; right: 0; top: 50%; border-top: 1px solid var(--line); }
+.kr-track::after { content: ""; position: absolute; right: 0; top: 0; bottom: 0; border-right: 1px solid var(--muted); }
+.kr-track i { position: absolute; left: 0; top: 50%; width: 0; height: 2px; background: var(--c); transform: translateY(-50%); }
+.kr-track i::after { content: ""; position: absolute; right: -3px; top: 50%; width: 7px; height: 7px; border-radius: 50%; background: var(--c); transform: translateY(-50%); }
+.kr-race.is-run .kr-track i { width: 100%; transition: width calc(var(--t) * var(--sec, 3s)) linear; }
+.kr-rank { font: 500 var(--t-label)/1 var(--mono); color: var(--c); opacity: 0; transition: opacity .3s; }
+.kr-race li.is-done .kr-rank { opacity: 1; }
+.kr-replay { margin-left: .5rem; padding: 0; font: inherit; color: var(--fg); text-decoration: underline; text-underline-offset: .2em; text-decoration-color: var(--line); }
+.kr-replay:hover { text-decoration-color: currentColor; }
+@media (max-width: 640px) {
+  .kr-race { gap: .5rem; }
+  .kr-race li { grid-template-columns: minmax(0, 1fr) 2.25rem; gap: .125rem .75rem; }
+  .kr-lbl { grid-column: 1 / -1; }
+}
+
+/* Metrics: three cards when W joins S and B. */
+.mt-grid.is-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+/* 04 Results: the S-B chart (paper Fig. 4). */
+.seg button:disabled { opacity: .4; cursor: not-allowed; }
+
+/* 05 Why robots fail: W bars (paper Fig. 5) and the three failure modes. */
+.wb { margin-top: var(--block); }
+.wb-lede { font-size: var(--t-small); color: var(--muted); max-width: var(--measure); }
+.wb-legend { display: flex; flex-wrap: wrap; gap: .375rem 1.25rem; margin-top: 1rem; font: 400 .8125rem/1.4 var(--mono); color: var(--muted); }
+.wb-legend li { display: inline-flex; align-items: center; gap: .5rem; }
+.wb-legend i { width: .75rem; height: .75rem; border-radius: 3px; background: var(--tone); }
+.wb-rows { display: grid; gap: .625rem; margin-top: 1.25rem; }
+.wb-row, .wb-axis { display: grid; grid-template-columns: 9.5rem minmax(0, 1fr) 3.5rem; align-items: center; gap: .875rem; }
+.wb-lbl { display: grid; font: 400 .8125rem/1.25 var(--mono); color: var(--muted); }
+.wb-lbl b { font: 500 .875rem/1.25 var(--body); color: var(--fg); }
+.wb-track { display: flex; height: 1.75rem; border-radius: 6px; background: var(--surface-2); overflow: hidden; }
+.wb-track i { display: flex; align-items: center; justify-content: center; width: 0; height: 100%; background: var(--tone); transition: width 1s var(--ease); overflow: hidden; }
+.wb-track i + i { box-shadow: inset 2px 0 0 var(--surface); }
+.wb-track span { font: 500 .75rem/1 var(--mono); color: #fff; }
+.wb-sum { font: 500 .875rem/1 var(--mono); font-variant-numeric: tabular-nums; }
+.wb-axis > div { position: relative; height: 1rem; border-top: 1px solid var(--line); }
+.wb-axis b { position: absolute; top: .25rem; transform: translateX(-50%); font: 400 .6875rem/1 var(--mono); color: var(--muted); }
+.wb-axis b:first-child { transform: none; }
+.wb-axis b:last-child { transform: translateX(-100%); }
+.wb-note { margin-top: 1rem; font-size: var(--t-small); color: var(--muted); max-width: var(--measure); }
+.fl-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--tile-gap); margin-top: var(--tile-gap); }
+.fl-card { display: flex; flex-direction: column; gap: .75rem; min-width: 0; padding: clamp(1rem, 2.4vw, 1.5rem); background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-l); }
+.fl-card h3 { font: var(--display-w) var(--t-sub)/1.15 var(--display); letter-spacing: -.01em; }
+.fl-stat { display: grid; gap: .25rem; padding-bottom: .75rem; border-bottom: 1px solid var(--line); }
+.fl-stat b { font: var(--display-w) 2rem/1 var(--display); letter-spacing: -.02em; color: var(--tomato); font-variant-numeric: tabular-nums; }
+.fl-stat span { font: 400 var(--t-label)/1.4 var(--mono); color: var(--muted); }
+.fl-body { font-size: var(--t-small); color: var(--muted); }
+
+/* 06 Real world. */
+.rwr-points { display: grid; gap: .75rem; margin-top: 1.5rem; max-width: var(--measure); }
+.rwr-points li { padding-left: .875rem; border-left: 2px solid var(--line); color: var(--muted); }
+.rwr-points b { color: var(--fg); font-weight: 600; }
+
+/* Demo candidates (temporary review section). */
+/* Demo video: full width, edge to edge, straight under the hero. */
+.dm { background: #000; }
+.dm video { display: block; width: 100%; height: auto; }
+.dm-note { padding: .75rem var(--gutter); background: var(--bg); text-align: center; font: 500 .875rem/1.4 var(--body); color: var(--muted); }
+/* About three times the usual section gap between the demo video and the abstract. */
+.dm + .pad { padding-top: clamp(9rem, 18vw, 16rem); }
+
+@media (max-width: 1000px) {
+  .kr-stats, .mt-grid.is-3, .fl-grid { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 640px) {
+  .kr-stats.is-2 { grid-template-columns: minmax(0, 1fr); }
+  .wb-row, .wb-axis { grid-template-columns: minmax(0, 1fr) 3rem; }
+  .wb-lbl { grid-column: 1 / -1; display: flex; gap: .5rem; }
+  .wb-axis > span:first-child { display: none; }
+}
+
 @media (prefers-reduced-motion: no-preference) {
   .ov-vis.is-on .ovv-task { animation: ov-pop .55s var(--ease) both; animation-delay: calc(var(--k) * 80ms); }
   .ov-vis.is-on .ovv-head { animation: ov-sweep 7s linear infinite; }
@@ -726,7 +803,7 @@ body[data-theme="cream"] .hero .wm-night { display: none; }
 
 /* Side rail: the top bar turns into a column once there is room for one. */
 @media (min-width: 1280px) {
-  main > section:not(.hero) { padding-left: var(--rail); }
+  main > section:not(.hero):not(.dm) { padding-left: var(--rail); } /* the demo video stays full width */
   .nav { inset: 0 auto 0 0; width: var(--rail); padding: 1.5rem 0 1.5rem 1.5rem; transform: translateX(-.5rem); }
   .nav::before { display: none; }
   .nav.is-on.is-end { opacity: 0; pointer-events: none; }
@@ -747,3 +824,139 @@ body[data-theme="cream"] .hero .wm-night { display: none; }
   .ov-step, .ov-detail, .ov-vis { transition: none; }
   .wm-eye { animation: none; }
 }
+
+/* ---------- Fewer boxes (2026-11-20) ----------
+ * Most grey boxes are gone: figures sit directly on the page, and tiles in a row keep only a hairline on top.
+ * Kept: controls, media frames, chart tracks, chat bubbles and the BibTeX block. */
+.panel, .hsim, .ov-vis, .dl { padding: 0; background: none; border: 0; border-radius: 0; }
+.principle, .mt-card, .kr-stats li, .fl-card, .rs-link {
+  padding: 1.125rem 0 0; background: none; border: 0; border-top: 1px solid var(--line); border-radius: 0;
+}
+.principles, .mt-grid, .kr-stats, .fl-grid, .rs-links { column-gap: clamp(1.5rem, 3vw, 2.5rem); row-gap: 2rem; }
+a.rs-link:hover { transform: none; border-top-color: currentColor; }
+.rs-link { min-height: 0; gap: 1.5rem; }
+.tl, .ro-chat { background: none; border: 0; border-radius: 0; border-top: 1px solid var(--line); padding-inline: 0; }
+.ro-chat-head { padding-inline: 0; }
+.ro-log { padding-inline: 0; }
+.ro-msg { background: none; }
+.ev-quote { padding: .25rem 0 .25rem 1rem; background: none; border: 0; border-left: 2px solid var(--line); border-radius: 0; }
+
+/* Separators asked for after the box clean-up: the three principles get thin dividers between columns, the task
+ * player one hairline outline. */
+.principle { padding: 0 0 0 clamp(1rem, 2.4vw, 1.75rem); border-top: 0; border-left: 1px solid var(--line); }
+.principle:first-child { padding-left: 0; border-left: 0; }
+.tasks-panel { padding: clamp(1rem, 2.4vw, 1.75rem); border: 1px solid var(--line); border-radius: var(--r-l); }
+@media (max-width: 1000px) {
+  .principle, .principle:first-child { padding: 1rem 0 0; border-left: 0; border-top: 1px solid var(--line); }
+}
+
+/* Task dialogue: more air between and inside messages. */
+.ro-log { gap: .75rem; padding-block: .875rem; }
+.ro-msg { padding: .5625rem .75rem .625rem; line-height: 1.5; }
+.ro-meta { margin-bottom: .3125rem; }
+
+/* Setup under the decision-loop figure: smaller, no rule. */
+.setup { gap: .75rem 1.25rem; margin-top: 4rem; padding-top: 0; border-top: 0; }
+.setup dt { font-size: .625rem; margin-bottom: .25rem; }
+.setup dd { font-size: .75rem; color: var(--muted); }
+
+/* Human simulator: the loop as four steps, one line each. */
+.hsim { display: block; }
+.hsim-lead { margin-top: .5rem; max-width: 36em; font-size: var(--t-lead); color: var(--muted); }
+.hsim-lead em { font-style: normal; color: var(--fg); }
+.hsim-steps { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1.5rem; margin-top: 1.5rem; }
+.hsim-steps li { padding-top: .75rem; border-top: 2px solid var(--tone); }
+.hsim-steps b { display: flex; gap: .5rem; align-items: baseline; font: 600 .9375rem/1.2 var(--body); }
+.hsim-steps b span { font: 500 var(--t-label)/1 var(--mono); color: var(--tone); }
+.hsim-steps p { margin-top: .375rem; font-size: .8125rem; line-height: 1.5; color: var(--muted); }
+@media (max-width: 760px) { .hsim-steps { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 420px) { .hsim-steps { grid-template-columns: minmax(0, 1fr); } }
+
+/* Metrics: the better direction under each name, and the two human references set apart in the value lists. */
+.mt-dir { display: inline-flex; margin-bottom: .5rem; font: 500 var(--t-label)/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--tomato); }
+.mt-card .stops li.is-ref span { color: var(--fg); }
+.stops li.is-ref em { display: inline-block; margin-right: .5rem; padding: .125rem .4375rem; border: 1px solid var(--fg); border-radius: 999px; font: 600 .6875rem/1.2 var(--mono); font-style: normal; letter-spacing: .02em; color: var(--fg); }
+#metrics .lede b, #metrics .sec-head b { font-weight: 600; color: var(--fg); }
+
+/* 04 Results: the table of medians. No box; the "robot helps" shade is the paper's Fig. 4 fill (#eee2e1). */
+.rt { margin-top: var(--block); }
+.rt-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.rt-table { width: 100%; min-width: 46rem; border-collapse: collapse; font: 400 .875rem/1.3 var(--body); font-variant-numeric: tabular-nums; }
+.rt-table th, .rt-table td { padding: .5rem .625rem; text-align: right; white-space: nowrap; }
+.rt-table th[scope="row"], .rt-table .rt-lat { text-align: left; }
+.rt-table thead th { font: 500 .75rem/1.2 var(--mono); letter-spacing: .04em; color: var(--muted); vertical-align: bottom; }
+.rt-table thead tr:first-child th[scope="colgroup"] { color: var(--fg); border-bottom: 1px solid var(--line); text-align: center; }
+.rt-table thead tr:last-child th, .rt-table thead th[rowspan] { border-bottom: 1.5px solid var(--fg); }
+.rt-table thead th:first-child, .rt-table thead th:nth-child(2) { text-align: left; }
+.rt-table thead i { font-style: normal; color: var(--tomato); }
+.rt-table tbody tr { border-bottom: 1px solid var(--line); }
+.rt-table tbody tr:has(+ .rt-2nd) { border-bottom-color: transparent; }
+.rt-table tbody th[scope="row"] { font-weight: 500; vertical-align: top; }
+.rt-lat { font: 400 .75rem/1.3 var(--mono); color: var(--muted); }
+.rt-ref th, .rt-ref td { color: var(--muted); }
+.rt-ref th[scope="row"] { color: var(--fg); font-weight: 600; }
+.rt-ref tr:last-child { border-bottom: 1.5px solid var(--fg); }
+.rt-group th { padding-top: 1.25rem; text-align: left; font: 500 .6875rem/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--tomato); }
+.rt-table tr.rt-group { border-bottom: 1px solid var(--line); }
+.rt-s { font-weight: 600; }
+.rt-na { text-align: center !important; color: var(--muted); }
+.rt-pending td { text-align: left; font: 400 .75rem/1.3 var(--mono); color: var(--muted); }
+.rt-table td.is-help { background: #eee2e1; color: #1b1817; }
+body[data-theme="ink"] .rt-table td.is-help { background: color-mix(in srgb, #eee2e1 22%, transparent); color: var(--fg); }
+.rt-note { margin-top: 1rem; max-width: var(--measure); font: 400 var(--t-label)/1.5 var(--mono); color: var(--muted); }
+.rt-note b { font-weight: 500; color: var(--fg); }
+.rs-takeaways { display: grid; gap: .5rem; margin-top: 2rem; max-width: var(--measure); padding-left: 1.125rem; list-style: disc; }
+.rs-takeaways li { font-size: var(--t-small); }
+.rs-takeaways li::marker { color: var(--tomato); }
+
+/* Table 1: a rule under each header row so the column names read as a header. */
+.matrix thead .m-grp th:not(:first-child) { border-bottom: 1px solid var(--line); }
+.matrix thead tr:last-child th { padding-bottom: .5rem; border-bottom: 1.5px solid var(--fg); color: var(--fg); }
+
+/* Figure fills: bright in both themes (the --f-* tokens). */
+.t-tomato { --ftone: var(--f-tomato); } .t-human { --ftone: var(--f-human); } .t-robot { --ftone: var(--f-robot); } .t-cool { --ftone: var(--f-cool); }
+.wb-track { background: color-mix(in srgb, var(--line) 50%, transparent); }
+.wb-track i, .wb-legend i { background: var(--ftone); }
+.wb-track i + i { box-shadow: inset 2px 0 0 var(--bg); }
+.wb-track span { color: #1b1817; }
+.wb-track i.t-tomato span { color: #fff; }
+.ovv-human { fill: var(--f-human); }
+.ovv-robot { fill: var(--f-robot); }
+.ovv-think { fill: var(--f-think); opacity: 1; }
+.ovv-hatch-ink { fill: var(--f-tomato); }
+.ovv-pause { stroke: color-mix(in srgb, var(--f-tomato) 60%, transparent); }
+.ovv-zone-neg { fill: color-mix(in srgb, var(--f-tomato) 28%, transparent); }
+.ovv-zone-pos { fill: color-mix(in srgb, var(--f-robot) 28%, transparent); }
+.ovv-mark circle { fill: var(--f-tomato); }
+
+/* 06 Real world: setup and comparison, then task order. */
+.rwx { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 1.5rem clamp(1.5rem, 4vw, 3rem); align-items: start; margin-top: var(--block); }
+.rws { margin: 0; }
+.rws-svg { display: block; width: 100%; height: auto; overflow: visible; }
+.rws figcaption { margin-top: .5rem; font: 400 var(--t-label)/1.4 var(--mono); color: var(--muted); }
+.rws-table { fill: color-mix(in srgb, var(--line) 45%, transparent); stroke: var(--line); }
+.rws-item { fill: var(--bg); stroke: var(--line); }
+.rws-in { font: 500 11px var(--mono); letter-spacing: .06em; fill: var(--muted); text-anchor: middle; text-transform: uppercase; }
+.rws-cam { fill: var(--fg); }
+.rws-head { fill: var(--fg); }
+.rws-lbl { font: 600 12px var(--body); fill: var(--fg); text-anchor: middle; }
+.rws-sub { font: 400 11px var(--mono); fill: var(--muted); }
+.rws-lead { fill: none; stroke: var(--muted); stroke-width: 1; stroke-dasharray: 2 3; }
+.rws .k-arm path { fill: none; stroke-linecap: round; }
+.rwc { display: grid; gap: 1.5rem; }
+.rwc h3 { font: 500 var(--t-label)/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--robot); }
+.rwc .is-diff h3 { color: var(--tomato); }
+.rwc ul { display: grid; gap: .375rem; margin-top: .625rem; }
+.rwc li { padding-left: .875rem; border-left: 2px solid var(--line); font-size: var(--t-small); }
+.rwo { margin: var(--block) 0 0; max-width: 34rem; }
+.rwo figcaption b { font: var(--display-w) var(--t-sub)/1.15 var(--display); letter-spacing: -.01em; }
+.rwo-svg { display: block; width: 100%; height: auto; margin-top: 1rem; overflow: visible; }
+.rwo p { margin-top: .75rem; font-size: var(--t-small); color: var(--muted); }
+.rwo-h { font: 500 11px var(--mono); letter-spacing: .08em; text-transform: uppercase; fill: var(--muted); }
+.rwo-t { font: 500 13px var(--body); fill: var(--fg); }
+.rwo-t.is-swap { fill: var(--tomato); font-weight: 600; }
+.rwo-line { fill: none; stroke: var(--line); stroke-width: 1.5; }
+.rwo-line.is-swap { stroke: var(--f-tomato); stroke-width: 2.25; }
+.rwo-k { font: 400 10.5px var(--mono); fill: var(--muted); }
+.rwo-arrow { fill: none; stroke: var(--muted); stroke-width: 1; marker-end: none; }
+@media (max-width: 1000px) { .rwx { grid-template-columns: minmax(0, 1fr); } }

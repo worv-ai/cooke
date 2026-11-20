@@ -282,6 +282,20 @@ window.FIG = (() => {
     </g>`;
   };
 
+  // Arms from above as soft capsules: an outline stroke under a lighter fill stroke, straight from shoulder to hand.
+  const capsule = (x1, y1, x2, y2, w) => `<path class="k-cap-o" d="M${x1} ${y1}L${x2} ${y2}" stroke-width="${w + 3}"/><path class="k-cap-i" d="M${x1} ${y1}L${x2} ${y2}" stroke-width="${w}"/>`;
+  // One YAM arm: a capsule from its mount and a two-finger gripper at the end, pointing along the arm.
+  const yam = (x, y, tx, ty, extra = "") => {
+    const a = Math.atan2(ty - y, tx - x);
+    const c = Math.cos(a), s = Math.sin(a);
+    const at = (f, p) => `${(tx + c * f - s * p).toFixed(1)} ${(ty + s * f + c * p).toFixed(1)}`;
+    return `<g class="k-arm t-robot${extra}">${capsule(x, y, tx, ty, 9)}
+      <path class="k-grip" d="M${at(5, -3.5)}L${at(12, -3.5)}M${at(5, 3.5)}L${at(12, 3.5)}"/>
+    </g>`;
+  };
+  // One human arm: a capsule and a round hand.
+  const arm = (x, y, tx, ty, extra = "") => `<g class="k-arm is-human t-human${extra}">${capsule(x, y, tx, ty, 8)}<circle class="k-hand" cx="${tx}" cy="${ty}" r="5.5"/></g>`;
+
   // The shared kitchen from above. Drawn at 256 × 220 and placed by the layouts below.
   const kitchen = (x, y, s) => `<g transform="translate(${x} ${y}) scale(${s})">
     <rect class="k-room" width="256" height="220" rx="14"/>
@@ -292,8 +306,13 @@ window.FIG = (() => {
     <circle class="k-bowl" cx="128" cy="92" r="15"/><circle class="k-fruit f-orange" cx="128" cy="92" r="6"/>
     <circle class="k-bowl" cx="180" cy="92" r="15"/><circle class="k-fruit f-straw" cx="180" cy="92" r="6"/>
     <circle class="k-bowl" cx="128" cy="158" r="24"/><circle class="k-bowl" cx="128" cy="158" r="14"/>
-    <g class="k-arm t-robot"><path d="M0 134H52L94 150"/><circle cx="94" cy="150" r="5"/></g>
-    <g class="k-arm is-human t-human"><path d="M256 134H204L162 150"/><circle cx="162" cy="150" r="5"/></g>
+    ${yam(24, 118, 66, 110)}
+    ${yam(24, 158, 84, 156, " is-two")}
+    <rect class="k-body t-robot" x="10" y="100" width="22" height="76" rx="8"/>
+    ${arm(232, 124, 190, 112)}
+    ${arm(232, 152, 172, 156, " is-two")}
+    <rect class="k-body t-human" x="226" y="110" width="20" height="56" rx="10"/>
+    <circle class="k-head t-human" cx="236" cy="138" r="8"/>
   </g>`;
 
   const LOOP = {

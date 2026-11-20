@@ -35,6 +35,7 @@
 .lb-table td.is-better { background: color-mix(in srgb, #3f9a66 var(--a), transparent); }
 
 .lb-s span { display: inline-block; min-width: 3.2rem; }
+.lb-rng { display: block; margin-top: .2rem; font: 400 .6875rem/1 var(--mono); color: var(--muted); letter-spacing: -.01em; }
 .lb-bar { position: relative; display: inline-block; width: 5rem; height: .55rem; margin-right: .5rem; vertical-align: middle; border-radius: 2px; background: var(--surface-2); }
 .lb-bar i { position: absolute; top: 0; bottom: 0; border-radius: 2px; }
 .lb-bar i.is-neg { background: var(--tomato); }
