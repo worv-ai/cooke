@@ -141,6 +141,7 @@
       <p class="hero-title">${C.hero.title}</p>
       <p class="hero-authors">${C.hero.authors}</p>
       <div class="btns">${C.hero.links.map((l) => button(l, C.hero.pending)).join("")}</div>
+      <a class="hero-lb" href="${C.hero.leaderboard.href}"><b>${C.hero.leaderboard.label}</b><span>${C.hero.leaderboard.note}</span><i aria-hidden="true">→</i></a>
     </div>
     <a class="hero-cue" href="#abstract">Scroll to explore</a>
   </section>`;
@@ -289,22 +290,31 @@
 
   /* ---------- Night mode ---------- */
 
+  // Night mode follows the system's light or dark setting, and keeps following it as it changes. Flipping the
+  // switch remembers the choice; flipping it back to what the system says forgets it, so the page follows again.
   const NIGHT_KEY = "cooke-night";
-  let night = true;
-  try { night = localStorage.getItem(NIGHT_KEY) !== "off"; } catch { /* storage blocked: stay on the default */ }
+  const systemDark = matchMedia("(prefers-color-scheme: dark)");
+  let chosen = null;
+  try { chosen = localStorage.getItem(NIGHT_KEY); } catch { /* storage blocked: follow the system */ }
+  let night = chosen ? chosen === "on" : systemDark.matches;
 
   const applyTheme = () => {
     document.body.dataset.theme = night ? "ink" : "cream";
     $("#mode").setAttribute("aria-checked", night);
     $("#mode-state").textContent = night ? "On" : "Off";
-    $('meta[name="theme-color"]').content = night ? "#141210" : "#f4ecdf";
+    // While the door intro runs, the browser bar keeps the wall colour; intro.js applies data-page when it ends.
+    const meta = $('meta[name="theme-color"]');
+    meta.dataset.page = night ? "#141210" : "#f4f2f1";
+    if (!document.documentElement.classList.contains("intro-running")) meta.content = meta.dataset.page;
     document.dispatchEvent(new Event("themechange"));
   };
   $("#mode").addEventListener("click", () => {
     night = !night;
-    try { localStorage.setItem(NIGHT_KEY, night ? "on" : "off"); } catch { /* not remembered */ }
+    chosen = night === systemDark.matches ? null : night ? "on" : "off";
+    try { if (chosen) localStorage.setItem(NIGHT_KEY, chosen); else localStorage.removeItem(NIGHT_KEY); } catch { /* not remembered */ }
     applyTheme();
   });
+  systemDark.addEventListener("change", (e) => { if (!chosen) { night = e.matches; applyTheme(); } });
   applyTheme();
 
   /* ---------- In-page links ---------- */
@@ -442,7 +452,7 @@
       };
 
       ctx.clearRect(0, 0, W, H);
-      ctx.font = `500 ${10 * s}px "JetBrains Mono", monospace`;
+      ctx.font = `500 ${10 * s}px "Geist Mono", monospace`;
       ctx.textBaseline = "middle";
       for (let t = 0; t <= TL.span; t += 10) {
         ctx.fillStyle = color("--line");
@@ -804,9 +814,17 @@
 
   gsap.matchMedia().add("(prefers-reduced-motion: no-preference)", () => {
     // Opening: the awning drops, then the title block fades in.
-    gsap.timeline({ defaults: { ease: "power3.out" } })
+    const opening = gsap.timeline({ defaults: { ease: "power3.out" }, paused: !!window.COOKE_INTRO })
       .from(".hero .awning i", { scaleY: 0, duration: 0.6, stagger: { each: 0.015, from: "center" } })
       .from(".hero-body > *, .hero-cue", { autoAlpha: 0, duration: 0.6 }, "-=.3");
+    // After the door intro (intro.js): the hero image waits slightly enlarged behind the door and settles as the
+    // visitor walks through, so the walk carries on into the page; the opening plays once they are inside.
+    const intro = window.COOKE_INTRO;
+    if (intro) {
+      const settle = gsap.fromTo(".hero-media", { scale: 1.12 }, { scale: 1, duration: 2, ease: "power2.out", paused: true });
+      intro.entering.then(() => settle.play());
+      intro.entered.then(() => opening.play());
+    }
 
     // Large figures fade in once.
     gsap.set("[data-r]", { autoAlpha: 0 });

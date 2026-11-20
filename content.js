@@ -36,6 +36,8 @@ window.CONTENT = {
       { label: "Code", href: null },
       { label: "Video", href: null },
     ],
+    /* The link under the buttons (leaderboard.html). */
+    leaderboard: { label: "Leaderboard", note: "Every agent, every task, four modes", href: "leaderboard.html" },
     /* TEMP */
     media: { src: "media/hero.jpg", label: "A human and a robot working at the same kitchen table" },
   },

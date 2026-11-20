@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>COOK·E Leaderboard</title>
+  <meta name="description" content="COOK·E leaderboard: task efficiency S and human burden B of every agent on five collaborative kitchen tasks, in four evaluation modes.">
+  <meta name="theme-color" content="#141210">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 74 74'%3E%3Crect width='74' height='74' rx='22' fill='%23e0492f'/%3E%3Ccircle cx='24' cy='32' r='6' fill='%23141210'/%3E%3Ccircle cx='50' cy='32' r='6' fill='%23141210'/%3E%3Cpath d='M26 50c6 6 16 6 22 0' fill='none' stroke='%23141210' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="leaderboard.css">
+</head>
+<body data-theme="ink">
+  <script>
+    /* Night mode before the page draws, the same rule as index.html (main.js). */
+    (function () {
+      var c = null;
+      try { c = localStorage.getItem("cooke-night"); } catch (e) {}
+      var night = c ? c === "on" : matchMedia("(prefers-color-scheme: dark)").matches;
+      document.body.dataset.theme = night ? "ink" : "cream";
+    })();
+  </script>
+  <div id="app"></div>
+  <noscript><p style="padding:24px">The COOK·E leaderboard needs JavaScript.</p></noscript>
+  <script src="content.js"></script>
+  <script src="leaderboard-data.js"></script>
+  <script src="leaderboard.js"></script>
+</body>
+</html>

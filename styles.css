@@ -44,9 +44,11 @@
   --t-h3: clamp(1.5rem, 1.2rem + 1.2vw, 2.25rem);
   --t-h2: clamp(1.75rem, 1.4rem + 1.4vw, 2.5rem);
 
-  --display: "Fraunces", Georgia, serif;
-  --body: "Instrument Sans", system-ui, sans-serif;
-  --mono: "JetBrains Mono", ui-monospace, monospace;
+  /* Geist throughout: headings at --display-w, running text and labels in Geist and Geist Mono. */
+  --display: "Geist", system-ui, sans-serif;
+  --display-w: 600;
+  --body: "Geist", system-ui, sans-serif;
+  --mono: "Geist Mono", ui-monospace, monospace;
   --ease: cubic-bezier(.2, .7, .1, 1);
 }
 
@@ -54,9 +56,12 @@ body[data-theme="ink"] {
   --bg: #141210; --fg: #f6efe3; --muted: #c9bfae;
   --line: #453d34; --surface: #1f1b17; --surface-2: #26211c;
 }
+/* Light theme ("cream" is the switch's old name). A warm grey with no yellow in it: --paper is the page colour, and
+ * the hero's veil and the browser bar (main.js) take the same value. */
 body[data-theme="cream"] {
-  --bg: #f4ecdf; --fg: #1c1815; --muted: #4f463b;
-  --line: #cfc3ae; --surface: #e8ddc9; --surface-2: #e1d4bc;
+  --paper: #f4f2f1;
+  --bg: var(--paper); --fg: #1b1817; --muted: #524b48;
+  --line: #d3cecb; --surface: #eae7e5; --surface-2: #e1dddb;
   --tomato: #c23a22; --human: #a8620a; --robot: #1f7f55; --cool: #3a6a8c;
 }
 *, *::before, *::after { box-sizing: border-box; }
@@ -93,7 +98,7 @@ section { position: relative; }
 /* Section openings: a plain numbered title, then the claim. */
 .sec-head h2 {
   display: flex; align-items: baseline; gap: .625rem;
-  font: 400 var(--t-h2)/1.1 var(--display); letter-spacing: -.015em;
+  font: var(--display-w) var(--t-h2)/1.1 var(--display); letter-spacing: -.015em;
 }
 .sec-no { font: 500 var(--t-label)/1 var(--mono); letter-spacing: .06em; color: var(--tomato); transform: translateY(-.15em); }
 .claim {
@@ -138,7 +143,7 @@ body[data-theme="ink"] .wm-day, body[data-theme="cream"] .wm-night { display: no
 .ph::after { top: .875rem; right: .875rem; border-left: 0; border-bottom: 0; }
 .ph.has-poster { background: linear-gradient(to top, color-mix(in srgb, var(--surface) 92%, transparent), color-mix(in srgb, var(--surface) 55%, transparent)), var(--poster) center / cover; }
 .ph-tag { font: 500 var(--t-label)/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--tomato); }
-.ph-title { font: 400 clamp(1.125rem, 1rem + .5vw, 1.5rem)/1.2 var(--display); }
+.ph-title { font: var(--display-w) clamp(1.125rem, 1rem + .5vw, 1.5rem)/1.2 var(--display); }
 .ph-spec { font: 400 var(--t-label)/1.4 var(--mono); color: var(--muted); }
 .ph-tc { position: absolute; top: 1.125rem; right: 2.5rem; font: 400 var(--t-label)/1 var(--mono); color: var(--muted); font-variant-numeric: tabular-nums; }
 
@@ -181,30 +186,55 @@ main { counter-reset: fig; }
 .mode b { font-weight: 500; color: var(--fg); min-width: 3ch; text-align: left; }
 
 /* Hero */
-/* The hero stays dark over its footage in both themes. */
+/* The hero follows night mode: a dark veil over its image with night mode on, a light veil with it off.
+ * The two veils cross-fade with the page colours. */
 .hero {
   --bg: #141210; --fg: #f6efe3; --muted: #d6ccbb; --line: #5a5046;
   min-height: 100svh; display: flex; flex-direction: column; overflow: hidden;
   background: var(--bg); color: var(--fg);
+  transition: --bg .3s ease, --fg .3s ease, --muted .3s ease, --line .3s ease;
 }
+body[data-theme="cream"] .hero { --bg: var(--paper); --fg: #1b1817; --muted: #524b48; --line: #d3cecb; }
 .hero-media { position: absolute; inset: 0; }
 .hero-media .media { position: absolute; inset: 0; }
 .hero-media .ph { justify-content: flex-start; padding-top: clamp(4rem, 8vw, 6rem); }
-.hero-shade {
-  position: absolute; inset: 0; pointer-events: none;
+.hero-shade { position: absolute; inset: 0; pointer-events: none; }
+.hero-shade::before, .hero-shade::after { content: ""; position: absolute; inset: 0; transition: opacity .3s ease; }
+.hero-shade::before {
   background: radial-gradient(ellipse 62% 50% at 50% 50%, rgba(20, 18, 16, .88), rgba(20, 18, 16, .62) 72%, rgba(20, 18, 16, .5)),
     linear-gradient(to top, #141210, transparent 22%);
 }
+.hero-shade::after {
+  opacity: 0;
+  background: radial-gradient(ellipse 62% 50% at 50% 50%, color-mix(in srgb, var(--paper) 92%, transparent), color-mix(in srgb, var(--paper) 70%, transparent) 72%, color-mix(in srgb, var(--paper) 58%, transparent)),
+    linear-gradient(to top, var(--paper), transparent 22%);
+}
+body[data-theme="cream"] .hero-shade::before { opacity: 0; }
+body[data-theme="cream"] .hero-shade::after { opacity: 1; }
 .hero-body {
   position: relative; z-index: 1; flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center;
   text-align: center; padding-block: 2.5rem 5rem;
 }
 .hero h1 { font-size: clamp(3.25rem, 9vw, 7.5rem); line-height: .9; }
 .hero h1 .wm { line-height: .9; }
-.hero-title { margin-top: clamp(1rem, 2.4vw, 1.75rem); max-width: 25em; font: 400 clamp(1.25rem, 1rem + 1.1vw, 2rem)/1.25 var(--display); letter-spacing: -.01em; text-wrap: balance; }
+.hero-title { margin-top: clamp(1rem, 2.4vw, 1.75rem); max-width: 25em; font: var(--display-w) clamp(1.25rem, 1rem + 1.1vw, 2rem)/1.25 var(--display); letter-spacing: -.01em; text-wrap: balance; }
 .hero-authors { margin-top: 1rem; font: 400 var(--t-label)/1.4 var(--mono); color: var(--muted); }
 .hero .btns { justify-content: center; margin-top: 1.5rem; }
 .hero .btn { background: rgba(20, 18, 16, .55); }
+body[data-theme="cream"] .hero .btn { background: color-mix(in srgb, #fff 70%, transparent); }
+/* The leaderboard link sits under the buttons: one wider pill in the accent colour. */
+.hero-lb {
+  display: inline-flex; align-items: baseline; gap: .75rem; margin-top: .875rem; padding: .75rem 1.25rem;
+  border: 1px solid var(--tomato); border-radius: 999px; background: color-mix(in srgb, var(--tomato) 14%, transparent);
+  color: var(--fg); text-decoration: none; transition: background .25s, color .25s;
+}
+.hero-lb b { font: 600 .9375rem/1 var(--body); }
+.hero-lb span { font: 400 var(--t-label)/1 var(--mono); letter-spacing: .04em; color: var(--muted); transition: color .25s; }
+.hero-lb i { font-style: normal; transition: transform .25s var(--ease); }
+.hero-lb:hover { background: var(--tomato); color: #fff; }
+.hero-lb:hover span { color: rgba(255, 255, 255, .85); }
+.hero-lb:hover i { transform: translateX(.2rem); }
+@media (max-width: 640px) { .hero-lb span { display: none; } }
 .hero-cue {
   position: absolute; z-index: 1; left: 50%; bottom: 1.25rem; transform: translateX(-50%); padding-bottom: 1.75rem;
   font: 500 .75rem/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; text-decoration: none; white-space: nowrap; color: var(--muted);
@@ -232,7 +262,7 @@ a.btn:hover { background: var(--fg); color: var(--bg); border-color: var(--fg); 
 }
 .gap-t { display: grid; grid-template-columns: 2.5rem minmax(0, 1fr); align-items: baseline; }
 .gap-list span { font: 400 var(--t-label)/1 var(--mono); color: var(--tomato); }
-.gap-list h3 { font: 400 var(--t-sub)/1.15 var(--display); letter-spacing: -.01em; }
+.gap-list h3 { font: var(--display-w) var(--t-sub)/1.15 var(--display); letter-spacing: -.01em; }
 .gap-list p { color: var(--muted); font-size: var(--t-small); }
 
 .matrix { margin-top: var(--block); }
@@ -263,7 +293,7 @@ a.btn:hover { background: var(--fg); color: var(--bg); border-color: var(--fg); 
 .bm-claim em { font-style: italic; color: var(--tomato); }
 .bm .lede { margin-top: .75rem; }
 .hsim { display: grid; grid-template-columns: var(--split-rev); gap: 1rem var(--col-gap); margin-top: var(--block); padding: clamp(1rem, 2.4vw, 1.5rem); background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-l); }
-.hsim h3 { font: 400 var(--t-sub)/1.15 var(--display); letter-spacing: -.01em; }
+.hsim h3 { font: var(--display-w) var(--t-sub)/1.15 var(--display); letter-spacing: -.01em; }
 .hsim-flow { display: flex; flex-wrap: wrap; gap: .5rem 1.25rem; margin-top: .875rem; }
 .hsim-flow li { position: relative; padding: .3125rem .5rem; border: 1px solid var(--tone); border-radius: .375rem; font: 500 .75rem/1 var(--mono); color: var(--tone); }
 .hsim-flow li + li::before { content: "→"; position: absolute; left: -1.125rem; width: 1rem; text-align: center; color: var(--muted); }
@@ -276,7 +306,7 @@ a.btn:hover { background: var(--fg); color: var(--bg); border-color: var(--fg); 
   background: var(--surface); border: 1px solid var(--line); padding: 1.25rem; border-radius: var(--r-m);
 }
 .principle span { font: 500 var(--t-label)/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
-.principle h3 { font: 400 var(--t-sub)/1.15 var(--display); letter-spacing: -.01em; margin: .75rem 0 .5rem; }
+.principle h3 { font: var(--display-w) var(--t-sub)/1.15 var(--display); letter-spacing: -.01em; margin: .75rem 0 .5rem; }
 .principle p { font-size: var(--t-small); color: var(--muted); }
 
 .sch-fig { margin-top: var(--block); }
@@ -412,7 +442,7 @@ a.btn:hover { background: var(--fg); color: var(--bg); border-color: var(--fg); 
 /* Metrics: real-world experiments */
 .rw-block { margin-top: var(--block); padding-top: var(--block); border-top: 1px solid var(--line); }
 .rw-head { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem 1rem; }
-.rw-head h3 { font: 400 var(--t-sub)/1.15 var(--display); letter-spacing: -.01em; }
+.rw-head h3 { font: var(--display-w) var(--t-sub)/1.15 var(--display); letter-spacing: -.01em; }
 .rw-head .badge { margin-top: 0; }
 .rw-block .lede { margin-top: .75rem; }
 .rw-block .rw-slider { margin-top: 1.25rem; }
@@ -420,7 +450,7 @@ a.btn:hover { background: var(--fg); color: var(--bg); border-color: var(--fg); 
 /* Metrics: collaboration against burden, then the formulas */
 .sc { margin-top: var(--block); background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-l); padding: clamp(1rem, 2.4vw, 2rem); }
 .sc-top { display: flex; flex-wrap: wrap; gap: .75rem; justify-content: space-between; align-items: center; }
-.sc-top h3 { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem .75rem; font: 400 var(--t-sub)/1.15 var(--display); letter-spacing: -.01em; }
+.sc-top h3 { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem .75rem; font: var(--display-w) var(--t-sub)/1.15 var(--display); letter-spacing: -.01em; }
 .sc-top h3 .badge { margin-top: 0; }
 .sc-corner { margin-top: .25rem; font: 400 var(--t-label)/1.4 var(--mono); color: var(--muted); }
 .sc-plot { display: block; width: 100%; height: auto; margin-top: .75rem; overflow: visible; }
@@ -451,7 +481,7 @@ button.sc-task:hover { border-color: var(--muted); }
 /* Metrics */
 .mt-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem var(--tile-gap); margin-top: var(--block); align-items: stretch; }
 .mt-card { min-width: 0; padding: clamp(1rem, 2.4vw, 1.75rem); background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-l); }
-.mt-card h3 { font: 400 var(--t-sub)/1.15 var(--display); margin-bottom: .5rem; }
+.mt-card h3 { font: var(--display-w) var(--t-sub)/1.15 var(--display); margin-bottom: .5rem; }
 .mt-card p { color: var(--muted); }
 .tex { margin-top: 1.125rem; overflow-x: auto; overflow-y: hidden; color: var(--fg); }
 .tex + .tex { margin-top: .25rem; }
@@ -485,7 +515,7 @@ button.sc-task:hover { border-color: var(--muted); }
 .rw-slide[hidden] { display: none; }
 .rw-slide video { display: block; width: 100%; height: 100%; object-fit: cover; }
 .rw-slide figcaption { position: absolute; left: 0; right: 0; bottom: 0; display: flex; align-items: baseline; gap: .625rem; padding: 2rem 1rem .75rem; background: linear-gradient(transparent, rgba(0, 0, 0, .7)); color: #fff; }
-.rw-slide figcaption b { font: 400 1.125rem/1.2 var(--display); }
+.rw-slide figcaption b { font: var(--display-w) 1.125rem/1.2 var(--display); }
 .rw-slide figcaption span { font: 500 .6875rem/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: rgba(255, 255, 255, .8); }
 .rw-nav { position: absolute; top: 50%; display: grid; place-items: center; width: 2.5rem; height: 2.5rem; margin-top: -1.25rem; border-radius: 50%; background: rgba(20, 18, 16, .6); color: #fff; transition: background .2s; }
 .rw-nav:hover { background: rgba(20, 18, 16, .85); }
@@ -512,7 +542,7 @@ button.sc-task:hover { border-color: var(--muted); }
   background: var(--surface); border-radius: var(--r-m); text-decoration: none; transition: transform .3s var(--ease);
 }
 a.rs-link:hover { transform: translateY(-.25rem); }
-.rs-link b { font: 400 var(--t-sub)/1 var(--display); }
+.rs-link b { font: var(--display-w) var(--t-sub)/1 var(--display); }
 .rs-link span { font: 400 var(--t-label)/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
 .citation { margin-top: var(--tile-gap); padding: 1.125rem 1.25rem; background: var(--surface-2); border-radius: var(--r-s); font: 400 var(--t-label)/1.5 var(--mono); }
 .foot { padding-block: 2.5rem; }
@@ -521,12 +551,15 @@ a.rs-link:hover { transform: translateY(-.25rem); }
 /* the hero (over the darkened video) and the red footer always take the cream-letter logo */
 body .hero .wm-day, body .foot .wm-day { display: none; }
 body .hero .wm-night, body .foot .wm-night { display: inline; }
+/* with night mode off the hero is light, so it takes the brown-letter logo */
+body[data-theme="cream"] .hero .wm-day { display: inline; }
+body[data-theme="cream"] .hero .wm-night { display: none; }
 .foot p { font: 400 var(--t-label)/1.4 var(--mono); color: var(--muted); }
 
 /* Panels hold every interactive figure. */
 .panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-l); padding: clamp(1rem, 2.4vw, 1.75rem); }
 .panel-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 1rem; margin-bottom: 1.25rem; }
-.panel-head h3 { font: 400 var(--t-sub)/1.15 var(--display); letter-spacing: -.01em; }
+.panel-head h3 { font: var(--display-w) var(--t-sub)/1.15 var(--display); letter-spacing: -.01em; }
 .eyebrow { font: 500 var(--t-label)/1.3 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-bottom: .5rem; }
 
 /* Tones color a figure part and every dot that travels with it. */
@@ -565,7 +598,7 @@ body .hero .wm-night, body .foot .wm-night { display: inline; }
 .ov-step { padding-left: 1.125rem; border-left: 2px solid var(--tone); }
 .ov-top { display: flex; justify-content: space-between; gap: .5rem; font: 500 .75rem/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
 .ov-top span:first-child { color: var(--tone); }
-.ov-step h3 { margin-top: .5rem; font: 400 var(--t-sub)/1.15 var(--display); letter-spacing: -.01em; }
+.ov-step h3 { margin-top: .5rem; font: var(--display-w) var(--t-sub)/1.15 var(--display); letter-spacing: -.01em; }
 .ov-hit { padding: 0; text-align: left; font: inherit; color: var(--fg); }
 .ov-copy { display: none; margin-top: .375rem; font-size: .9375rem; line-height: 1.45; color: var(--muted); }
 .ov-detail { padding-left: 1.125rem; border-left: 2px solid var(--tone); }
@@ -587,7 +620,7 @@ body .hero .wm-night, body .foot .wm-night { display: inline; }
 .ovv-bracket { fill: none; stroke: var(--tone); stroke-width: 2; stroke-linecap: round; }
 .ovv-group-label { font: 500 11px var(--mono); letter-spacing: .08em; fill: var(--tone); }
 .ovv-node rect { fill: var(--surface); stroke: var(--tone); stroke-width: 1.25; }
-.ovv-title { font: 400 18px var(--display); fill: var(--fg); }
+.ovv-title { font: var(--display-w) 18px var(--display); fill: var(--fg); }
 .ovv-sub { font: 400 10.5px var(--mono); fill: var(--muted); }
 .ovv-lane { font: 500 11px var(--mono); fill: var(--muted); }
 .ovv-note { font: 400 12px var(--body); fill: var(--fg); }
@@ -599,7 +632,7 @@ body .hero .wm-night, body .foot .wm-night { display: inline; }
 .ovv-hatch-ink { fill: var(--tomato); opacity: .55; }
 .ovv-head { stroke: var(--fg); stroke-width: 1.5; stroke-dasharray: 3 3; }
 .ovv-axis { fill: none; stroke: var(--line); stroke-width: 1.25; }
-.ovv-h { font: 400 18px var(--display); fill: var(--fg); }
+.ovv-h { font: var(--display-w) 18px var(--display); fill: var(--fg); }
 .ovv-better { font: 500 10.5px var(--mono); fill: var(--muted); }
 .ovv-zone-neg { fill: color-mix(in srgb, var(--tomato) 30%, transparent); }
 .ovv-zone-pos { fill: color-mix(in srgb, var(--robot) 30%, transparent); }
