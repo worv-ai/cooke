@@ -34,7 +34,51 @@ window.CONTENT = {
   hero: {
     title: "Beyond Solo Tasks, Towards Human-Robot Collaboration in Long-Horizon Kitchen Tasks",
     expansion: "<b>CO</b>llaborative <b>O</b>pen <b>K</b>itchen-<b>E</b>valuation",
-    authors: "Authors withheld during anonymous review",
+    /* Paper-style author block: each author carries the numbers of their affiliations (see affiliations below). */
+    authors: [
+      { name: "Jin Hyeon Kim", aff: [1], mark: "*" },
+      { name: "Seonghu Jeon", aff: [1], mark: "*" },
+      { name: "Hyunkoo Lee", aff: [1], mark: "*" },
+      { name: "Tongmin Kim", aff: [1], mark: "*" },
+      { name: "Junsu Kim", aff: [1], mark: "*" },
+      { name: "MinSeo Kim", aff: [2], mark: "*" },
+      { name: "Jiwon Kang", aff: [2], mark: "*" },
+      { name: "Junhyeok Choi", aff: [2], mark: "*" },
+      { name: "Suhwan Choi", aff: [2], mark: "*" },
+      { name: "Jaeyoon Jung", aff: [3], mark: "*" },
+      { name: "Woojin Cheong", aff: [2], mark: "*" },
+      { name: "Jaeeun Lee", aff: [4], mark: "*" },
+      { name: "Kyochul Jang", aff: [2] },
+      { name: "Jisang Han", aff: [1] },
+      { name: "Hyeongmin Lee", aff: [5] },
+      { name: "Yuke Zhu", aff: [6] },
+      { name: "Danfei Xu", aff: [4] },
+      { name: "Jiajun Wu", aff: [7] },
+      { name: "Marc Pollefeys", aff: [8] },
+      { name: "Sunghwan Hong", aff: [8], mark: "†" },
+      { name: "Youngjae Yu", aff: [9], mark: "†" },
+      { name: "Seungryong Kim", aff: [1], mark: "†" },
+      { name: "Yunsung Lee", aff: [3], mark: "†" },
+    ],
+    /* Marks on the names above, explained under the affiliations. */
+    authorNotes: [
+      { mark: "*", text: "Equal contribution" },
+      { mark: "†", text: "Corresponding authors" },
+    ],
+    /* logo: file in media/logos (split from affiliations/Affiliations.svg, white made transparent); h: its height in that Figma frame, so
+     * the logos keep their relative sizes. Entries sharing a logo show it once with both numbers. Without a logo
+     * the name is shown as text. */
+    affiliations: [
+      { no: 1, name: "KAIST", logo: "media/logos/kaist.png?v=2", h: 51 },
+      { no: 2, name: "Seoul National University", logo: "media/logos/snu.png?v=2", h: 67 },
+      { no: 3, name: "Maum.ai", logo: "media/logos/maum.png?v=2", h: 40 },
+      { no: 4, name: "Georgia Institute of Technology", logo: "media/logos/gatech.png?v=2", h: 42 },
+      { no: 5, name: "Seoul National University of Science and Technology", logo: "media/logos/seoultech.png?v=2", h: 62 },
+      { no: 6, name: "University of Texas at Austin", logo: "media/logos/utaustin.svg", h: 49 },
+      { no: 7, name: "Stanford University", logo: "media/logos/stanford.png?v=2", h: 51 },
+      { no: 8, name: "ETH Zurich", logo: "media/logos/ethz.svg", h: 39 },
+      { no: 9, name: "Seoul National University", logo: "media/logos/snu.png?v=2", h: 67 },
+    ],
     pending: "After review",
     links: [
       { label: "Paper", href: null },
