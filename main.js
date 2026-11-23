@@ -135,6 +135,27 @@
     </div>`;
   })();
 
+  // Paper-style authors: names with superscript affiliation numbers, then the numbered affiliations.
+  // A plain string (e.g. "Authors withheld during anonymous review") still shows as one line.
+  const authorBlock = (h) => {
+    if (!Array.isArray(h.authors)) return `<p class="hero-authors">${h.authors || ""}</p>`;
+    const names = h.authors.map((a, i) =>
+      `<span class="hero-author">${a.name}<sup>${(a.aff || []).join(",")}${a.mark || ""}</sup>${i < h.authors.length - 1 ? "," : ""}</span>`).join(" ");
+    // Affiliations: transparent logos, each with its number(s).
+    const list = h.affiliations || [];
+    const hasLogos = list.some((f) => f.logo);
+    const seen = new Map();
+    list.forEach((f) => {
+      const key = f.logo || `text:${f.no}`;
+      if (seen.has(key)) seen.get(key).nos.push(f.no); else seen.set(key, { ...f, nos: [f.no] });
+    });
+    const affs = [...seen.values()].map((f) => f.logo
+      ? `<span class="hero-logo"><sup>${f.nos.join(",")}</sup><img src="${f.logo}" alt="${f.name}" title="${f.name}" style="--h:${f.h || 50}" loading="eager"></span>`
+      : `<span class="hero-aff"><sup>${f.nos.join(",")}</sup>${f.name}</span>`).join(" ");
+    const notes = (h.authorNotes || []).map((n) => `<span class="hero-aff"><sup>${n.mark}</sup>${n.text}</span>`).join(" ");
+    return `<p class="hero-authors is-list">${names}</p>${affs ? `<p class="hero-affs${hasLogos ? " has-logos" : ""}">${affs}</p>` : ""}${notes ? `<p class="hero-affs hero-notes">${notes}</p>` : ""}`;
+  };
+
   const hero = `<section class="hero" id="top">
     <div class="hero-media">${media(C.hero.media)}<div class="hero-shade"></div></div>
     ${awning()}
@@ -142,7 +163,7 @@
       <h1>${wordmark()}</h1>
       <p class="hero-exp">${C.hero.expansion || "<b>CO</b>llaborative <b>O</b>pen <b>K</b>itchen-<b>E</b>valuation"}</p>
       <p class="hero-title">${C.hero.title}</p>
-      <p class="hero-authors">${C.hero.authors}</p>
+      ${authorBlock(C.hero)}
       <div class="btns">${C.hero.links.map((l) => button(l, C.hero.pending)).join("")}</div>
       <a class="hero-lb" href="${C.hero.leaderboard.href}"><b>${C.hero.leaderboard.label}</b><span>${C.hero.leaderboard.note}</span><i aria-hidden="true">→</i></a>
     </div>

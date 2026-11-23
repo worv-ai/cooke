@@ -222,6 +222,33 @@ body[data-theme="cream"] .hero-shade::after { opacity: 1; }
 .hero h1 .wm { line-height: .9; }
 .hero-title { margin-top: clamp(1rem, 2.4vw, 1.75rem); max-width: 25em; font: var(--display-w) clamp(1.25rem, 1rem + 1.1vw, 2rem)/1.25 var(--display); letter-spacing: -.01em; text-wrap: balance; }
 .hero-authors { margin-top: 1rem; font: 400 var(--t-label)/1.4 var(--mono); color: var(--muted); }
+/* Paper-style author block: names with superscript affiliation numbers, then the numbered affiliations. */
+.hero-authors.is-list {
+  max-width: min(76rem, 100%); margin-top: 1.25rem; font: 500 clamp(.875rem, .8rem + .3vw, 1.0625rem)/1.7 var(--body);
+  color: var(--fg); text-wrap: balance;
+}
+.hero-author, .hero-aff { display: inline-block; white-space: nowrap; }
+.hero-author { margin-inline: .2em; }
+.hero-authors sup, .hero-affs sup { font: 500 .68em/1 var(--mono); color: var(--tomato); vertical-align: super; }
+.hero-authors sup { margin-left: .1em; }
+.hero-affs {
+  max-width: min(76rem, 100%); margin-top: .75rem; font: 400 var(--t-label)/1.7 var(--mono); color: var(--muted); text-wrap: balance;
+}
+.hero-aff { margin-inline: .5em; }
+.hero-notes { margin-top: .25rem; }
+/* Affiliation logos: transparent files in full colour on the light hero; in night mode they turn into
+ * light single-colour marks, since several are dark navy or black. */
+.hero-affs.has-logos {
+  display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: .875rem clamp(1.25rem, 2.6vw, 2.5rem);
+  margin-top: 1.25rem;
+}
+body:not([data-theme="cream"]) .hero-logo img { filter: brightness(0) invert(1); opacity: .92; }
+.hero-logo { display: inline-flex; align-items: flex-start; gap: .2rem; }
+.hero-logo img { display: block; width: auto; height: calc(var(--h) * clamp(.46px, .22px + .036vw, .74px)); }
+.hero-affs.has-logos sup { margin: 0; color: var(--tomato); }
+.hero-notes { margin-top: .75rem; }
+.hero-affs sup { margin-right: .2em; }
+@media (max-width: 640px) { .hero-aff { white-space: normal; } }
 .hero .btns { justify-content: center; margin-top: 1.5rem; }
 .hero .btn { background: rgba(20, 18, 16, .55); }
 body[data-theme="cream"] .hero .btn { background: color-mix(in srgb, #fff 70%, transparent); }
