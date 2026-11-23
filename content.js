@@ -87,9 +87,9 @@ window.CONTENT = {
     ],
     /* The link under the buttons (leaderboard.html). */
     leaderboard: { label: "Leaderboard", note: "Every agent, every task, four modes", href: "leaderboard.html" },
-    /* Silent loop behind the title: the five tasks and one real-world run (demo candidate A). Stand-in footage. */
+    /* Silent 24 s loop behind the title: four tasks, each in simulation and in the real world, in a 3×2 grid. */
     /* ?v= changes the URL whenever the file is replaced, so browsers do not keep showing a cached copy. */
-    media: { src: "media/hero_loop.mp4?v=5", poster: "media/hero_loop.jpg?v=5", autoplay: true, label: "Five simulated kitchen tasks and one real-world run, looping" },
+    media: { src: "media/cooke_bg_4tasks_sim_real_loop_720p.mp4?v=1", poster: "media/cooke_bg_4tasks_sim_real_loop_720p.jpg?v=1", autoplay: true, label: "Four kitchen tasks in simulation and in the real world, looping" },
   },
 
   /*
