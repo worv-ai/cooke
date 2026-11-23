@@ -5,14 +5,12 @@
  * behind the Results chart are in leaderboard-data.js (copied from cjh/updates, checked there against facts.json).
  */
 Object.assign(window.CONTENT, {
-  /* The demo video under the hero (demo candidate B, "Thesis first"). Stand-in footage, no sound. */
+  /* The demo video under the hero: the 4-minute walkthrough with sound (benchmark, metrics, findings, real world). */
   demo: {
     kicker: "Demo",
-    src: "media/demo_video.mp4?v=3",
-    poster: "media/demo_video.jpg?v=3",
-    label: "COOK·E demo video: who finishes first, the benchmark, the three failure modes, the numbers and the real world",
-    /* For the team while the page is shared internally. Remove before release. */
-    note: "(임시 데모비디오 입니다)",
+    src: "media/v11240300-d.mp4",
+    poster: "media/v11240300-d.jpg",
+    label: "COOK·E demo video: the five kitchen tasks, the simulated human partner, the six metrics, the main findings and the real-world failures",
   },
 
   /* Key results: a race. Four teams make the same dish; each line fills at the team's average pace and the finishing
