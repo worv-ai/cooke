@@ -11,10 +11,13 @@
 
   /* COOK·E logo (projectpage/cook-E.png, cut out by projectpage/make_cooke_logo.py): brown letters for the cream
    * theme, cream letters for night mode and the red footer. The face's eyes are erased from the PNGs and drawn here
-   * so they can blink; their positions come from media/hero_logo-eyes.json. */
+   * so they can blink; their positions come from media/hero_logo-eyes.json. The E's robot arm is its own layer
+   * (hero_logo-arm.png, cut from the same PNGs, which are kept as hero_logo-noarm.png) so it can wave: it turns
+   * about its shoulder joint at (1227, 126). Only the logo in Figure 1 waves (teaser.css). */
   const wordmark = () => `<span class="wm" role="img" aria-label="COOK·E"><svg viewBox="0 0 1400 248" aria-hidden="true">
-    <image class="wm-day" href="media/hero_logo.png" width="1400" height="248"/>
-    <image class="wm-night" href="media/hero_logo-night.png" width="1400" height="248"/>
+    <image class="wm-day" href="media/hero_logo-noarm.png" width="1400" height="248"/>
+    <image class="wm-night" href="media/hero_logo-night-noarm.png" width="1400" height="248"/>
+    <image class="wm-arm" href="media/hero_logo-arm.png" x="1200" y="56" width="200" height="116"/>
     <g class="wm-eye" fill="#fefdfd"><ellipse cx="560.84" cy="97.38" rx="10.82" ry="18.03"/><ellipse cx="635.68" cy="97.38" rx="10.52" ry="18.03"/></g>
   </svg></span>`;
 
@@ -169,6 +172,11 @@
     </div>
     <a class="hero-cue" href="#abstract">Scroll to explore</a>
   </section>`;
+
+  // Interactive copy of the paper's Figure 1 (teaser.js), in its own band between the hero and the demo video.
+  const figure1 = window.TEASER && window.TEASER_DATA && window.LEADERBOARD
+    ? `<section class="sec-fig1" id="figure1" aria-label="Figure 1"><div class="wrap">${TEASER.markup(TEASER_DATA, { wordmark })}</div></section>`
+    : "";
 
   const abstract = `<section class="pad" id="abstract"><div class="wrap">
     ${head({ title: C.abstract.kicker, claim: C.abstract.lead })}
@@ -403,7 +411,7 @@
       <ul>${navItems.map(([l, id, n, top]) => `<li${top ? "" : ' class="is-minor"'}><a href="#${id}">${n ? `<b>${pad(n)}</b>` : ""}<span>${l}</span></a></li>`).join("")}</ul>
       <button class="mode" id="mode" type="button" role="switch" aria-label="Night mode" aria-checked="true"><span class="mode-label">Night mode</span><i aria-hidden="true"></i><b id="mode-state">On</b></button>
     </div></nav>
-    <main>${hero}${demos}${abstract}${keyResults}${overview}${gap}${tasks}${metrics}${results}${failures}${real}${resources}</main>`;
+    <main>${hero}${figure1}${demos}${abstract}${keyResults}${overview}${gap}${tasks}${metrics}${results}${failures}${real}${resources}</main>`;
 
   /* ---------- Equations ---------- */
 
@@ -414,6 +422,7 @@
 
   /* ---------- Figures ---------- */
 
+  if (figure1) TEASER.wire($("#fig1"), TEASER_DATA);
   FIG.overview.init($("#ov"), C.overview);
   FIG.decision.init($("#dl"));
 
