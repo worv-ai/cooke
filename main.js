@@ -167,8 +167,7 @@
       <p class="hero-exp">${C.hero.expansion || "<b>CO</b>llaborative <b>O</b>pen <b>K</b>itchen-<b>E</b>valuation"}</p>
       <p class="hero-title">${C.hero.title}</p>
       ${authorBlock(C.hero)}
-      <div class="btns">${C.hero.links.map((l) => button(l, C.hero.pending)).join("")}</div>
-      <a class="hero-lb" href="${C.hero.leaderboard.href}"><b>${C.hero.leaderboard.label}</b><span>${C.hero.leaderboard.note}</span><i aria-hidden="true">→</i></a>
+      <div class="btns">${C.hero.links.map((l) => button(l, C.hero.pending)).join("")}<a class="hero-lb" href="${C.hero.leaderboard.href}"><b>${C.hero.leaderboard.label}</b><span>${C.hero.leaderboard.note}</span><i aria-hidden="true">→</i></a></div>
     </div>
     <a class="hero-cue" href="#abstract">Scroll to explore</a>
   </section>`;

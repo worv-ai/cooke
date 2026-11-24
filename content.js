@@ -85,7 +85,7 @@ window.CONTENT = {
       { label: "Code", href: null },
       { label: "Video", href: "#demo" },
     ],
-    /* The link under the buttons (leaderboard.html). */
+    /* The link in the button row (leaderboard.html). */
     leaderboard: { label: "Leaderboard", note: "Every agent, every task, four modes", href: "leaderboard.html" },
     /* Silent 24 s loop behind the title: four tasks, each in simulation and in the real world, in a 3×2 grid. */
     /* ?v= changes the URL whenever the file is replaced, so browsers do not keep showing a cached copy. */
