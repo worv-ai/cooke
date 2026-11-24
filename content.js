@@ -3,9 +3,10 @@
  *
  * To change copy: edit the strings below. Inline <em> and <b> are allowed.
  * To add a video: put the file in media/ and set `src`, e.g.
- *   media: { src: "media/tasks_3-fruit-skewer_free-on_argon.mp4", poster: "media/tasks_3-fruit-skewer_free-on_argon.jpg", label: "..." }
+ *   media: { src: "media/tasks_3-fruit-skewer_free-on_astra_isaac.mp4", poster: "media/tasks_3-fruit-skewer_free-on_astra_isaac.jpg", label: "..." }
  * Media names start with the page section that shows them (hero_, overview_, tasks_, real-world_), then the task
- * number and name in the paper's order, the mode (free/aware = latency, on/off = communication) and the agent.
+ * number and name in the paper's order, the mode (free/aware = latency, on/off = communication) and the agent;
+ * _isaac marks an Isaac Sim render (robot head camera). real-world_ files are the real-robot overhead camera.
  * media/demovideo/ holds the demo-video drafts, media/unused/ the files no page uses.
  * While `src` is empty the page shows a placeholder using `label` and `spec`.
  * A link with `href: null` renders as disabled and shows `pending`.
@@ -1131,19 +1132,19 @@ window.CONTENT = {
   },
 
   /*
-   * Real-world runs, shown as a slider. Robot head camera cropped from the recordings in projectpage/
-   * (*_real.mp4, the frames the model saw), slightly brightened, whole run at 32× speed.
+   * Real-world runs, shown as a slider. Overhead camera (cam-high) of one successful real-robot trial per task,
+   * communication on, from cooke-supple-video media/supple/real; whole run at 8× speed, 960×600.
    */
   real: {
     kicker: "Real-World Experiments",
-    body: "Earlier footage from the robot's head camera, shown until the clips of the reported trials are ready.",
-    badge: "In progress",
-    speed: "32×",
+    body: "One real-robot trial per task, recorded from the overhead camera, with communication on.",
+    speed: "8×",
     items: [
-      { name: "Sandwich", robot: "Gemini 4 Argon", src: "media/real-world_1-sandwich_argon.mp4", poster: "media/real-world_1-sandwich_argon.jpg" },
-      { name: "Fruit Skewer", robot: "GPT-6 Astra", src: "media/real-world_3-fruit-skewer_astra.mp4", poster: "media/real-world_3-fruit-skewer_astra.jpg" },
-      { name: "Canapé", robot: "Gemini 4 Argon", src: "media/real-world_2-canape_argon.mp4", poster: "media/real-world_2-canape_argon.jpg" },
-      { name: "Cleanup", robot: "GPT-6 Astra", src: "media/real-world_5-cleanup_astra.mp4", poster: "media/real-world_5-cleanup_astra.jpg" },
+      { name: "Sandwich", robot: "Gemini 4 Argon", mode: "Latency-free", src: "media/real-world_1-sandwich_free-on_argon.mp4", poster: "media/real-world_1-sandwich_free-on_argon.jpg" },
+      { name: "Canapé", robot: "Claude Fable 5.2", mode: "Latency-free", src: "media/real-world_2-canape_free-on_fable.mp4", poster: "media/real-world_2-canape_free-on_fable.jpg" },
+      { name: "Fruit Skewer", robot: "Claude Fable 5.2", mode: "Latency-free", src: "media/real-world_3-fruit-skewer_free-on_fable.mp4", poster: "media/real-world_3-fruit-skewer_free-on_fable.jpg" },
+      { name: "S'mores", robot: "GPT-6 Astra", mode: "Latency-aware", src: "media/real-world_4-smores_aware-on_astra.mp4", poster: "media/real-world_4-smores_aware-on_astra.jpg" },
+      { name: "Cleanup", robot: "Gemini 4 Argon", mode: "Latency-free", src: "media/real-world_5-cleanup_free-on_argon.mp4", poster: "media/real-world_5-cleanup_free-on_argon.jpg" },
     ],
   },
 
