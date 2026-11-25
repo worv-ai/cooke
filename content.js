@@ -62,7 +62,7 @@ window.CONTENT = {
       { name: "Yunsung Lee", aff: [3], mark: "†" },
     ],
     /* Names per line on wide screens (three rows); must add up to the number of authors. */
-    authorRows: [8, 7, 8],
+    authorRows: [7, 8, 8],
     /* Marks on the names above, explained under the affiliations. */
     authorNotes: [
       { mark: "*", text: "Equal contribution" },
