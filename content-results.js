@@ -27,36 +27,51 @@ Object.assign(window.CONTENT, {
     ref: { sandwich: [79.6, 56.82], canape: [106.34, 58.5], fruit: [214.3, 132.5], smores: [111.13, 88.12], cleanup: [251.05, 155.16] },
   },
 
-  /* 04 Results: the table of medians in results-table-data.js (API rerun on the fixed code, and the VLA pilot runs). */
+  /* 04 Results: the paper's Table 8 (simulation results averaged over the four modes), copied as printed.
+   * Values are strings so they keep the paper's decimals; null is "–". † marks runs without communication. */
   results: {
     kicker: "Results",
     claim: "No agent or policy <em>beats the human working alone.</em>",
-    body: "Medians over every run on Sandwich, Canapé, Fruit Skewer and S'mores. A shaded cell would mean the robot helped (S > 0 and B < 1).",
-    /* One line per metric above the table (the full definitions are in the paper and in metrics, content.js). */
+    body: "Simulation results for every policy, averaged over the four modes. This is Table 8 of the paper; Table 7 has every mode.",
+    /* One line per column, worded like the results hub (the full definitions are in the paper). */
     keys: [
-      ["S", "↑", "task efficiency: 0\u00a0=\u00a0one person alone, 1\u00a0=\u00a0two\u00a0people"],
-      ["B", "↓", "human burden: 1\u00a0=\u00a0the human does as much as alone"],
-      ["W", "↓", "time the human loses to the robot"],
+      ["D", "↑", "runs that finish within the time limit (%)"],
+      ["S", "↑", "task efficiency: 0 = one person alone, 1 = two people"],
+      ["B", "↓", "human burden: 1 = the human does as much as alone"],
+      ["W", "↓", "time the human loses to the robot (% of one person's time)"],
+      ["C", "↑", "the robot's share of the finished subtasks (%)"],
+      ["R", "↓", "the robot's thinking time per decision (s)"],
     ],
-    latLabel: "Latency",
-    lat: [["free", "Latency-free"], ["aware", "Latency-aware"]],
-    labels: { h: "Human-alone (H)", hh: "Two humans (H-H)", off: "Comm. off", on: "Comm. on" },
-    /* Legend above the table: click an option to show or hide it. */
-    filter: { group: "Agents", groups: { agents: "Generalist agents", vla: "VLA policies" }, lat: "Latency", comm: "Communication", hint: "Click to show or hide",
-      /* Options that start switched off, as "group:id", "lat:free|aware" or "comm:off|on". */
-      off: ["group:vla"] },
     table: {
-      agent: "Agent",
-      cols: [["S", "↑"], ["B", "↓"], ["W", "↓"]],
-      ref: "Reference",
+      policy: "Policy",
+      /* Column groups as in Table 8: [group, [[symbol, arrow], ...]]. */
+      cols: [["Team", [["D", "↑"], ["S", "↑"]]], ["Human", [["B", "↓"], ["W", "↓"]]], ["Robot", [["C", "↑"], ["R", "↓"]]]],
+      groups: [
+        { name: "Reference", ref: true, rows: [
+          ["H (human alone)", ["100", "0.00", "1.00", "0.0", null, null]],
+          ["H-H (two humans)", ["100", "1.00", "0.47", "0.0", null, null]],
+        ] },
+        { name: "Frontier agents", rows: [
+          ["GPT-6 Astra", ["65", "−0.96", "1.15", "44.9", "12.2", "10.2"]],
+          ["Gemini 4 Argon", ["72", "−1.28", "1.12", "38.5", "7.8", "19.0"]],
+          ["Claude Opus 5.5", ["64", "−1.14", "1.12", "43.3", "9.0", "9.2"]],
+          ["Claude Fable 5.2", ["68", "−1.52", "1.11", "39.5", "11.0", "13.3"]],
+        ] },
+        { name: "VLA baselines", rows: [
+          ["π<sub>0.5</sub>†", ["100", "−0.11", "1.01", "0.0", "0.0", "0.04"]],
+          ["π<sub>0.5</sub> + Planner", ["100", "−0.16", "1.02", "0.0", "0.0", "59.6"]],
+          ["π<sub>0.5</sub> + GPT-6 Astra", ["100", "−0.18", "1.02", "0.0", "0.0", "5.4"]],
+          ["MolmoAct 2†", ["60", "−1.17", "1.32", "45.8", "0.0", "0.16"]],
+          ["MolmoAct 2 + Planner", ["88", "−0.49", "1.09", "9.8", "0.0", "43.0"]],
+          ["MolmoAct 2 + GPT-6 Astra", ["78", "−0.67", "1.07", "6.4", "0.0", "4.8"]],
+        ] },
+      ],
       na: "–",
-      running: "Rollouts still running",
-      note: "Agents: five rollouts per task, 20 runs per cell. VLA policies: three per task, 12 runs per cell. W is a share of the human-alone completion time. –: not evaluated (a VLA policy alone has no message channel).",
-      pending: "rerun results pending.",
+      note: "† Runs without communication. A VLA policy runs alone or takes instructions from the simulated human's planner or from GPT-6 Astra; for an instructed VLA, R is the time of the instructing model.",
     },
     takeaways: [
-      "Every median S is below zero, so no team finishes sooner than the human would alone.",
-      "Every B is 1.00 or higher, so the human never does less work than alone.",
+      "Every S is below zero, so no team finishes sooner than one person alone.",
+      "Every B is above 1.00, so no robot takes work off the human on average.",
     ],
   },
 

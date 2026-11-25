@@ -80,6 +80,7 @@
         </div>
         <div class="tp-ctl">
           ${seg("tp-lat", sw.lat.label, sw.lat.options)}
+          ${seg("tp-comm", sw.comm.label, sw.comm.options)}
           <div class="seg is-sm tp-speed" role="group" aria-label="Playback speed"></div>
         </div>
         <p class="tp-line"><b>${t.behavior}</b>${t.line}</p>
@@ -304,49 +305,26 @@
     <div class="mt-grid is-3">${metricCard(C.metrics.score)}${metricCard(C.metrics.burden)}${metricCard(C.metrics.delay)}</div>
   </div></section>`;
 
-  // 04 Results: one table of medians (results-table-data.js). Rows: each agent at both latencies; columns: S, B and W
-  // with communication off, then on. Cells where the robot helps (S > 0 and B < 1) take the paper's shading.
+  // 04 Results: the paper's Table 8, one row per policy averaged over the four modes, columns grouped into
+  // team, human and robot as in the paper.
   const RS2 = C.results;
-  const RT = window.RESULTS_TABLE;
-  const sgn = (v) => v.toFixed(2).replace("-", "−");
-  const rtCell = (c, comm) => {
-    const d = ` data-comm="${comm}"`;
-    if (!c) return `<td class="rt-na" colspan="3"${d}>${RS2.table.na}</td>`;
-    const [S, B, W, n] = c;
-    const help = S > 0 && B < 1 ? " is-help" : "";
-    return `<td class="rt-s${help}" title="${n} runs"${d}>${sgn(S)}</td><td class="${help.trim()}"${d}>${B.toFixed(2)}</td><td class="rt-w${help}"${d}>${W == null ? "–" : `${Math.round(W * 100)}%`}</td>`;
-  };
-  const rtOff = new Set(RS2.filter.off || []); // "key:value" options that start switched off
-  const gHide = (g) => (rtOff.has(`group:${g.id}`) ? " hidden" : "");
-  const rtRows = RT ? RT.groups.map((g) => `<tr class="rt-group" data-group="${g.id}"${gHide(g)}><th colspan="8" scope="rowgroup">${g.name}</th></tr>
-    ${g.rows.map((r) => r.pending
-      ? `<tr class="rt-pending" data-group="${g.id}"${gHide(g)}><th scope="row">${r.name}</th><td colspan="7">${RS2.table.running}</td></tr>`
-      : RS2.lat.map(([k, label], i) => `<tr class="${i ? "rt-2nd" : ""}" data-lat="${k}" data-group="${g.id}"${gHide(g)}><th scope="row" class="rt-name${i ? " rt-dup" : ""}"${i ? "" : ' rowspan="2"'}>${r.name}</th><td class="rt-lat">${label}</td>${rtCell(r.cells[`${k}-off`], "off")}${rtCell(r.cells[`${k}-on`], "on")}</tr>`).join("")).join("")}`).join("") : "";
-  // Legend above the table: agent type, latency and communication, each option shown or hidden (one per group stays on).
-  const RF = RS2.filter;
-  const rtFilter = `<div class="rt-filter" id="rt-filter">${[
-    ...(RT ? [["group", RF.group, RT.groups.map((g) => [g.id, RF.groups[g.id] || g.name])]] : []),
-    ["lat", RF.lat, RS2.lat],
-    ["comm", RF.comm, [["off", RS2.labels.off], ["on", RS2.labels.on]]],
-  ].map(([key, label, opts]) => `<div class="rt-fgroup"><span>${label}</span><div class="seg is-sm" data-key="${key}" role="group" aria-label="${label}">${opts.map(([v, l]) => `<button type="button" data-v="${v}" aria-pressed="${!rtOff.has(`${key}:${v}`)}">${l}</button>`).join("")}</div></div>`).join("")}
-  </div>`;
+  const RT = RS2.table;
+  const rtRows = RT.groups.map((g) => `<tbody${g.ref ? ' class="rt-ref"' : ""}>
+    ${g.ref ? "" : `<tr class="rt-group"><th colspan="7" scope="rowgroup">${g.name}</th></tr>`}
+    ${g.rows.map(([name, vals]) => `<tr><th scope="row">${name}</th>${vals.map((v, i) => `<td${i === 1 ? ' class="rt-s"' : ""}>${v ?? RT.na}</td>`).join("")}</tr>`).join("")}
+  </tbody>`).join("");
   const results = `<section class="pad" id="results"><div class="wrap">
     ${head({ n: 3, title: RS2.kicker, claim: RS2.claim, body: RS2.body })}
     <div class="rt">
       <dl class="rt-keys">${RS2.keys.map(([k, dir, v]) => `<div><dt>${k} <i>${dir}</i></dt><dd>${v}</dd></div>`).join("")}</dl>
-      ${rtFilter}
-      <div class="rt-scroll"><table class="rt-table ${[...rtOff].filter((x) => !x.startsWith("group:")).map((x) => `no-${x.replace(":", "-")}`).join(" ")}">
+      <div class="rt-scroll"><table class="rt-table">
         <thead>
-          <tr><th rowspan="2" scope="col">${RS2.table.agent}</th><th rowspan="2" scope="col">${RS2.latLabel}</th><th colspan="3" scope="colgroup" data-comm="off">${RS2.labels.off}</th><th colspan="3" scope="colgroup" data-comm="on">${RS2.labels.on}</th></tr>
-          <tr>${["off", "on"].map((m) => RS2.table.cols.map(([k, dir]) => `<th scope="col" data-comm="${m}">${k} <i>${dir}</i></th>`).join("")).join("")}</tr>
+          <tr><th rowspan="2" scope="col">${RT.policy}</th>${RT.cols.map(([g, cs]) => `<th colspan="${cs.length}" scope="colgroup">${g}</th>`).join("")}</tr>
+          <tr>${RT.cols.map(([, cs]) => cs.map(([k, dir]) => `<th scope="col">${k} <i>${dir}</i></th>`).join("")).join("")}</tr>
         </thead>
-        <tbody class="rt-ref">
-          <tr><th scope="row">${RS2.labels.h}</th><td class="rt-lat">${RS2.table.ref}</td>${["off", "on"].map((m) => `<td data-comm="${m}">0.00</td><td data-comm="${m}">1.00</td><td data-comm="${m}">0%</td>`).join("")}</tr>
-          <tr><th scope="row">${RS2.labels.hh}</th><td class="rt-lat">${RS2.table.ref}</td>${["off", "on"].map((m) => `<td data-comm="${m}">1.00</td><td data-comm="${m}">${RT ? RT.hhB.toFixed(2) : "–"}</td><td data-comm="${m}">–</td>`).join("")}</tr>
-        </tbody>
-        <tbody>${rtRows}</tbody>
+        ${rtRows}
       </table></div>
-      <p class="rt-note">${RS2.table.note}${RT && RT.pending.length ? ` <b>${RT.pending.join(", ")}: ${RS2.table.pending}</b>` : ""}</p>
+      <p class="rt-note">${RT.note}</p>
     </div>
     <ul class="rs-takeaways">${RS2.takeaways.map((t) => `<li>${t}</li>`).join("")}</ul>
   </div></section>`;
@@ -450,8 +428,8 @@
         <img src="${r.image}" alt="${r.alt}" loading="lazy">
         <ol>${(r.steps || C.benchmark.human.steps).map(([name, tone, line], i) => `<li class="t-${tone}"><b><span>${pad(i + 1)}</span>${name}</b><p>${line}</p></li>`).join("")}</ol>
       </div>`;
-    // Four evaluation modes: the paper's Figure 1 panel (d), from teaser.js; the plain table is the fallback.
-    if (r.kind === "modes" && window.TEASER?.modes && window.TEASER_DATA) return TEASER.modes(TEASER_DATA);
+    // Four evaluation modes: the animated panel (modes.js); the plain table is the fallback.
+    if (r.kind === "modes" && window.MODES && r.anim) return MODES.markup(r.anim);
     if (r.kind === "modes") return `<table class="cr-modes">
         <thead><tr><th></th>${r.cols.map((c) => `<th scope="col">${c}</th>`).join("")}</tr></thead>
         <tbody>${r.rows.map(([k, note, cells]) => `<tr><th scope="row"><b>${k}</b><span>${note}</span></th>${cells.map((c) => `<td>${c}</td>`).join("")}</tr>`).join("")}</tbody>
@@ -462,7 +440,7 @@
   const contrib = `<section class="pad" id="benchmark-cards"><div class="wrap">
     ${head({ n: 1, title: K.kicker, claim: C.benchmark.heading })}
     <div class="cr">
-      ${K.rows.map((r, i) => `<article class="cr-row${i % 2 ? " is-flip" : ""}">
+      ${K.rows.map((r, i) => `<article class="cr-row is-${r.kind}${i % 2 ? " is-flip" : ""}">
         <div class="cr-text">
           <span class="cb-role">${r.role}</span>
           <h3>${r.title}</h3>
@@ -482,7 +460,6 @@
     <nav class="nav" aria-label="Sections"><div class="wrap nav-in">
       <a class="nav-wm" href="#top" aria-label="Back to top">${wordmark()}</a>
       <ul>${navItems.map(([l, id, n, top]) => `<li${top ? "" : ' class="is-minor"'}><a href="#${id}">${n ? `<b>${pad(n)}</b>` : ""}<span>${l}</span></a></li>`).join("")}</ul>
-      <button class="mode" id="mode" type="button" role="switch" aria-label="Night mode" aria-checked="true"><span class="mode-label">Night mode</span><i aria-hidden="true"></i><b id="mode-state">On</b></button>
     </div></nav>
     <main>${hero}${tldr}${demos}${contrib}${tasks}${results}${failures}${resources}</main>`;
 
@@ -501,35 +478,6 @@
 
   // Canvas and SVG drawings are in px, so they read the root size that scales the CSS.
   const rootScale = () => parseFloat(getComputedStyle(document.documentElement).fontSize) / 16;
-
-  /* ---------- Night mode ---------- */
-
-  // Night mode follows the system's light or dark setting, and keeps following it as it changes. Flipping the
-  // switch remembers the choice; flipping it back to what the system says forgets it, so the page follows again.
-  const NIGHT_KEY = "cooke-night";
-  const systemDark = matchMedia("(prefers-color-scheme: dark)");
-  let chosen = null;
-  try { chosen = localStorage.getItem(NIGHT_KEY); } catch { /* storage blocked: follow the system */ }
-  let night = chosen ? chosen === "on" : systemDark.matches;
-
-  const applyTheme = () => {
-    document.body.dataset.theme = night ? "ink" : "cream";
-    $("#mode").setAttribute("aria-checked", night);
-    $("#mode-state").textContent = night ? "On" : "Off";
-    // While the door intro runs, the browser bar keeps the wall colour; intro.js applies data-page when it ends.
-    const meta = $('meta[name="theme-color"]');
-    meta.dataset.page = night ? "#141210" : "#f4f2f1";
-    if (!document.documentElement.classList.contains("intro-running")) meta.content = meta.dataset.page;
-    document.dispatchEvent(new Event("themechange"));
-  };
-  $("#mode").addEventListener("click", () => {
-    night = !night;
-    chosen = night === systemDark.matches ? null : night ? "on" : "off";
-    try { if (chosen) localStorage.setItem(NIGHT_KEY, chosen); else localStorage.removeItem(NIGHT_KEY); } catch { /* not remembered */ }
-    applyTheme();
-  });
-  systemDark.addEventListener("change", (e) => { if (!chosen) { night = e.matches; applyTheme(); } });
-  applyTheme();
 
   /* ---------- In-page links ---------- */
 
@@ -737,7 +685,7 @@
         tf: $(".tf", el), slot: $(".tp-media", el), log: $(".ro-log", el), count: $(".ro-count", el),
         canvas: $(".tl-canvas", el), read: $(".tl-read", el), modeTag: $(".tl-mode", el), meta: $(".tp-meta", el),
         play: $(".ro-play", el), track: $(".ro-track", el), speed: $(".tp-speed", el),
-        lat: T.switches.lat.options[0][0],
+        lat: T.switches.lat.options[0][0], comm: T.switches.comm.options[0][0],
         clip: null, video: null, length: intro + (steps + 1) * STEP + HOLD,
         // Videos start on their own even with reduced motion (the reader can pause them); only the drawn clock stays still.
         clock: 0, held: false, rate: 1, phase: null, shown: 0, said: 0, readText: "",
@@ -796,17 +744,18 @@
     // Loads the rollout of the selected mode, or the placeholder when there is none.
     const open = (k) => {
       const names = T.modeNames;
-      // Every rollout shown runs with communication on; `clips` is keyed by the latency mode.
-      const id = k.t.clips?.[k.lat];
+      // `clips` is keyed by latency and communication; a mode with no recorded run shows the placeholder.
+      const mode = `${names[k.lat]} · ${names[k.comm]}`;
+      const id = k.t.clips?.[`${k.lat}-${k.comm}`];
       k.clip = id ? C.rollouts[id] : null;
       if (k.video) { videoObserver.unobserve(k.video); k.video.pause(); }
       k.slot.innerHTML = k.clip
         ? `${media({ src: k.clip.src, poster: k.clip.poster, label: k.clip.label })}<span class="ro-tag">${k.clip.view}</span><span class="ro-tag ro-model">${T.models[k.clip.robot] || k.clip.robot}</span>`
-        : media({ src: "", poster: k.t.poster, label: `${k.t.name}: ${names[k.lat]}`, spec: T.pending });
+        : media({ src: "", poster: k.t.poster, label: `${k.t.name}: ${mode}`, spec: T.pending });
       k.video = $("video", k.slot);
       k.meta.textContent = k.clip?.meta || "";
       k.meta.hidden = !k.clip;
-      k.modeTag.textContent = names[k.lat];
+      k.modeTag.textContent = mode;
       k.rate = 1;
       k.speed.innerHTML = (k.clip?.speeds || T.speeds).map(([rate, label]) => `<button type="button" data-v="${rate}" aria-pressed="${rate === 1}">${label}</button>`).join("");
       k.shown = 0;
@@ -838,6 +787,7 @@
         state(k);
       });
       segment($(".tp-lat", k.el), (v) => { k.lat = v; open(k); });
+      segment($(".tp-comm", k.el), (v) => { k.comm = v; open(k); });
       segment(k.speed, (v) => {
         k.rate = Number(v);
         if (k.video) k.video.playbackRate = k.rate;
@@ -1001,9 +951,10 @@
     });
   })();
 
-  /* ---------- Benchmark: Figure 1 panel (d) steps through the modes ---------- */
+  /* ---------- Benchmark: the four modes panel plays while on screen ---------- */
 
-  $$(".cr-media .f1-solo").forEach((el) => TEASER.wireModes(el, TEASER_DATA));
+  const modesRow = C.contrib.rows.find((r) => r.kind === "modes");
+  $$(".cr-media .md").forEach((el) => MODES.wire(el, modesRow.anim));
 
   /* ---------- Benchmark cards: a task thumbnail opens that task's rollout ---------- */
 
@@ -1022,32 +973,6 @@
     const on = $('#task-tabs button[aria-pressed="true"]');
     window.TURNTABLE.open(on ? Number(on.dataset.v) : 0);
   });
-
-  /* ---------- Results legend: show or hide latency and communication modes ---------- */
-
-  (() => {
-    const table = $(".rt-table"), filter = $("#rt-filter");
-    if (!table || !filter) return;
-    filter.addEventListener("click", (e) => {
-      const b = e.target.closest("button");
-      if (!b) return;
-      const group = b.parentElement;
-      const on = b.getAttribute("aria-pressed") === "true";
-      if (on && $$('button[aria-pressed="true"]', group).length === 1) return; // keep one option per group
-      b.setAttribute("aria-pressed", String(!on));
-      if (group.dataset.key === "group") {
-        // Agent type: hide the rows of the groups switched off.
-        const shown = new Set($$('button[aria-pressed="true"]', group).map((x) => x.dataset.v));
-        $$("tr[data-group]", table).forEach((tr) => { tr.hidden = !shown.has(tr.dataset.group); });
-      } else {
-        $$("button", group).forEach((x) => table.classList.toggle(`no-${group.dataset.key}-${x.dataset.v}`, x.getAttribute("aria-pressed") !== "true"));
-      }
-      // With one latency left, each agent's row carries its own name.
-      const bothLat = !table.classList.contains("no-lat-free") && !table.classList.contains("no-lat-aware");
-      $$("th.rt-name:not(.rt-dup)", table).forEach((th) => { th.rowSpan = bothLat ? 2 : 1; });
-      ScrollTrigger.refresh();
-    });
-  })();
 
   /* ---------- Scroll motion ---------- */
 

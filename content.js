@@ -40,17 +40,17 @@ window.CONTENT = {
     expansion: "<b>CO</b>llaborative <b>O</b>pen <b>K</b>itchen-<b>E</b>valuation",
     /* Paper-style author block: each author carries the numbers of their affiliations (see affiliations below). */
     authors: [
-      { name: "Jin Hyeon Kim", aff: [1], mark: "*" },
-      { name: "Seonghu Jeon", aff: [1], mark: "*" },
-      { name: "Hyunkoo Lee", aff: [1], mark: "*" },
-      { name: "Tongmin Kim", aff: [1], mark: "*" },
-      { name: "Junsu Kim", aff: [1], mark: "*" },
-      { name: "MinSeo Kim", aff: [2], mark: "*" },
-      { name: "Jiwon Kang", aff: [2], mark: "*" },
-      { name: "Junhyeok Choi", aff: [2], mark: "*" },
+      { name: "Jin Hyeon Kim", aff: [1, 3], mark: "*" },
+      { name: "Seonghu Jeon", aff: [1, 3], mark: "*" },
+      { name: "Hyunkoo Lee", aff: [1, 3], mark: "*" },
+      { name: "Tongmin Kim", aff: [1, 3], mark: "*" },
+      { name: "Junsu Kim", aff: [1, 3], mark: "*" },
+      { name: "MinSeo Kim", aff: [2, 3], mark: "*" },
+      { name: "Jiwon Kang", aff: [2, 3], mark: "*" },
+      { name: "Junhyeok Choi", aff: [2, 3], mark: "*" },
       { name: "Suhwan Choi", aff: [2], mark: "*" },
       { name: "Jaeyoon Jung", aff: [3], mark: "*" },
-      { name: "Woojin Cheong", aff: [2], mark: "*" },
+      { name: "Woojin Cheong", aff: [2, 3], mark: "*" },
       { name: "Jaeeun Lee", aff: [4], mark: "*" },
       { name: "Kyochul Jang", aff: [2] },
       { name: "Jisang Han", aff: [1] },
@@ -103,14 +103,14 @@ window.CONTENT = {
   tldr: {
     kicker: "TL;DR",
     rows: [
-      ["Problem", "Robots are usually tested alone, next to a scripted partner, or in simplified setups, and the time they spend thinking isn't counted. Nobody knows yet whether they can actually work <b>with a person</b>."],
-      ["COOK·E", "Five long-horizon kitchen tasks where a robot and a person cook <b>together, at the same time</b>, both in simulation and on a real robot."],
-      ["Finding", "With today's frontier embodied policies, the team is <em>slower than a person working alone</em>. The robot handles things imprecisely, plans too little and decides slowly, and in a shared kitchen each of these costs the person time."],
+      ["Problem", "Robots are mostly tested alone or with scripted partners, and the time they take to think is ignored. We don't know if they can really work <b>with a person</b>."],
+      ["COOK·E", "Five kitchen tasks where a robot and a person <b>work together at the same time</b>, in simulation and in the real world."],
+      ["Finding", "Today's best robot agents make the team <em>slower than one person alone</em>. They are clumsy, plan poorly and think slowly."],
     ],
     stats: [
-      { value: "4 / 4", label: "frontier agents slower than a person working alone (median, simulation)" },
-      { value: "40 / 40", label: "real-world trials slower than the participant alone" },
-      { value: "15.0 s", label: "median robot thinking time per decision, while the human keeps working" },
+      { value: "4 / 4", label: "agents slower than one person alone (simulation, median)" },
+      { value: "40 / 40", label: "real-robot trials slower than one person alone" },
+      { value: "15.0 s", label: "median time the robot thinks before each move" },
     ],
     more: "Read the full abstract",
   },
@@ -243,7 +243,7 @@ window.CONTENT = {
 
   /* Shown inside 01 Motivation, after the comparison table. */
   benchmark: {
-    heading: "<b>COOK·E</b>: a robot and a person, <em>cooking at the same time.</em>",
+    heading: "<b>COOK·E</b>: a robot and a person <em>collaborating in real time.</em>",
     body: "In each episode, a robot and a human act concurrently in a shared kitchen to accomplish a common goal. The robot gets the goal as one sentence, and both agents get the same recipe.",
     principles: [
       {
@@ -305,7 +305,9 @@ window.CONTENT = {
       {
         kind: "tasks", role: "Benchmark", title: "Five long-horizon kitchen tasks",
         body: "The robot and the human follow the same recipe in one kitchen, at the same time. Nobody tells them who does which step, and some steps need the same tool or the same spot on the counter.",
-        thumbs: ["media/overview_task-1-sandwich.jpg", "media/overview_task-2-canape.jpg", "media/overview_task-3-fruit-skewer.jpg", "media/overview_task-4-smores.jpg", "media/overview_task-5-cleanup.jpg"],
+        /* Robot head camera at the start pose: frame 0 of each task's rollout (Isaac Sim renders; Cleanup from its
+         * MuJoCo dashboard recording until its render is in). */
+        thumbs: ["media/head_task-1-sandwich.jpg", "media/head_task-2-canape.jpg", "media/head_task-3-fruit-skewer.jpg", "media/head_task-4-smores.jpg", "media/head_task-5-cleanup.jpg"],
         go: "Watch",
       },
       {
@@ -323,6 +325,53 @@ window.CONTENT = {
           ["Latency off", "the world pauses while the robot thinks", ["pause · talk", "pause · watch"]],
           ["Latency on", "the human keeps working meanwhile", ["real time · talk", "real time · watch"]],
         ],
+        /* The animated panel (modes.js). Seconds of world time; an illustration built on the paper's numbers: a decision
+         * every 2 s, 15.0 s median thinking time, 2.6–6.1 decisions a minute with latency, and requests ignored. */
+        anim: {
+          span: 60,
+          clock: "World time",
+          illustration: "illustration",
+          comm: { label: "Comm.", options: [["on", "On"], ["off", "Off"]] },
+          lanes: { robot: "Robot", human: "Human", chat: "Chat" },
+          labels: { thinking: "thinking ≈ 15 s", blocked: "blocked" },
+          strips: [
+            {
+              id: "free", name: "Latency off", note: "the world waits while the robot thinks", rate: "≈ 30 decisions / min",
+              foot: "These 60 s of world time take about 8 minutes of real time.",
+              robot: { every: 2 },
+              human: {
+                on: [["work", 0, 24], ["blocked", 24, 26], ["work", 26, 60]],
+                off: [["work", 0, 24], ["blocked", 24, 30], ["work", 30, 60]],
+              },
+              chat: [[1, "robot", "I'll toast the bread"], [24, "human", "Could you move?"], [26, "robot", "Moving"]],
+              notes: {
+                on: [[24, "asked to move, it moves at its next decision, 2 s later"]],
+                off: [[24, "with no message, it moves only once it sees the problem"]],
+              },
+            },
+            {
+              id: "aware", name: "Latency on", note: "the world keeps moving while the robot thinks", rate: "2.6–6.1 decisions / min",
+              foot: "These 60 s of world time take 60 s of real time.",
+              robot: { think: 15, act: 2 },
+              human: {
+                on: [["work", 0, 20], ["blocked", 20, 32], ["work", 32, 60]],
+                off: [["work", 0, 20], ["blocked", 20, 32], ["work", 32, 60]],
+              },
+              chat: [[15, "robot", "I'll toast the bread"], [21, "human", "Could you move?"], [32, "robot", "Moving"]],
+              notes: {
+                on: [[17, "the arm stops in the human's way"], [32, "it answers and moves only at its next decision"]],
+                off: [[17, "the arm stops in the human's way"], [32, "it moves only at its next decision"]],
+              },
+            },
+          ],
+          ignored: {
+            title: "Requests to move that the robot ignores",
+            rows: [["Latency off", "0–8%", 0, 8], ["Latency on", "36–63%", 36, 63]],
+            note: "Range over agents and tasks, S'mores excluded.",
+          },
+          silent: "No messages: the robot can only watch what the human does.",
+          legend: { act: "robot moves", think: "robot thinks", work: "human works", blocked: "human blocked", msg: "message" },
+        },
       },
       {
         kind: "real", role: "Real world", title: "Real participants, same setup",
@@ -336,7 +385,7 @@ window.CONTENT = {
   /*
    * 02 Rollouts (earlier 02 Tasks): one player per task, with the evaluation modes as switches under the video.
    *
-   * `clips` maps the latency mode ("free" or "aware"; communication is always on) to a recorded
+   * `clips` maps the mode ("free-on", "aware-off": latency, then communication) to a recorded
    * rollout in `rollouts` below. A mode with no clip shows the task's `poster`
    * as a placeholder. `art` picks the drawing in figures.js and `flow` lists its steps as [step, note].
    *
@@ -346,15 +395,16 @@ window.CONTENT = {
    */
   tasks: {
     kicker: "Rollouts",
-    heading: "Watch a robot and a human <em>cook together.</em>",
-    body: "Pick a task. Simulation runs are shown from the robot's head camera, with the dialogue next to the video. The <b>latency</b> switch under the video decides whether the world pauses while the robot thinks (off) or the human keeps working (on). On the right is the same task on the real robot.",
+    heading: "Watch a robot and a human <em>collaborate.</em>",
+    body: "Pick a task. The video is the robot's view, with the chat beside it. Under the video, <b>latency</b> sets whether the world waits while the robot thinks, and <b>comm.</b> sets whether the two can send messages. On the right is the same task on the real robot.",
     /* Earlier body, kept for reference: "Every task runs in four evaluation modes. With <b>latency off</b> (latency-free), the simulation pauses while the robot's model computes, which isolates decision quality; with <b>latency on</b> (latency-aware), the world keeps running and the human keeps working. With communication off, the agents coordinate only by watching. The videos here run with <b>communication on</b>; switch latency under each video." */
     /* Playback speeds for a clip that sets none. */
     speeds: [[0.5, "0.5×"], [1, "1×"], [2, "2×"]],
     switches: {
       lat: { label: "Latency", options: [["free", "Off"], ["aware", "On"]] },
+      comm: { label: "Comm.", options: [["on", "On"], ["off", "Off"]] },
     },
-    modeNames: { free: "latency off", aware: "latency on" },
+    modeNames: { free: "latency off", aware: "latency on", on: "comm. on", off: "comm. off" },
     /* The robot model of each rollout (its `robot`), shown on the video. */
     models: { Argon: "Gemini 4 Argon", Astra: "GPT-6 Astra", Fable: "Claude Fable 5.2", Opus: "Claude Opus 5.5" },
     pending: "Human–robot rollout coming soon",
@@ -404,7 +454,7 @@ window.CONTENT = {
         behavior: "Sequential collaboration",
         line: "Make the daughter's sandwich layer by layer; ketchup and hot sauce sit in two identical red bottles.",
         poster: "media/overview_task-1-sandwich.jpg",
-        clips: { free: "sandwich-free-on-fable-isaac", aware: "sandwich-aware-on-argon-isaac" },
+        clips: { "free-on": "sandwich-free-on-fable-isaac", "aware-on": "sandwich-aware-on-argon-isaac" },
         sync: { intro: 2 },
         art: { kind: "sandwich", title: "Finished: one example order" },
         flow: {
@@ -427,7 +477,7 @@ window.CONTENT = {
         behavior: "Parallel collaboration",
         line: "Make six canapés on three plates; each agent works from its own ingredients, in any order.",
         poster: "media/overview_task-2-canape.jpg",
-        clips: { free: "canape-free-on-astra-isaac", aware: "canape-aware-on-opus-isaac" },
+        clips: { "free-on": "canape-free-on-astra-isaac", "aware-on": "canape-aware-on-opus-isaac" },
         sync: { intro: 2, rounds: 6 },
         art: { kind: "canape", title: "Finished: two canapés on each plate" },
         flow: {
@@ -445,7 +495,7 @@ window.CONTENT = {
         behavior: "Fine-grained manipulation",
         line: "Make four fruit skewers, one per family member, each threaded in the order the recipe gives.",
         poster: "media/overview_task-3-fruit-skewer.jpg",
-        clips: { free: "fruit-free-on-astra-isaac", aware: "fruit-aware-on-opus-isaac" },
+        clips: { "free-on": "fruit-free-on-astra-isaac", "aware-on": "fruit-aware-on-opus-isaac" },
         sync: { intro: 2, rounds: 4 },
         art: { kind: "skewer", title: "Finished: four skewers on the plate" },
         flow: {
@@ -465,7 +515,7 @@ window.CONTENT = {
         behavior: "Time-dependent constraints",
         line: "Make three s'mores: toast each marshmallow over the heater and take it off once its top is brown, before it melts and falls.",
         poster: "media/overview_task-4-smores.jpg",
-        clips: { free: "smores-free-on-astra-isaac", aware: "smores-aware-on-argon-isaac" },
+        clips: { "free-on": "smores-free-on-astra-isaac", "aware-on": "smores-aware-on-argon-isaac" },
         sync: { intro: 2 },
         art: { kind: "marshmallow", title: "Each marshmallow has a time window" },
         flow: {
@@ -486,7 +536,7 @@ window.CONTENT = {
         behavior: "Shared-resource constraints",
         line: "Clear the table after a meal, sharing one tray, cup, bin, brush and towel by the household's rules.",
         poster: "media/overview_task-5-cleanup.jpg",
-        clips: { free: "cleanup-free-on", aware: "cleanup-aware-on" },
+        clips: { "free-on": "cleanup-free-on", "aware-on": "cleanup-aware-on" },
         sync: { intro: 2 },
         art: { kind: "cleanup", title: "The table at the start" },
         flow: {
