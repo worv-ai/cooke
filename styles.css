@@ -979,80 +979,70 @@ body[data-theme="ink"] .rt-table td.is-help { background: color-mix(in srgb, #ee
 .cr-modes tbody th span { display: block; margin-top: .1875rem; font-size: .75rem; font-weight: 400; line-height: 1.35; color: var(--muted); }
 .cr-modes td { padding: 1rem .75rem; border-radius: .625rem; background: var(--surface); border: 1px solid var(--line); font: 500 .8125rem/1.3 var(--mono); }
 /* Benchmark: the four modes panel (modes.js). The same 60 s of world time twice, latency off above and on below;
-   --p / --f are the playhead (percent / fraction of the strip), set by modes.js. */
-.md { --lab: 3.75rem; display: grid; gap: 1.125rem; padding: clamp(1rem, 2.2vw, 1.5rem); border: 1px solid var(--line); border-radius: var(--r-l); background: color-mix(in srgb, var(--surface) 40%, var(--bg)); }
+   --p / --f are the playhead (percent / fraction of the strip), set by modes.js. The red "blocked" span leads. */
+.md { --lab: 3.5rem; display: grid; gap: 1rem; padding: clamp(1rem, 2.2vw, 1.375rem) clamp(1rem, 2.4vw, 1.5rem); border: 1px solid var(--line); border-radius: var(--r-l); background: color-mix(in srgb, var(--surface) 35%, var(--bg)); }
 .md[data-comm="on"] [data-comm="off"], .md[data-comm="off"] [data-comm="on"] { display: none; }
 .md-top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .5rem 1rem; }
-.md-clock { font: 500 var(--t-label)/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
-.md-clock b { display: inline-block; min-width: 4ch; margin-left: .375rem; font: 600 1.25rem/1 var(--mono); letter-spacing: 0; color: var(--fg); font-variant-numeric: tabular-nums; }
+.md-clock { display: flex; align-items: baseline; gap: .375rem; font: 500 var(--t-label)/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.md-clock b { min-width: 4ch; font: 600 1.125rem/1 var(--mono); letter-spacing: 0; color: var(--fg); font-variant-numeric: tabular-nums; }
 .md-clock span { text-transform: none; letter-spacing: 0; }
-.md-strip { display: grid; gap: .625rem; }
-.md-strip + .md-strip { padding-top: 1.125rem; border-top: 1px dashed var(--line); }
-.md-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: .25rem .625rem; }
-.md-head b { font: 600 1rem/1.2 var(--body); }
+.md-strip { display: grid; gap: .5rem; }
+.md-strip + .md-strip { padding-top: .875rem; border-top: 1px solid var(--line); }
+.md-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: .125rem .5rem; }
+.md-head b { font: 600 .9375rem/1.2 var(--body); }
 .md-strip.is-aware .md-head b { color: var(--tomato); }
 .md-head span { font-size: .8125rem; color: var(--muted); }
-.md-head em { margin-left: auto; padding: .3125rem .5625rem; border: 1px solid var(--line); border-radius: 999px; font: 500 .6875rem/1 var(--mono); font-style: normal; color: var(--muted); white-space: nowrap; }
-.md-lanes { position: relative; display: grid; gap: .4375rem; }
-.md-lane { display: grid; grid-template-columns: var(--lab) minmax(0, 1fr); align-items: center; }
-.md-lab { font: 500 .6875rem/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
-.md-track { position: relative; height: 1.5rem; border-radius: .4375rem; background: color-mix(in srgb, var(--line) 30%, transparent); }
-.md-fill { position: absolute; inset: 0; clip-path: inset(0 calc(100% - var(--p)) 0 0); }
-.md-seg { position: absolute; top: 0; bottom: 0; display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: .3125rem; }
-.md-seg span { font: 500 .625rem/1 var(--mono); letter-spacing: .02em; white-space: nowrap; }
-.md-seg.is-act { top: 12%; bottom: 12%; background: color-mix(in srgb, var(--fg) 88%, var(--bg)); border-radius: .25rem; }
-.md-seg.is-think { background: repeating-linear-gradient(135deg, color-mix(in srgb, var(--tomato) 20%, transparent) 0 5px, transparent 5px 10px); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tomato) 30%, transparent); color: var(--tomato); }
-.md-seg.is-work { background: color-mix(in srgb, var(--human) 26%, var(--bg)); border-radius: 0; }
-.md-seg.is-work:first-child { border-radius: .3125rem 0 0 .3125rem; }
-.md-seg.is-work:last-child { border-radius: 0 .3125rem .3125rem 0; }
-.md-seg.is-blocked { background: var(--tomato); color: #fff; border-radius: 0; }
-/* Chat: the human's messages above the line, the robot's below. */
-.md-lane.is-chat .md-track { height: 2.75rem; background: none; border-radius: 0; }
-.md-lane.is-chat .md-track::before { content: ""; position: absolute; left: 0; right: 0; top: 50%; border-top: 1px dashed var(--line); }
-.md-msg { position: absolute; display: block; padding: .25rem .5rem; border: 1px solid var(--line); border-radius: .625rem; background: var(--bg); font: 500 .6875rem/1.1 var(--body); white-space: nowrap; opacity: 0; transform: translateY(.25rem) scale(.9); transform-origin: 0 50%; transition: opacity .3s, transform .3s var(--ease); }
-.md-msg.is-on { opacity: 1; transform: none; }
-.md-msg.is-human { top: 0; border-color: color-mix(in srgb, var(--human) 60%, var(--line)); border-bottom-left-radius: .1875rem; }
-.md-msg.is-robot { bottom: 0; border-color: color-mix(in srgb, var(--robot) 60%, var(--line)); border-top-left-radius: .1875rem; }
-.md-head-line { position: absolute; top: -.25rem; bottom: -.25rem; left: calc(var(--lab) + (100% - var(--lab)) * var(--f)); width: 2px; margin-left: -1px; border-radius: 1px; background: var(--fg); opacity: .55; pointer-events: none; }
-/* Callouts under a strip, one per line, each starting at its moment. */
-.md-notes { position: relative; height: calc(var(--rows) * 1.3rem); margin-left: var(--lab); }
-.md-note { position: absolute; left: var(--x); top: calc(var(--row) * 1.3rem); padding-left: .875rem; font: 500 .75rem/1.3 var(--body); color: var(--tomato); white-space: nowrap; opacity: 0; transition: opacity .35s; }
-.md-note::before { content: "↑"; position: absolute; left: 0; font-weight: 600; }
+.md-head em { margin-left: auto; font: 500 .6875rem/1 var(--mono); font-style: normal; color: var(--muted); white-space: nowrap; }
+.md-lanes { position: relative; display: grid; gap: .3125rem; }
+.md-lane { display: grid; grid-template-columns: var(--lab) minmax(0, 1fr); align-items: end; }
+.md-lab { font: 500 .625rem/1.6 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.md-track { position: relative; }
+.md-fill { position: relative; clip-path: inset(-2px calc(100% - var(--p)) -2px 0); }
+.md-lane.is-robot .md-fill { height: .625rem; }
+.md-lane.is-human .md-fill { height: 1.375rem; border-radius: .375rem; overflow: hidden; }
+.md-seg { position: absolute; top: 0; bottom: 0; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.md-seg span { font: 500 .625rem/1 var(--mono); letter-spacing: .04em; white-space: nowrap; }
+/* Robot: a thin tick per decision without latency; with latency, a faint hatched wait then a short move. */
+.md-tick { position: absolute; top: 0; bottom: 0; width: 2px; margin-left: -1px; border-radius: 1px; background: color-mix(in srgb, var(--fg) 70%, var(--bg)); }
+.md-seg.is-think { border-radius: .25rem; background: repeating-linear-gradient(135deg, color-mix(in srgb, var(--tomato) 16%, transparent) 0 4px, transparent 4px 8px); color: var(--tomato); }
+.md-seg.is-think span { font-size: .5625rem; }
+.md-seg.is-act { border-radius: .25rem; background: color-mix(in srgb, var(--fg) 80%, var(--bg)); }
+/* Human: works in sand, blocked in red. */
+.md-seg.is-work { background: color-mix(in srgb, var(--human) 22%, var(--bg)); }
+.md-seg.is-blocked { background: var(--tomato); color: #fff; }
+/* With communication: the request (human dot), the answer (robot dot) and the wait, above the human lane. */
+.md-asks { position: relative; height: 1.125rem; }
+.md-ask, .md-ans { position: absolute; bottom: .1875rem; width: .5rem; height: .5rem; margin-left: -.25rem; border-radius: 50%; opacity: 0; transform: scale(.4); transition: opacity .25s, transform .25s var(--ease); }
+.md-ask { background: var(--human); }
+.md-ans { background: var(--robot); }
+.md-wait { position: absolute; bottom: .4375rem; height: 1px; background: color-mix(in srgb, var(--fg) 45%, transparent); opacity: 0; transition: opacity .25s; }
+.md-wait span { position: absolute; left: 50%; bottom: .1875rem; transform: translateX(-50%); font: 600 .6875rem/1 var(--mono); color: var(--fg); white-space: nowrap; }
+.md-ask.is-on, .md-ans.is-on { opacity: 1; transform: none; }
+.md-wait.is-on { opacity: 1; }
+.md-head-line { position: absolute; top: -.125rem; bottom: -.125rem; left: calc(var(--lab) + (100% - var(--lab)) * var(--f)); width: 2px; margin-left: -1px; border-radius: 1px; background: var(--fg); opacity: .5; pointer-events: none; }
+/* One line under the strip, starting at its moment. */
+.md-notes { position: relative; min-height: 1.125rem; margin-left: var(--lab); }
+.md-note { position: absolute; left: min(var(--x), 100% - 22rem); max-width: 100%; font: 500 .75rem/1.4 var(--body); color: var(--tomato); white-space: nowrap; opacity: 0; transition: opacity .35s; }
+.md-strip.is-free .md-note { color: var(--muted); }
 .md-note.is-on { opacity: 1; }
-.md-foot { margin-left: var(--lab); font: 400 .75rem/1.4 var(--mono); color: var(--muted); }
-/* Requests ignored: one range bar per latency mode. */
-.md-ign { display: grid; gap: .5rem; padding-top: 1rem; border-top: 1px solid var(--line); }
-.md-ign-title { font: 600 .875rem/1.3 var(--body); }
-.md-ign-row { display: grid; grid-template-columns: 6rem minmax(0, 1fr) 4.5rem; align-items: center; gap: .75rem; font-size: .8125rem; }
-.md-ign-row > span { color: var(--muted); }
-.md-ign-row:last-of-type > span { color: var(--tomato); }
-.md-ign-bar { position: relative; height: .625rem; border-radius: 999px; background: color-mix(in srgb, var(--line) 45%, transparent); }
-.md-ign-bar i { position: absolute; top: 0; bottom: 0; border-radius: 999px; background: var(--muted); }
-.md-ign-row:last-of-type .md-ign-bar i { background: var(--tomato); }
-.md-ign-row b { font: 600 .9375rem/1 var(--display); font-variant-numeric: tabular-nums; }
-.md-ign-row:last-of-type b { color: var(--tomato); }
-.md-ign-note { font: 400 .6875rem/1.4 var(--mono); color: var(--muted); }
-.md-silent { padding-top: 1rem; border-top: 1px solid var(--line); font-size: .875rem; color: var(--muted); }
-.md-legend { display: flex; flex-wrap: wrap; gap: .375rem 1rem; font-size: .75rem; color: var(--muted); }
-.md-legend li { display: inline-flex; align-items: center; gap: .375rem; }
-.md-key { display: inline-block; width: .875rem; height: .625rem; border-radius: .1875rem; }
-.md-key.is-act { background: var(--fg); }
-.md-key.is-think { background: repeating-linear-gradient(135deg, color-mix(in srgb, var(--tomato) 35%, transparent) 0 3px, transparent 3px 6px); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tomato) 35%, transparent); }
-.md-key.is-work { background: color-mix(in srgb, var(--human) 26%, var(--bg)); }
-.md-key.is-blocked { background: var(--tomato); }
-.md-key.is-msg { border: 1px solid var(--line); border-radius: .3125rem; background: var(--bg); }
+/* The outcome: requests ignored, without and with latency. */
+.md-out { padding-top: .875rem; border-top: 1px solid var(--line); }
+.md-ign { display: grid; grid-template-columns: minmax(0, 1fr) auto auto auto; align-items: center; gap: .25rem 1rem; }
+.md-ign > p { font: 500 .8125rem/1.35 var(--body); color: var(--muted); }
+.md-num { display: grid; justify-items: center; gap: .1875rem; }
+.md-num b { font: var(--display-w) 1.375rem/1 var(--display); letter-spacing: -.02em; font-variant-numeric: tabular-nums; color: var(--muted); }
+.md-num.is-hi b { color: var(--tomato); }
+.md-num span { font: 500 .625rem/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.md-arrow { color: var(--muted); }
+.md-silent { font-size: .8125rem; color: var(--muted); }
 @media (max-width: 640px) {
-  .md { --lab: 3.25rem; }
-  .md-head em { margin-left: 0; }
-  .md-seg.is-think span { display: none; } /* too narrow for the label; the legend names it */
-  .md-lane.is-chat .md-track { height: 1.75rem; }
-  .md-msg span { display: none; } /* a dot per message on phones; the callouts carry the story */
-  .md-msg, .md-msg.is-human, .md-msg.is-robot { width: .625rem; height: .625rem; margin-left: -.3125rem; padding: 0; border: 0; border-radius: 50%; }
-  .md-msg.is-human { top: .125rem; background: var(--human); }
-  .md-msg.is-robot { bottom: .125rem; background: var(--robot); }
-  .md-notes { height: auto; display: grid; gap: .25rem; }
+  .md { --lab: 3rem; }
+  .md-head em { margin-left: 0; width: 100%; }
+  .md-seg.is-think span { display: none; }
+  .md-notes { min-height: 0; }
   .md-note { position: static; white-space: normal; }
-  .md-ign-row { grid-template-columns: 5rem minmax(0, 1fr) 3.75rem; }
+  .md-ign { grid-template-columns: auto auto auto; justify-content: start; }
+  .md-ign > p { grid-column: 1 / -1; }
 }
 .cr-pair { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; }
 .cr-pair figure { position: relative; margin: 0; border-radius: var(--r-m); overflow: hidden; background: #000; aspect-ratio: 1 / 1; }

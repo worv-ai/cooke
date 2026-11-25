@@ -332,45 +332,32 @@ window.CONTENT = {
           clock: "World time",
           illustration: "illustration",
           comm: { label: "Comm.", options: [["on", "On"], ["off", "Off"]] },
-          lanes: { robot: "Robot", human: "Human", chat: "Chat" },
-          labels: { thinking: "thinking ≈ 15 s", blocked: "blocked" },
+          lanes: { robot: "Robot", human: "Human" },
+          labels: { thinking: "thinking ≈ 15 s", blocked: "blocked", ask: "the human asks the robot to move", answer: "the robot answers", wait: "{s} s" },
           strips: [
             {
               id: "free", name: "Latency off", note: "the world waits while the robot thinks", rate: "≈ 30 decisions / min",
-              foot: "These 60 s of world time take about 8 minutes of real time.",
               robot: { every: 2 },
               human: {
                 on: [["work", 0, 24], ["blocked", 24, 26], ["work", 26, 60]],
                 off: [["work", 0, 24], ["blocked", 24, 30], ["work", 30, 60]],
               },
-              chat: [[1, "robot", "I'll toast the bread"], [24, "human", "Could you move?"], [26, "robot", "Moving"]],
-              notes: {
-                on: [[24, "asked to move, it moves at its next decision, 2 s later"]],
-                off: [[24, "with no message, it moves only once it sees the problem"]],
-              },
+              ask: [[24, 26]],
+              notes: { on: [24, "asked to move, it moves at its next decision"], off: [24, "with no message, it moves once it sees the problem"] },
             },
             {
               id: "aware", name: "Latency on", note: "the world keeps moving while the robot thinks", rate: "2.6–6.1 decisions / min",
-              foot: "These 60 s of world time take 60 s of real time.",
               robot: { think: 15, act: 2 },
               human: {
                 on: [["work", 0, 20], ["blocked", 20, 32], ["work", 32, 60]],
                 off: [["work", 0, 20], ["blocked", 20, 32], ["work", 32, 60]],
               },
-              chat: [[15, "robot", "I'll toast the bread"], [21, "human", "Could you move?"], [32, "robot", "Moving"]],
-              notes: {
-                on: [[17, "the arm stops in the human's way"], [32, "it answers and moves only at its next decision"]],
-                off: [[17, "the arm stops in the human's way"], [32, "it moves only at its next decision"]],
-              },
+              ask: [[21, 32]],
+              notes: { on: [20, "the arm stops in the way; the answer waits for the next decision"], off: [20, "the arm stops in the way until the next decision"] },
             },
           ],
-          ignored: {
-            title: "Requests to move that the robot ignores",
-            rows: [["Latency off", "0–8%", 0, 8], ["Latency on", "36–63%", 36, 63]],
-            note: "Range over agents and tasks, S'mores excluded.",
-          },
+          ignored: { title: "Requests to move that the robot ignores", rows: [["latency off", "0–8%"], ["latency on", "36–63%"]] },
           silent: "No messages: the robot can only watch what the human does.",
-          legend: { act: "robot moves", think: "robot thinks", work: "human works", blocked: "human blocked", msg: "message" },
         },
       },
       {
