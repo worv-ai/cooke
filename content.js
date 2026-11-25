@@ -60,7 +60,7 @@ window.CONTENT = {
       { name: "Jiajun Wu", aff: [7] },
       { name: "Marc Pollefeys", aff: [8] },
       { name: "Sunghwan Hong", aff: [8], mark: "†" },
-      { name: "Youngjae Yu", aff: [9], mark: "†" },
+      { name: "Youngjae Yu", aff: [2], mark: "†" },
       { name: "Seungryong Kim", aff: [1], mark: "†" },
       { name: "Yunsung Lee", aff: [3], mark: "†" },
     ],
@@ -81,7 +81,6 @@ window.CONTENT = {
       { no: 6, name: "University of Texas at Austin", logo: "media/logos/utaustin.svg", h: 49 },
       { no: 7, name: "Stanford University", logo: "media/logos/stanford.png?v=2", h: 51 },
       { no: 8, name: "ETH Zurich", logo: "media/logos/ethz.svg", h: 39 },
-      { no: 9, name: "Seoul National University", logo: "media/logos/snu.png?v=2", h: 67 },
     ],
     pending: "After review",
     links: [
