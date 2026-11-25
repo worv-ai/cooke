@@ -980,7 +980,7 @@ body[data-theme="ink"] .rt-table td.is-help { background: color-mix(in srgb, #ee
 .cr-modes td { padding: 1rem .75rem; border-radius: .625rem; background: var(--surface); border: 1px solid var(--line); font: 500 .8125rem/1.3 var(--mono); }
 /* Benchmark: the four modes panel (modes.js). The same 60 s of world time twice, latency off above and on below;
    --p / --f are the playhead (percent / fraction of the strip), set by modes.js. The red "blocked" span leads. */
-.md { --lab: 3.5rem; display: grid; gap: 1rem; padding: clamp(1rem, 2.2vw, 1.375rem) clamp(1rem, 2.4vw, 1.5rem); border: 1px solid var(--line); border-radius: var(--r-l); background: color-mix(in srgb, var(--surface) 35%, var(--bg)); }
+.md { --lab: 4.25rem; display: grid; gap: 1rem; padding: clamp(1rem, 2.2vw, 1.375rem) clamp(1rem, 2.4vw, 1.5rem); border: 1px solid var(--line); border-radius: var(--r-l); background: color-mix(in srgb, var(--surface) 35%, var(--bg)); }
 .md[data-comm="on"] [data-comm="off"], .md[data-comm="off"] [data-comm="on"] { display: none; }
 .md-top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .5rem 1rem; }
 .md-clock { display: flex; align-items: baseline; gap: .375rem; font: 500 var(--t-label)/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
@@ -995,7 +995,14 @@ body[data-theme="ink"] .rt-table td.is-help { background: color-mix(in srgb, #ee
 .md-head em { margin-left: auto; font: 500 .6875rem/1 var(--mono); font-style: normal; color: var(--muted); white-space: nowrap; }
 .md-lanes { position: relative; display: grid; gap: .3125rem; }
 .md-lane { display: grid; grid-template-columns: var(--lab) minmax(0, 1fr); align-items: end; }
-.md-lab { font: 500 .625rem/1.6 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.md-lab { display: inline-flex; align-items: center; gap: .3125rem; font: 500 .625rem/1.6 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+/* Icons: the human in its colour (its requests are the orange dots), the robot in its (its answers are the green ones). */
+.md-ico { flex: none; width: .875rem; height: .875rem; }
+.md-ico.is-line { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.md-lane.is-robot .md-ico { color: var(--robot); }
+.md-lane.is-human .md-ico { color: var(--human); }
+.md-head b { display: inline-flex; align-items: center; gap: .375rem; }
+.md-head b .md-ico { width: 1rem; height: 1rem; }
 .md-track { position: relative; }
 .md-fill { position: relative; clip-path: inset(-2px calc(100% - var(--p)) -2px 0); }
 .md-lane.is-robot .md-fill { height: .625rem; }
@@ -1019,6 +1026,9 @@ body[data-theme="ink"] .rt-table td.is-help { background: color-mix(in srgb, #ee
 .md-wait span { position: absolute; left: 50%; bottom: .1875rem; transform: translateX(-50%); font: 600 .6875rem/1 var(--mono); color: var(--fg); white-space: nowrap; }
 .md-ask.is-on, .md-ans.is-on { opacity: 1; transform: none; }
 .md-wait.is-on { opacity: 1; }
+/* The restart: everything drawn fades out together, then the strips fill again from empty. */
+.md-fill, .md-asks, .md-notes, .md-head-line { transition: opacity .4s; }
+.md.is-fading .md-fill, .md.is-fading .md-asks, .md.is-fading .md-notes, .md.is-fading .md-head-line { opacity: 0; }
 .md-head-line { position: absolute; top: -.125rem; bottom: -.125rem; left: calc(var(--lab) + (100% - var(--lab)) * var(--f)); width: 2px; margin-left: -1px; border-radius: 1px; background: var(--fg); opacity: .5; pointer-events: none; }
 /* One line under the strip, starting at its moment. */
 .md-notes { position: relative; min-height: 1.125rem; margin-left: var(--lab); }
@@ -1036,11 +1046,13 @@ body[data-theme="ink"] .rt-table td.is-help { background: color-mix(in srgb, #ee
 .md-arrow { color: var(--muted); }
 .md-silent { font-size: .8125rem; color: var(--muted); }
 @media (max-width: 640px) {
-  .md { --lab: 3rem; }
+  .md { --lab: 1.75rem; }
+  .md-lab span { display: none; } /* the icon alone on phones */
   .md-head em { margin-left: 0; width: 100%; }
   .md-seg.is-think span { display: none; }
-  .md-notes { min-height: 0; }
-  .md-note { position: static; white-space: normal; }
+  /* Phones: the callout sits under the lanes as a short paragraph with a rule, its space kept while hidden. */
+  .md-notes { min-height: 0; margin-left: 0; }
+  .md-note { position: static; padding-left: .625rem; border-left: 2px solid currentColor; white-space: normal; }
   .md-ign { grid-template-columns: auto auto auto; justify-content: start; }
   .md-ign > p { grid-column: 1 / -1; }
 }

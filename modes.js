@@ -12,6 +12,13 @@
  *   MODES.markup(A)  -> HTML for the panel        MODES.wire(el, A) -> starts the animation and the switch
  */
 window.MODES = (() => {
+  // The line icons of the earlier Figure 1 panel (d) (teaser.js): who is on a lane, and which latency mode.
+  const icon = {
+    robot: '<svg class="md-ico" viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="5.5" width="11" height="8.5" rx="2" fill="currentColor"/><path d="M8 5.5V2.8" stroke="currentColor" stroke-width="1.6"/><circle cx="8" cy="2.4" r="1.3" fill="currentColor"/><circle cx="5.8" cy="9.6" r="1.1" fill="#fff"/><circle cx="10.2" cy="9.6" r="1.1" fill="#fff"/></svg>',
+    human: '<svg class="md-ico" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="4.8" r="3" fill="currentColor"/><path d="M2.4 15a5.6 5.6 0 0 1 11.2 0z" fill="currentColor"/></svg>',
+    free: '<svg class="md-ico is-line" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M10 9v6M14 9v6"/></svg>',
+    aware: '<svg class="md-ico is-line" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>',
+  };
   const pc = (s, span) => `${(100 * s) / span}%`;
   const seg = (cls, a, b, span, label = "", comm = "") =>
     `<i class="md-seg is-${cls}"${comm ? ` data-comm="${comm}"` : ""} style="left:${pc(a, span)};width:${pc(b - a, span)}">${label ? `<span>${label}</span>` : ""}</i>`;
@@ -48,10 +55,10 @@ window.MODES = (() => {
     ? `<p class="md-note" data-comm="${c}" data-t="${S.notes[c][0]}" style="--x:${pc(S.notes[c][0], span)}">${S.notes[c][1]}</p>` : "").join("");
 
   const strip = (S, A) => `<section class="md-strip is-${S.id}" aria-label="${S.name}">
-      <header class="md-head"><b>${S.name}</b><span>${S.note}</span><em>${S.rate}</em></header>
+      <header class="md-head"><b>${icon[S.id]}${S.name}</b><span>${S.note}</span><em>${S.rate}</em></header>
       <div class="md-lanes">
-        <div class="md-lane is-robot"><span class="md-lab">${A.lanes.robot}</span><div class="md-track"><div class="md-fill">${robotLane(S, A.span, A.labels)}</div></div></div>
-        <div class="md-lane is-human"><span class="md-lab">${A.lanes.human}</span><div class="md-track">
+        <div class="md-lane is-robot"><span class="md-lab">${icon.robot}<span>${A.lanes.robot}</span></span><div class="md-track"><div class="md-fill">${robotLane(S, A.span, A.labels)}</div></div></div>
+        <div class="md-lane is-human"><span class="md-lab">${icon.human}<span>${A.lanes.human}</span></span><div class="md-track">
           <div class="md-asks" data-comm="on">${asks(S, A.span, A.labels)}</div>
           <div class="md-fill">${humanLane(S, A.span, A.labels)}</div>
         </div></div>
@@ -75,10 +82,11 @@ window.MODES = (() => {
     </div>
   </div>`;
 
-  // One sweep of the playhead over the world time, a short hold on the full picture, then again. It runs only while
-  // the panel is on screen; with reduced motion the full picture stays.
+  // One sweep of the playhead over the world time, a hold on the full picture, a short fade, then again from an empty
+  // strip (so the restart never shows marks vanishing one by one). It runs only while the panel is on screen; with
+  // reduced motion the full picture stays.
   const wire = (root, A) => {
-    const SWEEP = 9000, HOLD = 3500;
+    const SWEEP = 9000, HOLD = 3500, FADE = 450;
     const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
     const clock = root.querySelector(".md-clock b");
     const timed = [...root.querySelectorAll("[data-t]")];
@@ -91,13 +99,15 @@ window.MODES = (() => {
     };
     const frame = (now) => {
       if (!start) start = now;
-      const e = (now - start) % (SWEEP + HOLD);
+      const e = (now - start) % (SWEEP + HOLD + FADE);
+      root.classList.toggle("is-fading", e > SWEEP + HOLD);
       set(Math.min(e / SWEEP, 1) * A.span);
       raf = requestAnimationFrame(frame);
     };
     const sync = () => {
       cancelAnimationFrame(raf);
       raf = 0;
+      root.classList.remove("is-fading");
       if (seen && !still && !document.hidden) { start = 0; raf = requestAnimationFrame(frame); }
     };
     set(A.span);
