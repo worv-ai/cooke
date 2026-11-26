@@ -47,6 +47,9 @@
 @media (min-width: 1100px) {
   .f1 { --w: min(calc(100vw - 2 * var(--gutter) - 16px), 88rem); width: var(--w); margin-left: calc(50% - var(--w) / 2); }
 }
+/* Panel (d) on its own in the Benchmark section (teaser.js modes): no wide band, no top margin. */
+.f1.f1-solo { width: auto; margin: 0; }
+.f1-solo .f1-p { background: var(--f1-panel); color: var(--f1-ink); }
 /* Figure 1 has its own band between the hero and the main result (main.js). */
 .sec-fig1 { padding-top: clamp(1rem, 2.5vw, 2rem); }
 .sec-fig1 .f1 { margin-top: 0; }

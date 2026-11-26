@@ -92,6 +92,20 @@ window.TEASER = (() => {
 
   /* ---------- Markup ---------- */
 
+  // Panel (d), the four evaluation modes: the 2×2 timelines, the legend and the note under them.
+  const modesBody = (F, M) => `<div class="f1-modes">
+        <span></span>${M.cols.map((c) => `<b class="f1-col">${icon[c.id]}${c.name}</b>`).join("")}
+        ${M.rows.map((r) => `<b class="f1-row"><span>${F.d.rows[r.id]}</span></b>${M.cols.map((c) => `<button type="button" class="f1-cell" data-lat="${c.id}" data-comm="${r.id}" aria-pressed="false" aria-label="${c.name}, ${r.name.toLowerCase()}">${cell(c.id, r.id)}</button>`).join("")}`).join("")}
+      </div>
+      <ul class="f1-legend"><li><i class="md-key is-act"></i>${M.legend.act}</li><li><i class="md-key is-think"></i>${M.legend.think}</li><li><i class="md-key is-pause"></i>${M.legend.paused}</li><li><i class="md-key is-msg"></i>${M.legend.msg}</li></ul>
+      <div class="f1-note" aria-live="polite"></div>`;
+
+  // Panel (d) on its own, for the page's Benchmark section (main.js). Wire it with wireModes.
+  const modes = (D) => {
+    const { F, BM } = parts(D);
+    return `<div class="f1 f1-solo"><section class="f1-p is-d" aria-label="${BM.modes.title}"><div class="f1-body">${modesBody(F, BM.modes)}</div></section></div>`;
+  };
+
   const markup = (D, h) => {
     const { F, O, BM, R, FL } = parts(D);
     // Images with a real-world copy (`real` in teaser-data.js) carry both sources for the Real world toggle.
@@ -125,13 +139,7 @@ window.TEASER = (() => {
       </div>
       <div class="f1-note" aria-live="polite"></div>`;
 
-    const M = BM.modes;
-    const pd = `<div class="f1-modes">
-        <span></span>${M.cols.map((c) => `<b class="f1-col">${icon[c.id]}${c.name}</b>`).join("")}
-        ${M.rows.map((r) => `<b class="f1-row"><span>${F.d.rows[r.id]}</span></b>${M.cols.map((c) => `<button type="button" class="f1-cell" data-lat="${c.id}" data-comm="${r.id}" aria-pressed="false" aria-label="${c.name}, ${r.name.toLowerCase()}">${cell(c.id, r.id)}</button>`).join("")}`).join("")}
-      </div>
-      <ul class="f1-legend"><li><i class="md-key is-act"></i>${M.legend.act}</li><li><i class="md-key is-think"></i>${M.legend.think}</li><li><i class="md-key is-pause"></i>${M.legend.paused}</li><li><i class="md-key is-msg"></i>${M.legend.msg}</li></ul>
-      <div class="f1-note" aria-live="polite"></div>`;
+    const pd = modesBody(F, BM.modes);
 
     const lats = [...R.latency].reverse(); // latency-aware first, as in the figure
     const pe = `<div><p class="f1-claim" aria-live="polite"></p><p class="f1-sub"></p></div>
@@ -438,5 +446,32 @@ window.TEASER = (() => {
     setPlaying(state.playing);
   };
 
-  return { markup, wire };
+  // The stand-alone panel (d): steps through the four modes every 6 s (one playhead sweep) while on screen, until
+  // the reader clicks a mode. With reduced motion it stays on the first mode and does not sweep.
+  const wireModes = (root, D) => {
+    const M = parts(D).BM.modes;
+    const cells = [...root.querySelectorAll(".f1-cell")];
+    const note = root.querySelector(".f1-note");
+    const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let k = 0, seen = false, pinned = false, t = 0;
+    const show = () => {
+      const b = cells[k];
+      const c = M.cols.find((x) => x.id === b.dataset.lat);
+      const r = M.rows.find((x) => x.id === b.dataset.comm);
+      cells.forEach((x) => x.setAttribute("aria-pressed", x === b));
+      note.innerHTML = `<b>${c.name} · ${r.name.toLowerCase()}.</b> ${c.body} ${r.body}`;
+    };
+    const sync = () => {
+      clearInterval(t);
+      t = 0;
+      if (seen && !pinned && !still && !document.hidden) t = setInterval(() => { k = (k + 1) % cells.length; show(); }, 6000);
+    };
+    if (!still) root.classList.add("is-moving");
+    new IntersectionObserver(([e]) => { seen = e.isIntersecting; sync(); }, { threshold: 0.4 }).observe(root);
+    document.addEventListener("visibilitychange", sync);
+    cells.forEach((b, j) => b.addEventListener("click", () => { pinned = true; sync(); k = j; show(); }));
+    show();
+  };
+
+  return { markup, wire, modes, wireModes };
 })();

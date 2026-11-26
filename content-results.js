@@ -8,8 +8,9 @@ Object.assign(window.CONTENT, {
   /* The demo video under the hero: the 4-minute walkthrough with sound (benchmark, metrics, findings, real world). */
   demo: {
     kicker: "Demo",
+    play: "Watch the 4-minute video",
     src: "media/v11240300-d.mp4",
-    poster: "media/v11240300-d.jpg",
+    poster: "media/v11240300-d-poster.jpg", // frame at 3 s: the opening line in full
     label: "COOK·E demo video: the five kitchen tasks, the simulated human partner, the six metrics, the main findings and the real-world failures",
   },
 
@@ -26,34 +27,60 @@ Object.assign(window.CONTENT, {
     ref: { sandwich: [79.6, 56.82], canape: [106.34, 58.5], fruit: [214.3, 132.5], smores: [111.13, 88.12], cleanup: [251.05, 155.16] },
   },
 
-  /* 04 Results: the table of medians in results-table-data.js (API rerun on the fixed code, and the VLA pilot runs). */
+  /* 04 Results: the paper's Table 8 (simulation results averaged over the four modes), copied as printed.
+   * Values are strings so they keep the paper's decimals; null is "–". † marks runs without communication. */
   results: {
     kicker: "Results",
     claim: "No agent or policy <em>beats the human working alone.</em>",
-    body: "Median task efficiency S (higher is better), human burden B and human delayed time W (lower is better) for each agent at both latencies, with communication off and on. Medians pool every run on Sandwich, Canapé, Fruit Skewer and S'mores. A shaded cell would mean the robot helped (S > 0 and B < 1), as in the paper's Fig. 4.",
-    latLabel: "Latency",
-    lat: [["free", "Latency-free"], ["aware", "Latency-aware"]],
-    labels: { h: "Human-alone (H)", hh: "Two humans (H-H)", off: "Comm. off", on: "Comm. on" },
+    body: "Simulation results for every policy, averaged over the four modes. This is Table 8 of the paper; Table 7 has every mode.",
+    /* One line per column, worded like the results hub (the full definitions are in the paper). */
+    keys: [
+      ["D", "↑", "runs that finish within the time limit (%)"],
+      ["S", "↑", "task efficiency: 0 = one person alone, 1 = two people"],
+      ["B", "↓", "human burden: 1 = the human does as much as alone"],
+      ["W", "↓", "time the human loses to the robot (% of one person's time)"],
+      ["C", "↑", "the robot's share of the finished subtasks (%)"],
+      ["R", "↓", "the robot's thinking time per decision (s)"],
+    ],
     table: {
-      agent: "Agent",
-      cols: [["S", "↑"], ["B", "↓"], ["W", "↓"]],
-      ref: "Reference",
+      policy: "Policy",
+      /* Column groups as in Table 8: [group, [[symbol, arrow], ...]]. */
+      cols: [["Team", [["D", "↑"], ["S", "↑"]]], ["Human", [["B", "↓"], ["W", "↓"]]], ["Robot", [["C", "↑"], ["R", "↓"]]]],
+      groups: [
+        { name: "Reference", ref: true, rows: [
+          ["H (human alone)", ["100", "0.00", "1.00", "0.0", null, null]],
+          ["H-H (two humans)", ["100", "1.00", "0.47", "0.0", null, null]],
+        ] },
+        { name: "Frontier agents", rows: [
+          ["GPT-6 Astra", ["65", "−0.96", "1.15", "44.9", "12.2", "10.2"]],
+          ["Gemini 4 Argon", ["72", "−1.28", "1.12", "38.5", "7.8", "19.0"]],
+          ["Claude Opus 5.5", ["64", "−1.14", "1.12", "43.3", "9.0", "9.2"]],
+          ["Claude Fable 5.2", ["68", "−1.52", "1.11", "39.5", "11.0", "13.3"]],
+        ] },
+        { name: "VLA baselines", rows: [
+          ["π<sub>0.5</sub>†", ["100", "−0.11", "1.01", "0.0", "0.0", "0.04"]],
+          ["π<sub>0.5</sub> + Planner", ["100", "−0.16", "1.02", "0.0", "0.0", "59.6"]],
+          ["π<sub>0.5</sub> + GPT-6 Astra", ["100", "−0.18", "1.02", "0.0", "0.0", "5.4"]],
+          ["MolmoAct 2†", ["60", "−1.17", "1.32", "45.8", "0.0", "0.16"]],
+          ["MolmoAct 2 + Planner", ["88", "−0.49", "1.09", "9.8", "0.0", "43.0"]],
+          ["MolmoAct 2 + GPT-6 Astra", ["78", "−0.67", "1.07", "6.4", "0.0", "4.8"]],
+        ] },
+      ],
       na: "–",
-      running: "Rollouts still running",
-      note: "Agents: five rollouts per task, 20 runs per cell. VLA policies: three per task, 12 runs per cell. W is a share of the human-alone completion time. –: not evaluated (a VLA policy alone has no message channel).",
-      pending: "rerun results pending.",
+      note: "† Runs without communication. A VLA policy runs alone or takes instructions from the simulated human's planner or from GPT-6 Astra; for an instructed VLA, R is the time of the instructing model.",
     },
     takeaways: [
-      "Every median S is below zero: no team finishes sooner than the human alone.",
-      "B is 1.00 or higher in every cell: the human never does less work than alone.",
-      "π0.5 rows sit closest to the human-alone reference, with S near 0, B near 1 and no delay.",
+      "Every S is below zero, so no team finishes sooner than one person alone.",
+      "Every B is above 1.00, so no robot takes work off the human on average.",
     ],
   },
 
   failures: {
     kicker: "Why robots fail",
-    claim: "No single missing skill: <em>small failures add up in the shared workspace.</em>",
-    body: "Imprecise manipulation, thin planning and slow decisions compound where both partners work, and every one of them costs the human time.",
+    claim: "No single missing skill. <em>Small failures pile up.</em>",
+    body: "Each failure on its own is minor, but when both partners work in the same space, every one of them costs the human time.",
+    /* One line on the real world under the cards (from realWorld: points and stats). */
+    real: { badge: "Real world", text: "The same failures show up with a real participant, and real and simulated scores correlate strongly across the 40 combinations. This is preliminary: we ran only a small number of trials." },
     w: {
       title: "Where the human loses time",
       body: "Human delayed time W, averaged over agents and tasks, as a share of the human-alone completion time.",
@@ -68,11 +95,11 @@ Object.assign(window.CONTENT, {
       note: "Being blocked is the largest part in every mode (12–56% across agents and modes), ahead of waiting (0–21%) and fixing (1–12%). Within every task, episodes where the human loses more time score lower S.",
     },
     items: [
-      { name: "Imprecise manipulation", stat: "0 / 47", statLabel: "Fruit Skewer episodes in which the robot threads a piece", body: "Agents rarely do the fine work themselves. Of 227 fruit pieces they pick up, they place 115 on the human's side and 90 on their own board, and leave the threading to the human." },
-      { name: "Insufficient planning", stat: "36 / 226", statLabel: "episodes in which the robot takes work off the human (B < 1)", body: "Agents claim subtasks they finish late, promise work they are too slow to deliver, and leave the arm where the human must reach next, although they can move it away at any time." },
+      { name: "Imprecise manipulation", stat: "0 / 47", statLabel: "Fruit Skewer episodes in which the robot threads a piece", body: "Agents rarely do the fine work themselves. Of the 227 fruit pieces they pick up, 115 go on the human's side and 90 on their own board. The threading is left to the human." },
+      { name: "Insufficient planning", stat: "36 / 226", statLabel: "episodes in which the robot takes work off the human (B < 1)", body: "Agents claim subtasks and finish them late, promise work they're too slow to deliver, and park the arm where the human needs to reach next, even though they could move it at any time." },
       {
         name: "High inference latency", stat: "15.0 s", statLabel: "median time per decision, about 4 decisions a minute",
-        body: "The human keeps working while the robot thinks, so the robot acts on a scene that has already changed, and an arm that blocks the human stays put until the next decision.",
+        body: "The human keeps working while the robot thinks, so by the time the robot acts, the scene has changed. If its arm is in the human's way, it stays there until the next decision.",
       },
     ],
   },

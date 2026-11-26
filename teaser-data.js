@@ -237,29 +237,29 @@ window.TEASER_DATA = {
     },
     "modes": {
       "title": "Four evaluation modes",
-      "lede": "Every agent runs every task in four modes along two axes. The robot's goal and the recipe are the same in all four.",
+      "lede": "Each task runs in all four modes. The goal and the recipe don't change between them.",
       "rows": [
         {
           "id": "on",
           "name": "Communication on",
-          "body": "The partners exchange messages to share plans, make requests and announce subtasks."
+          "body": "The robot and the human can send each other text messages."
         },
         {
           "id": "off",
           "name": "Communication off",
-          "body": "The message channel is closed. The robot must read the human's intent from what it sees."
+          "body": "No messages. The robot has to work out what the human is doing by watching."
         }
       ],
       "cols": [
         {
           "id": "free",
           "name": "Latency-free",
-          "body": "The simulation pauses while the robot thinks. This isolates decision quality."
+          "body": "The simulation stops while the robot's model is thinking, so a slow model isn't penalized."
         },
         {
           "id": "aware",
           "name": "Latency-aware",
-          "body": "The human keeps working in wall-clock time while the robot thinks, as in the real world."
+          "body": "The human keeps working while the robot's model is thinking, as in a real kitchen."
         }
       ],
       "legend": {

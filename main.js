@@ -68,7 +68,8 @@
 
   // One task player: the video with its controls and a line on the task, beside it the dialogue and
   // a small timeline. The task players below fill in the video, the speeds, and the dialogue.
-  const player = (t) => {
+  // rw: the same task's real-world run (CONTENT.real.items), shown beside the simulation run above the dialogue.
+  const player = (t, rw) => {
     const sw = C.tasks.switches;
     return `<div class="tp">
       <div class="tp-main">
@@ -79,12 +80,18 @@
         </div>
         <div class="tp-ctl">
           ${seg("tp-lat", sw.lat.label, sw.lat.options)}
+          ${seg("tp-comm", sw.comm.label, sw.comm.options)}
           <div class="seg is-sm tp-speed" role="group" aria-label="Playback speed"></div>
         </div>
         <p class="tp-line"><b>${t.behavior}</b>${t.line}</p>
         <p class="tp-meta"></p>
       </div>
       <div class="tp-side"><div class="tp-side-in">
+        ${rw ? `<figure class="tp-real">
+          <video src="${rw.src}" poster="${rw.poster}" muted loop playsinline preload="metadata" aria-label="${rw.name}, real-world run with ${rw.robot}, overhead camera"></video>
+          <span class="ro-tag">${C.real.tag}</span>
+          <figcaption>${rw.robot} · ${rw.mode} · ${C.real.speed}</figcaption>
+        </figure>` : ""}
         <div class="ro-chat">
           <p class="ro-chat-head"><b>${C.tasks.chat.title}</b><span class="ro-count"></span></p>
           <ol class="ro-log" aria-live="polite"></ol>
@@ -102,10 +109,10 @@
 
   /* [label, id, section number, also shown in the short top bar] */
   const navItems = [
-    ["Demo", "demo", 0, false], ["Abstract", "abstract", 0, true], ["Overview", "overview", 0, false],
-    ["Motivation", "gap", 1, false], ["Tasks", "tasks", 2, true], ["Metrics", "metrics", 3, false],
-    ["Results", "results", 4, true], ["Why robots fail", "failures", 5, true], ["Real world", "real", 6, true],
+    ["TL;DR", "tldr", 0, true], ["Video", "demo", 0, false], ["Benchmark", "benchmark-cards", 1, true],
+    ["Rollouts", "tasks", 2, true], ["Results", "results", 3, true], ["Why robots fail", "failures", 4, true],
     ["Resources", "resources", 0, false],
+    /* Not on the page at the moment: ["Metrics", "metrics"], ["Real world", "real"], ["Motivation", "gap"]. */
   ];
 
   const matrix = (() => {
@@ -175,24 +182,36 @@
       <div class="btns">${C.hero.links.map((l) => button(l, C.hero.pending)).join("")}</div>
       <a class="hero-lb" href="${C.hero.leaderboard.href}"><b>${C.hero.leaderboard.label}</b><span>${C.hero.leaderboard.note}</span><i aria-hidden="true">→</i></a>
     </div>
-    <a class="hero-cue" href="#abstract">Scroll to explore</a>
+    <a class="hero-cue" href="#tldr">Scroll to explore</a>
   </section>`;
 
-  // Interactive copy of the paper's Figure 1 (teaser.js), in its own band between the hero and the demo video.
+  // Interactive copy of the paper's Figure 1 (teaser.js). Not on the page at the moment: TL;DR, the demo video and
+  // the rollout players cover its panels. To show it again, put ${figure1} back into <main> below.
   const figure1 = window.TEASER && window.TEASER_DATA && window.LEADERBOARD
     ? `<section class="sec-fig1" id="figure1" aria-label="Figure 1"><div class="wrap">${TEASER.markup(TEASER_DATA, { wordmark })}</div></section>`
     : "";
 
-  const abstract = `<section class="pad" id="abstract"><div class="wrap">
-    ${head({ title: C.abstract.kicker, claim: C.abstract.lead })}
-    <p class="abs-body">${C.abstract.body}</p>
+  // TL;DR right under the hero: three lines, three numbers, then the paper's abstract folded away.
+  const T = C.tldr;
+  const tldr = `<section class="pad tldr" id="tldr"><div class="wrap">
+    <h2 class="kr-title">${T.kicker}</h2>
+    <dl class="tldr-rows">${T.rows.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join("")}</dl>
+    <ul class="kr-stats">${T.stats.map((x) => `<li data-r><b>${x.value}</b><span>${x.label}</span></li>`).join("")}</ul>
+    <details class="ev-more tldr-abs" id="abstract">
+      <summary>${T.more}</summary>
+      <p class="abs-lead">${C.abstract.lead}</p>
+      <p class="abs-body">${C.abstract.body}</p>
+    </details>
   </div></section>`;
 
-  // The demo video, right under the hero (the Video button points here). It plays only when the reader starts it.
+  // The demo video, right under the TL;DR (the Video button points here). It plays only when the reader starts it.
   const DM = C.demo;
   // Centred at 60% of the page width, with no heading: the body starts below it.
   const demos = `<section class="dm" id="demo" aria-label="${DM.kicker}">
-    <video src="${DM.src}" poster="${DM.poster}" controls playsinline preload="metadata" aria-label="${DM.label}"></video>
+    <div class="dm-frame">
+      <video src="${DM.src}" poster="${DM.poster}" playsinline preload="metadata" aria-label="${DM.label}"></video>
+      <button type="button" class="dm-play" aria-label="${DM.play}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg><span>${DM.play}</span></button>
+    </div>
     ${DM.note ? `<p class="dm-note" lang="ko">${DM.note}</p>` : ""}
   </section>`;
 
@@ -216,7 +235,7 @@
 
   const B = C.benchmark;
   const gap = `<section class="pad" id="gap"><div class="wrap">
-    ${head({ n: 1, title: C.gap.kicker, claim: C.gap.heading })}
+    ${head({ n: 6, title: C.gap.kicker, claim: C.gap.heading })}
     <ol class="gap-list">${C.gap.items.map((it, i) => `<li><div class="gap-t"><span>${pad(i + 1)}</span><h3>${it.title}</h3></div><p>${it.body}</p></li>`).join("")}</ol>
     ${matrix}
     <div class="bm" id="benchmark">
@@ -233,10 +252,29 @@
     </div>
   </div></section>`;
 
+  // Real-robot overhead footage, shown right under the simulation players so both kinds of rollout sit near the top.
+  const realFootage = `<div class="rw-block" data-r>
+      <div class="rw-head"><h3>Real-world footage</h3></div>
+      <p class="lede">${C.real.body}</p>
+      <div class="rw-slider">
+        <div class="rw-stage">
+          ${C.real.items.map((v, i) => `<figure class="rw-slide"${i ? " hidden" : ""}>
+            <video src="${v.src}" poster="${v.poster}" muted playsinline preload="metadata" aria-label="${v.name}, real-world run with ${v.robot}, overhead camera"></video>
+            <figcaption><b>${v.name}</b><span>${v.robot} · ${v.mode} · Comm. on · ${C.real.speed}</span></figcaption>
+          </figure>`).join("")}
+          <button class="rw-nav is-prev" type="button" aria-label="Previous video"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+          <button class="rw-nav is-next" type="button" aria-label="Next video"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
+        </div>
+        <div class="rw-dots" role="group" aria-label="Real-world video">${C.real.items.map((v, i) => `<button type="button" data-v="${i}" aria-pressed="${i === 0}">${v.name}</button>`).join("")}</div>
+      </div>
+    </div>`;
+
   const P = C.tasks.prompts;
   const tasks = `<section class="pad" id="tasks"><div class="wrap">
     ${head({ n: 2, title: C.tasks.kicker, claim: C.tasks.heading, body: C.tasks.body })}
-    <details class="ev-more">
+    ${window.TURNTABLE ? `<button type="button" class="tt-btn" id="tt-btn" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg>${C.tasks.turntable.button}</button>` : ""}
+    ${"" /* The robot prompt and settings fold is not on the page at the moment. */}
+    <details class="ev-more" hidden>
       <summary>${P.title}</summary>
       <div class="ev-grid">
         <blockquote class="ev-quote">
@@ -251,8 +289,9 @@
       <div class="tabs" id="task-tabs" role="group" aria-label="Task">
         ${C.tasks.items.map((t, i) => `<button type="button" data-v="${i}" aria-pressed="${i === 0}"><b>${pad(i + 1)}</b>${t.name}</button>`).join("")}
       </div>
-      ${C.tasks.items.map((t, i) => `<article class="task"${i ? " hidden" : ""}>${player(t)}${FIG.task(t)}</article>`).join("")}
+      ${C.tasks.items.map((t, i) => `<article class="task"${i ? " hidden" : ""}>${player(t, C.real.items[i])}</article>`).join("")}
     </div>
+    ${"" /* The separate real-world slider (realFootage) is not on the page: each task shows its real run beside the simulation. */}
   </div></section>`;
 
   const tex = (list) => list.map((src) => `<div class="tex" data-tex="${src}">${src}</div>`).join("");
@@ -267,40 +306,30 @@
     <ul class="stops">${m.stops.map(([k, v, tone, ref]) => `<li class="t-${tone}${ref ? " is-ref" : ""}"><b>${k}</b><span>${ref ? `<em>${ref}</em>` : ""}${v}</span></li>`).join("")}</ul>
   </article>`;
   const metrics = `<section class="pad" id="metrics"><div class="wrap">
-    ${head({ n: 3, title: C.metrics.kicker, claim: C.metrics.heading, body: C.metrics.body })}
+    ${head({ n: 2, title: C.metrics.kicker, claim: C.metrics.heading, body: C.metrics.body })}
     <div class="mt-grid is-3">${metricCard(C.metrics.score)}${metricCard(C.metrics.burden)}${metricCard(C.metrics.delay)}</div>
   </div></section>`;
 
-  // 04 Results: one table of medians (results-table-data.js). Rows: each agent at both latencies; columns: S, B and W
-  // with communication off, then on. Cells where the robot helps (S > 0 and B < 1) take the paper's shading.
+  // 04 Results: the paper's Table 8, one row per policy averaged over the four modes, columns grouped into
+  // team, human and robot as in the paper.
   const RS2 = C.results;
-  const RT = window.RESULTS_TABLE;
-  const sgn = (v) => v.toFixed(2).replace("-", "−");
-  const rtCell = (c) => {
-    if (!c) return `<td class="rt-na" colspan="3">${RS2.table.na}</td>`;
-    const [S, B, W, n] = c;
-    const help = S > 0 && B < 1 ? " is-help" : "";
-    return `<td class="rt-s${help}" title="${n} runs">${sgn(S)}</td><td class="${help.trim()}">${B.toFixed(2)}</td><td class="rt-w${help}">${W == null ? "–" : `${Math.round(W * 100)}%`}</td>`;
-  };
-  const rtRows = RT ? RT.groups.map((g) => `<tr class="rt-group"><th colspan="8" scope="rowgroup">${g.name}</th></tr>
-    ${g.rows.map((r) => r.pending
-      ? `<tr class="rt-pending"><th scope="row">${r.name}</th><td colspan="7">${RS2.table.running}</td></tr>`
-      : RS2.lat.map(([k, label], i) => `<tr class="${i ? "rt-2nd" : ""}">${i ? "" : `<th scope="row" rowspan="2">${r.name}</th>`}<td class="rt-lat">${label}</td>${rtCell(r.cells[`${k}-off`])}${rtCell(r.cells[`${k}-on`])}</tr>`).join("")).join("")}`).join("") : "";
+  const RT = RS2.table;
+  const rtRows = RT.groups.map((g) => `<tbody${g.ref ? ' class="rt-ref"' : ""}>
+    ${g.ref ? "" : `<tr class="rt-group"><th colspan="7" scope="rowgroup">${g.name}</th></tr>`}
+    ${g.rows.map(([name, vals]) => `<tr><th scope="row">${name}</th>${vals.map((v, i) => `<td${i === 1 ? ' class="rt-s"' : ""}>${v ?? RT.na}</td>`).join("")}</tr>`).join("")}
+  </tbody>`).join("");
   const results = `<section class="pad" id="results"><div class="wrap">
-    ${head({ n: 4, title: RS2.kicker, claim: RS2.claim, body: RS2.body })}
-    <div class="rt" data-r>
+    ${head({ n: 3, title: RS2.kicker, claim: RS2.claim, body: RS2.body })}
+    <div class="rt">
+      <dl class="rt-keys">${RS2.keys.map(([k, dir, v]) => `<div><dt>${k} <i>${dir}</i></dt><dd>${v}</dd></div>`).join("")}</dl>
       <div class="rt-scroll"><table class="rt-table">
         <thead>
-          <tr><th rowspan="2" scope="col">${RS2.table.agent}</th><th rowspan="2" scope="col">${RS2.latLabel}</th><th colspan="3" scope="colgroup">${RS2.labels.off}</th><th colspan="3" scope="colgroup">${RS2.labels.on}</th></tr>
-          <tr>${[0, 1].map(() => RS2.table.cols.map(([k, dir]) => `<th scope="col">${k} <i>${dir}</i></th>`).join("")).join("")}</tr>
+          <tr><th rowspan="2" scope="col">${RT.policy}</th>${RT.cols.map(([g, cs]) => `<th colspan="${cs.length}" scope="colgroup">${g}</th>`).join("")}</tr>
+          <tr>${RT.cols.map(([, cs]) => cs.map(([k, dir]) => `<th scope="col">${k} <i>${dir}</i></th>`).join("")).join("")}</tr>
         </thead>
-        <tbody class="rt-ref">
-          <tr><th scope="row">${RS2.labels.h}</th><td class="rt-lat">${RS2.table.ref}</td>${[0, 1].map(() => `<td>0.00</td><td>1.00</td><td>0%</td>`).join("")}</tr>
-          <tr><th scope="row">${RS2.labels.hh}</th><td class="rt-lat">${RS2.table.ref}</td>${[0, 1].map(() => `<td>1.00</td><td>${RT ? RT.hhB.toFixed(2) : "–"}</td><td>–</td>`).join("")}</tr>
-        </tbody>
-        <tbody>${rtRows}</tbody>
+        ${rtRows}
       </table></div>
-      <p class="rt-note">${RS2.table.note}${RT && RT.pending.length ? ` <b>${RT.pending.join(", ")}: ${RS2.table.pending}</b>` : ""}</p>
+      <p class="rt-note">${RT.note}</p>
     </div>
     <ul class="rs-takeaways">${RS2.takeaways.map((t) => `<li>${t}</li>`).join("")}</ul>
   </div></section>`;
@@ -308,8 +337,8 @@
   const FL = C.failures;
   const W = FL.w;
   const failures = `<section class="pad" id="failures"><div class="wrap">
-    ${head({ n: 5, title: FL.kicker, claim: FL.claim, body: FL.body })}
-    <div class="panel wb" data-r>
+    ${head({ n: 4, title: FL.kicker, claim: FL.claim, body: FL.body })}
+    <div class="panel wb" data-r hidden>
       <div class="panel-head"><h3>${W.title}</h3></div>
       <p class="wb-lede">${W.body}</p>
       <ul class="wb-legend">${W.names.map((n, i) => `<li class="t-${W.tones[i]}"><i></i>${n}</li>`).join("")}</ul>
@@ -328,6 +357,7 @@
       <p class="fl-stat"><b>${it.stat}</b><span>${it.statLabel}</span></p>
       <p class="fl-body">${it.body}</p>
     </article>`).join("")}</div>
+    <p class="fl-real"><span class="badge">${FL.real.badge}</span>${FL.real.text}</p>
   </div></section>`;
 
   // 06 Real world: the setup from above (after the paper's Fig. 7), in the same soft style as the decision-loop kitchen.
@@ -368,7 +398,7 @@
 
   const RW = C.realWorld;
   const real = `<section class="pad" id="real"><div class="wrap">
-    ${head({ n: 6, title: RW.kicker, claim: RW.claim, body: RW.body, badge: RW.badge })}
+    ${head({ n: 5, title: RW.kicker, claim: RW.claim, body: RW.body, badge: RW.badge })}
     <ul class="kr-stats is-2">${RW.stats.map((x) => `<li data-r><b>${x.value}</b><span>${x.label}</span></li>`).join("")}</ul>
     <div class="rwx" data-r>
       <figure class="rws">${rwSetup(RW.setup.labels)}<figcaption>${RW.setup.caption}</figcaption></figure>
@@ -383,21 +413,6 @@
       <ul class="rwr-points">${RW.points.map((x) => `<li>${x}</li>`).join("")}</ul>
     </div>
     <p class="kr-note">${RW.note}</p>
-    <div class="rw-block" data-r>
-      <div class="rw-head"><h3>Real-world footage</h3></div>
-      <p class="lede">${C.real.body}</p>
-      <div class="rw-slider">
-        <div class="rw-stage">
-          ${C.real.items.map((v, i) => `<figure class="rw-slide"${i ? " hidden" : ""}>
-            <video src="${v.src}" poster="${v.poster}" muted playsinline preload="metadata" aria-label="${v.name}, real-world run with ${v.robot}, overhead camera"></video>
-            <figcaption><b>${v.name}</b><span>${v.robot} · ${v.mode} · Comm. on · ${C.real.speed}</span></figcaption>
-          </figure>`).join("")}
-          <button class="rw-nav is-prev" type="button" aria-label="Previous video"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
-          <button class="rw-nav is-next" type="button" aria-label="Next video"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
-        </div>
-        <div class="rw-dots" role="group" aria-label="Real-world video">${C.real.items.map((v, i) => `<button type="button" data-v="${i}" aria-pressed="${i === 0}">${v.name}</button>`).join("")}</div>
-      </div>
-    </div>
   </div></section>`;
 
   const resources = `<section class="pad" id="resources"><div class="wrap">
@@ -410,13 +425,48 @@
   <footer class="foot"><div class="wrap foot-in">${wordmark()}<p>${C.resources.footer}</p></div></footer>
   </section>`;
 
+  // 01 Benchmark: one row per contribution (text beside one still visual, sides alternating), then Table 1 folded.
+  const K = C.contrib;
+  const rowVisual = (r) => {
+    if (r.kind === "tasks") return `<div class="cb-thumbs">${C.tasks.items.map((t, i) => `<button type="button" data-v="${i}" aria-label="${r.go}: ${t.name}"><img src="${r.thumbs[i]}" alt="" loading="lazy"><span class="ro-tag">${pad(i + 1)} ${t.name}</span></button>`).join("")}</div>`;
+    if (r.kind === "human") return `<div class="cr-human">
+        <img src="${r.image}" alt="${r.alt}" loading="lazy">
+        <ol>${(r.steps || C.benchmark.human.steps).map(([name, tone, line], i) => `<li class="t-${tone}"><b><span>${pad(i + 1)}</span>${name}</b><p>${line}</p></li>`).join("")}</ol>
+      </div>`;
+    // Four evaluation modes: the animated panel (modes.js); the plain table is the fallback.
+    if (r.kind === "modes" && window.MODES && r.anim) return MODES.markup(r.anim);
+    if (r.kind === "modes") return `<table class="cr-modes">
+        <thead><tr><th></th>${r.cols.map((c) => `<th scope="col">${c}</th>`).join("")}</tr></thead>
+        <tbody>${r.rows.map(([k, note, cells]) => `<tr><th scope="row"><b>${k}</b><span>${note}</span></th>${cells.map((c) => `<td>${c}</td>`).join("")}</tr>`).join("")}</tbody>
+      </table>`;
+    if (r.kind === "real") return `<div class="cr-pair" role="img" aria-label="${r.alt}">${r.pair.map(([src, tag]) => `<figure><img src="${src}" alt="" loading="lazy"><span class="ro-tag">${tag}</span></figure>`).join("")}</div>`;
+    return "";
+  };
+  const contrib = `<section class="pad" id="benchmark-cards"><div class="wrap">
+    ${head({ n: 1, title: K.kicker, claim: C.benchmark.heading })}
+    <div class="cr">
+      ${K.rows.map((r, i) => `<article class="cr-row is-${r.kind}${i % 2 ? " is-flip" : ""}">
+        <div class="cr-text">
+          <span class="cb-role">${r.role}</span>
+          <h3>${r.title}</h3>
+          <p>${r.body}</p>
+          ${r.kind === "tasks" ? `<dl class="cb-chips">${C.benchmark.principles.map((p) => `<div title="${p.body}"><dt>${p.role}</dt><dd>${p.name}</dd></div>`).join("")}</dl>` : ""}
+        </div>
+        <div class="cr-media">${rowVisual(r)}</div>
+      </article>`).join("")}
+    </div>
+    <details class="ev-more cb-more">
+      <summary>${K.more}</summary>
+      ${matrix}
+    </details>
+  </div></section>`;
+
   $("#app").innerHTML = `
     <nav class="nav" aria-label="Sections"><div class="wrap nav-in">
       <a class="nav-wm" href="#top" aria-label="Back to top">${wordmark()}</a>
       <ul>${navItems.map(([l, id, n, top]) => `<li${top ? "" : ' class="is-minor"'}><a href="#${id}">${n ? `<b>${pad(n)}</b>` : ""}<span>${l}</span></a></li>`).join("")}</ul>
-      <button class="mode" id="mode" type="button" role="switch" aria-label="Night mode" aria-checked="true"><span class="mode-label">Night mode</span><i aria-hidden="true"></i><b id="mode-state">On</b></button>
     </div></nav>
-    <main>${hero}${figure1}${demos}${abstract}${keyResults}${overview}${gap}${tasks}${metrics}${results}${failures}${real}${resources}</main>`;
+    <main>${hero}${tldr}${demos}${contrib}${tasks}${results}${failures}${resources}</main>`;
 
   /* ---------- Equations ---------- */
 
@@ -427,41 +477,12 @@
 
   /* ---------- Figures ---------- */
 
-  if (figure1) TEASER.wire($("#fig1"), TEASER_DATA);
-  FIG.overview.init($("#ov"), C.overview);
-  FIG.decision.init($("#dl"));
+  if ($("#fig1")) TEASER.wire($("#fig1"), TEASER_DATA);
+  if ($("#ov")) FIG.overview.init($("#ov"), C.overview); // the overview is not on the page at the moment
+  if ($("#dl")) FIG.decision.init($("#dl"));
 
   // Canvas and SVG drawings are in px, so they read the root size that scales the CSS.
   const rootScale = () => parseFloat(getComputedStyle(document.documentElement).fontSize) / 16;
-
-  /* ---------- Night mode ---------- */
-
-  // Night mode follows the system's light or dark setting, and keeps following it as it changes. Flipping the
-  // switch remembers the choice; flipping it back to what the system says forgets it, so the page follows again.
-  const NIGHT_KEY = "cooke-night";
-  const systemDark = matchMedia("(prefers-color-scheme: dark)");
-  let chosen = null;
-  try { chosen = localStorage.getItem(NIGHT_KEY); } catch { /* storage blocked: follow the system */ }
-  let night = chosen ? chosen === "on" : systemDark.matches;
-
-  const applyTheme = () => {
-    document.body.dataset.theme = night ? "ink" : "cream";
-    $("#mode").setAttribute("aria-checked", night);
-    $("#mode-state").textContent = night ? "On" : "Off";
-    // While the door intro runs, the browser bar keeps the wall colour; intro.js applies data-page when it ends.
-    const meta = $('meta[name="theme-color"]');
-    meta.dataset.page = night ? "#141210" : "#f4f2f1";
-    if (!document.documentElement.classList.contains("intro-running")) meta.content = meta.dataset.page;
-    document.dispatchEvent(new Event("themechange"));
-  };
-  $("#mode").addEventListener("click", () => {
-    night = !night;
-    chosen = night === systemDark.matches ? null : night ? "on" : "off";
-    try { if (chosen) localStorage.setItem(NIGHT_KEY, chosen); else localStorage.removeItem(NIGHT_KEY); } catch { /* not remembered */ }
-    applyTheme();
-  });
-  systemDark.addEventListener("change", (e) => { if (!chosen) { night = e.matches; applyTheme(); } });
-  applyTheme();
 
   /* ---------- In-page links ---------- */
 
@@ -669,7 +690,7 @@
         tf: $(".tf", el), slot: $(".tp-media", el), log: $(".ro-log", el), count: $(".ro-count", el),
         canvas: $(".tl-canvas", el), read: $(".tl-read", el), modeTag: $(".tl-mode", el), meta: $(".tp-meta", el),
         play: $(".ro-play", el), track: $(".ro-track", el), speed: $(".tp-speed", el),
-        lat: T.switches.lat.options[0][0],
+        lat: T.switches.lat.options[0][0], comm: T.switches.comm.options[0][0],
         clip: null, video: null, length: intro + (steps + 1) * STEP + HOLD,
         // Videos start on their own even with reduced motion (the reader can pause them); only the drawn clock stays still.
         clock: 0, held: false, rate: 1, phase: null, shown: 0, said: 0, readText: "",
@@ -712,7 +733,7 @@
       const phase = phaseAt(k, time, d);
       if (phase !== k.phase) {
         k.phase = phase;
-        FIG.taskPhase(k.tf, k.t, phase);
+        if (k.tf) FIG.taskPhase(k.tf, k.t, phase);
       }
       showPosition(k.track, time / d);
       syncChat(k, time);
@@ -728,17 +749,18 @@
     // Loads the rollout of the selected mode, or the placeholder when there is none.
     const open = (k) => {
       const names = T.modeNames;
-      // Every rollout shown runs with communication on; `clips` is keyed by the latency mode.
-      const id = k.t.clips?.[k.lat];
+      // `clips` is keyed by latency and communication; a mode with no recorded run shows the placeholder.
+      const mode = `${names[k.lat]} · ${names[k.comm]}`;
+      const id = k.t.clips?.[`${k.lat}-${k.comm}`];
       k.clip = id ? C.rollouts[id] : null;
       if (k.video) { videoObserver.unobserve(k.video); k.video.pause(); }
       k.slot.innerHTML = k.clip
         ? `${media({ src: k.clip.src, poster: k.clip.poster, label: k.clip.label })}<span class="ro-tag">${k.clip.view}</span><span class="ro-tag ro-model">${T.models[k.clip.robot] || k.clip.robot}</span>`
-        : media({ src: "", poster: k.t.poster, label: `${k.t.name}: ${names[k.lat]}`, spec: T.pending });
+        : media({ src: "", poster: k.t.poster, label: `${k.t.name}: ${mode}`, spec: T.pending });
       k.video = $("video", k.slot);
       k.meta.textContent = k.clip?.meta || "";
       k.meta.hidden = !k.clip;
-      k.modeTag.textContent = names[k.lat];
+      k.modeTag.textContent = mode;
       k.rate = 1;
       k.speed.innerHTML = (k.clip?.speeds || T.speeds).map(([rate, label]) => `<button type="button" data-v="${rate}" aria-pressed="${rate === 1}">${label}</button>`).join("");
       k.shown = 0;
@@ -770,6 +792,7 @@
         state(k);
       });
       segment($(".tp-lat", k.el), (v) => { k.lat = v; open(k); });
+      segment($(".tp-comm", k.el), (v) => { k.comm = v; open(k); });
       segment(k.speed, (v) => {
         k.rate = Number(v);
         if (k.video) k.video.playbackRate = k.rate;
@@ -834,6 +857,7 @@
   (function raceLines() {
     const D = window.LEADERBOARD;
     const ol = $("#kr-race");
+    if (!ol) return; // key results are not on the page at the moment
     const ids = D.tasks.map((t) => t.id);
     const mean = (a) => a.reduce((x, y) => x + y, 0) / a.length;
     const ratio = (t) => KR.ref[t][1] / KR.ref[t][0];
@@ -865,6 +889,7 @@
   /* ---------- 05 Why robots fail: W bars grow on first view ---------- */
   (function wBars() {
     const segs = $$("#wb-rows .wb-track i");
+    if (!segs.length || $(".wb").hidden) return; // the W chart is not on the page at the moment
     const MAX = 60;
     const grow = () => segs.forEach((el, i) => {
       el.style.transitionDelay = `${Math.floor(i / 3) * 120 + (i % 3) * 60}ms`;
@@ -889,8 +914,12 @@
     videoObserver.observe(heroVideo);
   }
 
+  // Real runs beside the simulation players: play while in view, like the other videos.
+  $$(".tp-real video").forEach((v) => videoObserver.observe(v));
+
   (function realSlider() {
     const slides = $$(".rw-slide");
+    if (!slides.length) return; // the slider is not on the page at the moment
     const dots = $(".rw-dots");
     let at = 0;
     const go = (i) => {
@@ -914,14 +943,50 @@
     segment(dots, (v) => go(Number(v)));
   })();
 
+  /* ---------- Demo video: one big play button over the poster; the browser's controls come with playback ---------- */
+
+  (() => {
+    const btn = $(".dm-play"), v = $("#demo video");
+    if (!btn || !v) return;
+    btn.addEventListener("click", () => {
+      v.controls = true;
+      btn.hidden = true;
+      v.play().catch(() => {});
+      v.focus();
+    });
+  })();
+
+  /* ---------- Benchmark: the four modes panel plays while on screen ---------- */
+
+  const modesRow = C.contrib.rows.find((r) => r.kind === "modes");
+  $$(".cr-media .md").forEach((el) => MODES.wire(el, modesRow.anim));
+
+  /* ---------- Benchmark cards: a task thumbnail opens that task's rollout ---------- */
+
+  $(".cb-thumbs")?.addEventListener("click", (e) => {
+    const b = e.target.closest("button");
+    if (!b) return;
+    $(`#task-tabs button[data-v="${b.dataset.v}"]`)?.click();
+    $("#tasks").scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+  });
+
+  /* ---------- Rollouts: the 360° scene viewer opens on the task in view ---------- */
+
+  // The button stays hidden until the turntable renders are in media/turntable/ (turntable.js whenRendered).
+  if ($("#tt-btn")) window.TURNTABLE.whenRendered(() => { $("#tt-btn").hidden = false; });
+  $("#tt-btn")?.addEventListener("click", () => {
+    const on = $('#task-tabs button[aria-pressed="true"]');
+    window.TURNTABLE.open(on ? Number(on.dataset.v) : 0);
+  });
+
   /* ---------- Scroll motion ---------- */
 
   gsap.registerPlugin(ScrollTrigger);
 
   const nav = $(".nav");
-  // The rail (and the narrow-screen bar) appears once the full-width demo video has passed, so it never covers it.
+  // The rail (and the narrow-screen bar) appears once the hero has passed.
   ScrollTrigger.create({
-    trigger: $("#demo") ? "#demo" : ".hero", start: "bottom 10%",
+    trigger: ".hero", start: "bottom 10%",
     onEnter: () => nav.classList.add("is-on"),
     onLeaveBack: () => nav.classList.remove("is-on"),
   });
@@ -951,6 +1016,23 @@
       start: "top 92%", once: true,
       onEnter: (els) => gsap.to(els, { autoAlpha: 1, duration: 0.5, ease: "power2.out", overwrite: true }),
     });
+
+    // Benchmark rows come in once, like chapters: the text from its own side, the visual from the other side
+    // a beat later. Stacked (narrow screens) they rise a little instead.
+    $$(".cr-row").forEach((row) => {
+      const side = row.classList.contains("is-flip") ? 1 : -1; // where the text sits: -1 left, 1 right
+      const stacked = matchMedia("(max-width: 760px)").matches;
+      const text = $(".cr-text", row), visual = $(".cr-media", row);
+      gsap.set([text, visual], { autoAlpha: 0 });
+      ScrollTrigger.create({
+        trigger: row, start: "top 85%", once: true,
+        onEnter: () => {
+          const from = (s) => (stacked ? { x: 0, y: 18 } : { x: 28 * s, y: 0 });
+          gsap.fromTo(text, from(side), { x: 0, y: 0, autoAlpha: 1, duration: 0.6, ease: "power2.out" });
+          gsap.fromTo(visual, from(-side), { x: 0, y: 0, autoAlpha: 1, duration: 0.6, delay: 0.12, ease: "power2.out" });
+        },
+      });
+    });
   });
 
   // Nav highlights the current section.
@@ -962,7 +1044,7 @@
     });
   });
 
-  $(".ev-more").addEventListener("toggle", () => ScrollTrigger.refresh());
+  $$(".ev-more").forEach((d) => d.addEventListener("toggle", () => ScrollTrigger.refresh()));
   document.fonts?.ready.then(() => ScrollTrigger.refresh());
   $$("img").forEach((img) => img.addEventListener("load", () => ScrollTrigger.refresh()));
   $$("video").forEach((v) => v.addEventListener("loadedmetadata", () => ScrollTrigger.refresh()));

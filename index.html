@@ -5,14 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>COOK·E</title>
   <meta name="description" content="COOK·E: a benchmark for human-robot collaboration in long-horizon kitchen tasks.">
-  <meta name="theme-color" content="#141210">
+  <meta name="theme-color" content="#f4f2f1" data-page="#f4f2f1">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 74 74'%3E%3Crect width='74' height='74' rx='22' fill='%23e0492f'/%3E%3Ccircle cx='24' cy='32' r='6' fill='%23141210'/%3E%3Ccircle cx='50' cy='32' r='6' fill='%23141210'/%3E%3Cpath d='M26 50c6 6 16 6 22 0' fill='none' stroke='%23141210' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&family=Geist+Mono:wght@400;500&family=Outfit:wght@700&family=Inter:wght@500;800&family=Patrick+Hand&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
-  <link rel="stylesheet" href="styles.css?v=20261124d">
-  <link rel="stylesheet" href="teaser.css?v=20261124c">
+  <link rel="stylesheet" href="styles.css?v=20261125q">
+  <link rel="stylesheet" href="teaser.css?v=20261125a">
   <link rel="stylesheet" href="intro.css?v=20261124c">
   <script>
     /* Door intro: keep the page behind the shopfront colour until intro.js draws the door (3 s at most). */
@@ -25,30 +25,23 @@
     })();
   </script>
 </head>
-<body data-theme="ink">
-  <script>
-    /* Night mode before the page draws, so a light system setting gets no dark flash (main.js keeps it in sync). */
-    (function () {
-      var c = null;
-      try { c = localStorage.getItem("cooke-night"); } catch (e) {}
-      var night = c ? c === "on" : matchMedia("(prefers-color-scheme: dark)").matches;
-      document.body.dataset.theme = night ? "ink" : "cream";
-    })();
-  </script>
+<body data-theme="cream">
+  <!-- Always the light theme (no night mode), like the leaderboard. -->
   <div id="app"></div>
   <noscript><p style="padding:24px">COOK·E: a benchmark for human-robot collaboration in long-horizon kitchen tasks. This page needs JavaScript.</p></noscript>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
-  <script src="content.js?v=20261124f"></script>
-  <script src="content-results.js?v=20261124c"></script>
+  <script src="content.js?v=20261125k"></script>
+  <script src="content-results.js?v=20261125e"></script>
   <script src="leaderboard-data.js?v=20261124c"></script>
   <script src="leaderboard-rollouts.js?v=20261124c"></script>
-  <script src="results-table-data.js?v=20261124c"></script>
   <script src="figures.js?v=20261124c"></script>
-  <script src="teaser-data.js?v=20261124c"></script>
-  <script src="teaser.js?v=20261124c"></script>
+  <script src="teaser-data.js?v=20261125a"></script>
+  <script src="teaser.js?v=20261125a"></script>
+  <script src="turntable.js?v=20261125b"></script>
+  <script src="modes.js?v=20261125c"></script>
   <script src="vendor/gsap.min.js"></script>
-  <script src="intro.js?v=20261124c"></script>
+  <script src="intro.js?v=20261125b"></script>
   <script src="vendor/ScrollTrigger.min.js"></script>
-  <script src="main.js?v=20261124d"></script>
+  <script src="main.js?v=20261125m"></script>
 </body>
 </html>

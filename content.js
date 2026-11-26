@@ -12,9 +12,12 @@
  * A link with `href: null` renders as disabled and shows `pending`.
  * Figures carry no captions except the paper's own (Table 1).
  * Short labels inside the animated diagrams live in figures.js.
- * Page order: hero, demo candidates (temporary), abstract, key results, overview, 01 Motivation (with the
- * benchmark and the human simulator), 02 Tasks (task players), 03 Metrics (S, B and W), 04 Results,
- * 05 Why robots fail, 06 Real world, resources. Copy for key results and 04–06 is in content-results.js.
+ * Page order (compact): hero, TL;DR (with the abstract folded in), demo video, 01 Benchmark (four contribution
+ * cards, Table 1 folded), 02 Rollouts (simulation players, the 360° viewer, then the real-world footage),
+ * 03 Results (S, B and W in one line, then the table), 04 Why robots fail (three cards and one line on the real
+ * world), resources. Not on the page at the moment, but kept in the code: the
+ * overview, Figure 1, key results, Metrics, the Real world analysis, Motivation, the robot prompt fold, the
+ * per-task flow figures and the W chart. Copy for key results and 04–06 is in content-results.js.
  *
  * TEMP FIGURES: the paper's figures are still placeholders, so the figures are drawn from the
  * paper text and the task configs. Replace them when the final figures exist. The task-player
@@ -92,6 +95,26 @@ window.CONTENT = {
     /* Silent 24 s loop behind the title: four tasks, each in simulation and in the real world, in a 3×2 grid. */
     /* ?v= changes the URL whenever the file is replaced, so browsers do not keep showing a cached copy. */
     media: { src: "media/cooke_bg_4tasks_sim_real_loop_720p.mp4?v=1", poster: "media/cooke_bg_4tasks_sim_real_loop_720p.jpg?v=1", autoplay: true, label: "Four kitchen tasks in simulation and in the real world, looping" },
+  },
+
+  /*
+   * TL;DR right under the hero: the abstract in three lines, three numbers, and the full abstract folded below.
+   * DRAFT wording, to be agreed with the co-authors. Numbers: sim from 04 Results (every median S < 0),
+   * real world from realWorld.stats, latency from failures.items (content-results.js).
+   */
+  tldr: {
+    kicker: "TL;DR",
+    rows: [
+      ["Problem", "Robots are mostly tested alone or with scripted partners, and the time they take to think is ignored. We don't know if they can really work <b>with a person</b>."],
+      ["COOK·E", "Five kitchen tasks where a robot and a person <b>work together at the same time</b>, in simulation and in the real world."],
+      ["Finding", "Today's best robot agents make the team <em>slower than one person alone</em>. They are clumsy, plan poorly and think slowly."],
+    ],
+    stats: [
+      { value: "4 / 4", label: "agents slower than one person alone (simulation, median)" },
+      { value: "40 / 40", label: "real-robot trials slower than one person alone" },
+      { value: "15.0 s", label: "median time the robot thinks before each move" },
+    ],
+    more: "Read the full abstract",
   },
 
   /*
@@ -222,7 +245,7 @@ window.CONTENT = {
 
   /* Shown inside 01 Motivation, after the comparison table. */
   benchmark: {
-    heading: "<b>COOK·E</b>: one kitchen, one goal, <em>two agents acting at once.</em>",
+    heading: "<b>COOK·E</b>: a robot and a person <em>collaborating in real time.</em>",
     body: "In each episode, a robot and a human act concurrently in a shared kitchen to accomplish a common goal. The robot gets the goal as one sentence, and both agents get the same recipe.",
     principles: [
       {
@@ -273,9 +296,85 @@ window.CONTENT = {
   },
 
   /*
-   * 02 Tasks: one player per task, with the evaluation modes as switches under the video.
+   * 01 Benchmark: one row per contribution, a claim and a sentence beside one still visual, sides alternating
+   * (after Habitat 3.0 and PARTNR). No videos here: the hero, the demo and the rollouts carry the footage, so
+   * nothing on the page repeats. Stills are from media/ and media/figure1/. Table 1 is folded below the rows.
+   */
+  contrib: {
+    kicker: "Benchmark",
+    more: "How COOK·E compares with existing benchmarks (Table 1)",
+    rows: [
+      {
+        kind: "tasks", role: "Benchmark", title: "Five long-horizon kitchen tasks",
+        body: "The robot and the human follow the same recipe in one kitchen, at the same time. Nobody tells them who does which step, and some steps need the same tool or the same spot on the counter.",
+        /* Robot head camera at the start pose: frame 0 of each task's rollout (Isaac Sim renders; Cleanup from its
+         * MuJoCo dashboard recording until its render is in). */
+        thumbs: ["media/head_task-1-sandwich.jpg", "media/head_task-2-canape.jpg", "media/head_task-3-fruit-skewer.jpg", "media/head_task-4-smores.jpg", "media/head_task-5-cleanup.jpg"],
+        go: "Watch",
+      },
+      {
+        kind: "human", role: "Partner", title: "An adaptive human partner",
+        body: "The simulated human is run by a vision-language model that decides what to do next. A state engine checks each decision before the avatar acts it out, so runs are reproducible.",
+        image: "media/figure1/task-smores-sim.webp", alt: "The simulated human standing at the S'mores table across from the robot",
+        /* Short labels for the four steps beside the still; the full sentences are in the Human simulator section. */
+        steps: [["Observe", "human", "its view, the chat, the recipe"], ["Propose", "human", "the VLM picks a subtask"], ["Validate", "cool", "the state engine checks it"], ["Execute", "cool", "the avatar carries it out"]],
+      },
+      {
+        kind: "modes", role: "Protocol", title: "Four evaluation modes",
+        body: "We run every agent on the same episodes four ways: with and without inference latency, and with and without text chat.",
+        cols: ["Comm. on", "Comm. off"],
+        rows: [
+          ["Latency off", "the world pauses while the robot thinks", ["pause · talk", "pause · watch"]],
+          ["Latency on", "the human keeps working meanwhile", ["real time · talk", "real time · watch"]],
+        ],
+        /* The animated panel (modes.js). Seconds of world time; an illustration built on the paper's numbers: a decision
+         * every 2 s, 15.0 s median thinking time, 2.6–6.1 decisions a minute with latency, and requests ignored. */
+        anim: {
+          span: 60,
+          clock: "World time",
+          illustration: "illustration",
+          comm: { label: "Comm.", options: [["on", "On"], ["off", "Off"]] },
+          lanes: { robot: "Robot", human: "Human" },
+          labels: { thinking: "thinking ≈ 15 s", blocked: "blocked", ask: "the human asks the robot to move", answer: "the robot answers", wait: "{s} s" },
+          strips: [
+            {
+              id: "free", name: "Latency off", note: "the world waits while the robot thinks", rate: "≈ 30 decisions / min",
+              robot: { every: 2 },
+              human: {
+                on: [["work", 0, 24], ["blocked", 24, 26], ["work", 26, 60]],
+                off: [["work", 0, 24], ["blocked", 24, 30], ["work", 30, 60]],
+              },
+              ask: [[24, 26]],
+              notes: { on: [24, "asked to move, it moves at its next decision"], off: [24, "with no message, it moves once it sees the problem"] },
+            },
+            {
+              id: "aware", name: "Latency on", note: "the world keeps moving while the robot thinks", rate: "2.6–6.1 decisions / min",
+              robot: { think: 15, act: 2 },
+              human: {
+                on: [["work", 0, 20], ["blocked", 20, 32], ["work", 32, 60]],
+                off: [["work", 0, 20], ["blocked", 20, 32], ["work", 32, 60]],
+              },
+              ask: [[21, 32]],
+              notes: { on: [20, "the arm stops in the way; the answer waits for the next decision"], off: [20, "the arm stops in the way until the next decision"] },
+            },
+          ],
+          ignored: { title: "Requests to move that the robot ignores", rows: [["latency off", "0–8%"], ["latency on", "36–63%"]] },
+          silent: "No messages: the robot can only watch what the human does.",
+        },
+      },
+      {
+        kind: "real", role: "Real world", title: "Real participants, same setup",
+        body: "We also run every task with the real robot and a real person in place of the simulated human. The robot, prompt and scoring are unchanged, so the two sets of scores can be compared.",
+        pair: [["media/figure1/task-canape-sim.webp", "Simulation"], ["media/figure1/task-canape-real.webp", "Real world"]],
+        alt: "The Canapé table in simulation and in the real world",
+      },
+    ],
+  },
+
+  /*
+   * 02 Rollouts (earlier 02 Tasks): one player per task, with the evaluation modes as switches under the video.
    *
-   * `clips` maps the latency mode ("free" or "aware"; communication is always on) to a recorded
+   * `clips` maps the mode ("free-on", "aware-off": latency, then communication) to a recorded
    * rollout in `rollouts` below. A mode with no clip shows the task's `poster`
    * as a placeholder. `art` picks the drawing in figures.js and `flow` lists its steps as [step, note].
    *
@@ -284,21 +383,35 @@ window.CONTENT = {
    * are spread evenly after `sync.intro` seconds; `rounds` is how many times the steps repeat.
    */
   tasks: {
-    kicker: "Tasks",
-    heading: "Five long-horizon <em>collaborative tasks.</em>",
-    body: "Every task runs in four evaluation modes. With <b>latency off</b> (latency-free), the simulation pauses while the robot's model computes, which isolates decision quality; with <b>latency on</b> (latency-aware), the world keeps running and the human keeps working. With communication off, the agents coordinate only by watching. The videos here run with <b>communication on</b>; switch latency under each video.",
+    kicker: "Rollouts",
+    heading: "Watch a robot and a human <em>collaborate.</em>",
+    body: "Pick a task. The video is the robot's view, with the chat beside it. Under the video, <b>latency</b> sets whether the world waits while the robot thinks, and <b>comm.</b> sets whether the two can send messages. On the right is the same task on the real robot.",
+    /* Earlier body, kept for reference: "Every task runs in four evaluation modes. With <b>latency off</b> (latency-free), the simulation pauses while the robot's model computes, which isolates decision quality; with <b>latency on</b> (latency-aware), the world keeps running and the human keeps working. With communication off, the agents coordinate only by watching. The videos here run with <b>communication on</b>; switch latency under each video." */
     /* Playback speeds for a clip that sets none. */
     speeds: [[0.5, "0.5×"], [1, "1×"], [2, "2×"]],
     switches: {
       lat: { label: "Latency", options: [["free", "Off"], ["aware", "On"]] },
+      comm: { label: "Comm.", options: [["on", "On"], ["off", "Off"]] },
     },
-    modeNames: { free: "latency off", aware: "latency on" },
+    modeNames: { free: "latency off", aware: "latency on", on: "comm. on", off: "comm. off" },
     /* The robot model of each rollout (its `robot`), shown on the video. */
     models: { Argon: "Gemini 4 Argon", Astra: "GPT-6 Astra", Fable: "Claude Fable 5.2", Opus: "Claude Opus 5.5" },
     pending: "Human–robot rollout coming soon",
     chat: { title: "Dialogue", none: "No rollout in this mode yet." },
     /* A schematic of the selected latency mode, its playhead tied to the video. Durations are illustrative:
      * one answer every `latency` s, a decision every `every` s of simulation (configs/evaluation/settings.yaml). */
+    /* The 360° scene viewer (turntable.js): Isaac Sim turntable renders, one folder of frames per task. */
+    turntable: {
+      button: "Explore the scene in 360°",
+      title: "Explore the scene",
+      hint: "Drag to turn · ← → to step · Esc to close",
+      pending: "Placeholder: a schematic stands in until the Isaac Sim turntable render for this task is in.",
+      alt: "the task's kitchen in simulation, turned by dragging",
+      labels: { robot: "Robot", human: "Human" },
+      count: 72, // frames per turn, 5° apart, frame 000 from the robot's side
+      path: "media/turntable/{dir}/{i}.jpg",
+      dirs: ["1-sandwich", "2-canape", "3-fruit-skewer", "4-smores", "5-cleanup"],
+    },
     timeline: {
       title: "Timeline · schematic",
       latency: 8, every: 2, motion: 6, span: 40,
@@ -330,7 +443,7 @@ window.CONTENT = {
         behavior: "Sequential collaboration",
         line: "Make the daughter's sandwich layer by layer; ketchup and hot sauce sit in two identical red bottles.",
         poster: "media/overview_task-1-sandwich.jpg",
-        clips: { free: "sandwich-free-on-fable-isaac", aware: "sandwich-aware-on-argon-isaac" },
+        clips: { "free-on": "sandwich-free-on-fable-isaac", "aware-on": "sandwich-aware-on-argon-isaac" },
         sync: { intro: 2 },
         art: { kind: "sandwich", title: "Finished: one example order" },
         flow: {
@@ -353,7 +466,7 @@ window.CONTENT = {
         behavior: "Parallel collaboration",
         line: "Make six canapés on three plates; each agent works from its own ingredients, in any order.",
         poster: "media/overview_task-2-canape.jpg",
-        clips: { free: "canape-free-on-astra-isaac", aware: "canape-aware-on-opus-isaac" },
+        clips: { "free-on": "canape-free-on-astra-isaac", "aware-on": "canape-aware-on-opus-isaac" },
         sync: { intro: 2, rounds: 6 },
         art: { kind: "canape", title: "Finished: two canapés on each plate" },
         flow: {
@@ -371,7 +484,7 @@ window.CONTENT = {
         behavior: "Fine-grained manipulation",
         line: "Make four fruit skewers, one per family member, each threaded in the order the recipe gives.",
         poster: "media/overview_task-3-fruit-skewer.jpg",
-        clips: { free: "fruit-free-on-astra-isaac", aware: "fruit-aware-on-opus-isaac" },
+        clips: { "free-on": "fruit-free-on-astra-isaac", "aware-on": "fruit-aware-on-opus-isaac" },
         sync: { intro: 2, rounds: 4 },
         art: { kind: "skewer", title: "Finished: four skewers on the plate" },
         flow: {
@@ -391,7 +504,7 @@ window.CONTENT = {
         behavior: "Time-dependent constraints",
         line: "Make three s'mores: toast each marshmallow over the heater and take it off once its top is brown, before it melts and falls.",
         poster: "media/overview_task-4-smores.jpg",
-        clips: { free: "smores-free-on-astra-isaac", aware: "smores-aware-on-argon-isaac" },
+        clips: { "free-on": "smores-free-on-astra-isaac", "aware-on": "smores-aware-on-argon-isaac" },
         sync: { intro: 2 },
         art: { kind: "marshmallow", title: "Each marshmallow has a time window" },
         flow: {
@@ -412,7 +525,7 @@ window.CONTENT = {
         behavior: "Shared-resource constraints",
         line: "Clear the table after a meal, sharing one tray, cup, bin, brush and towel by the household's rules.",
         poster: "media/overview_task-5-cleanup.jpg",
-        clips: { free: "cleanup-free-on", aware: "cleanup-aware-on" },
+        clips: { "free-on": "cleanup-free-on", "aware-on": "cleanup-aware-on" },
         sync: { intro: 2 },
         art: { kind: "cleanup", title: "The table at the start" },
         flow: {
@@ -1140,6 +1253,7 @@ window.CONTENT = {
     kicker: "Real-World Experiments",
     body: "One real-robot trial per task, recorded from the overhead camera, with communication on.",
     speed: "8×",
+    tag: "Real world",
     items: [
       { name: "Sandwich", robot: "Gemini 4 Argon", mode: "Latency-free", src: "media/real-world_1-sandwich_free-on_argon.mp4", poster: "media/real-world_1-sandwich_free-on_argon.jpg" },
       { name: "Canapé", robot: "Claude Fable 5.2", mode: "Latency-free", src: "media/real-world_2-canape_free-on_fable.mp4", poster: "media/real-world_2-canape_free-on_fable.jpg" },
