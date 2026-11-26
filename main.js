@@ -149,8 +149,13 @@
   // A plain string (e.g. "Authors withheld during anonymous review") still shows as one line.
   const authorBlock = (h) => {
     if (!Array.isArray(h.authors)) return `<p class="hero-authors">${h.authors || ""}</p>`;
-    const names = h.authors.map((a, i) =>
-      `<span class="hero-author">${a.name}<sup>${(a.aff || []).join(",")}${a.mark || ""}</sup>${i < h.authors.length - 1 ? "," : ""}</span>`).join(" ");
+    const tags = h.authors.map((a, i) =>
+      `<span class="hero-author">${a.name}<sup>${(a.aff || []).join(",")}${a.mark || ""}</sup>${i < h.authors.length - 1 ? "," : ""}</span>`);
+    // Optional fixed rows (content.js hero.authorRows, e.g. [8, 7, 8]): each row is one line on wide screens; narrower
+    // screens wrap the names as usual (styles.css .hero-author-row).
+    const rows = Array.isArray(h.authorRows) && h.authorRows.reduce((x, y) => x + y, 0) === tags.length ? h.authorRows : null;
+    let k = 0;
+    const names = rows ? rows.map((n) => `<span class="hero-author-row">${tags.slice(k, k += n).join(" ")}</span>`).join(" ") : tags.join(" ");
     // Affiliations: transparent logos, each with its number(s).
     const list = h.affiliations || [];
     const hasLogos = list.some((f) => f.logo);
