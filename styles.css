@@ -228,6 +228,11 @@ body[data-theme="cream"] .hero-shade::after { opacity: 1; }
   color: var(--fg); text-wrap: balance;
 }
 .hero-author, .hero-aff { display: inline-block; white-space: nowrap; }
+/* Fixed author rows (content.js hero.authorRows): one line each where they fit, plain wrapping below that. */
+@media (min-width: 75rem) {
+  .hero-authors.is-list { width: max-content; max-width: calc(100vw - 2rem); }
+  .hero-author-row { display: block; white-space: nowrap; }
+}
 .hero-author { margin-inline: .2em; }
 .hero-authors sup, .hero-affs sup { font: 500 .68em/1 var(--mono); color: var(--tomato); vertical-align: super; }
 .hero-authors sup { margin-left: .1em; }
@@ -508,7 +513,7 @@ a.btn:hover { background: var(--fg); color: var(--bg); border-color: var(--fg); 
 
 /* Real world: one video slot per task. */
 .rw-slider { max-width: 46rem; }
-.rw-stage { position: relative; aspect-ratio: 4 / 3; border-radius: var(--r-l); overflow: hidden; background: #000; }
+.rw-stage { position: relative; aspect-ratio: 16 / 10; border-radius: var(--r-l); overflow: hidden; background: #000; }
 .rw-slide { position: absolute; inset: 0; }
 .rw-slide[hidden] { display: none; }
 .rw-slide video { display: block; width: 100%; height: 100%; object-fit: cover; }

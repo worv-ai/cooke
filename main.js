@@ -142,8 +142,13 @@
   // A plain string (e.g. "Authors withheld during anonymous review") still shows as one line.
   const authorBlock = (h) => {
     if (!Array.isArray(h.authors)) return `<p class="hero-authors">${h.authors || ""}</p>`;
-    const names = h.authors.map((a, i) =>
-      `<span class="hero-author">${a.name}<sup>${(a.aff || []).join(",")}${a.mark || ""}</sup>${i < h.authors.length - 1 ? "," : ""}</span>`).join(" ");
+    const tags = h.authors.map((a, i) =>
+      `<span class="hero-author">${a.name}<sup>${(a.aff || []).join(",")}${a.mark || ""}</sup>${i < h.authors.length - 1 ? "," : ""}</span>`);
+    // Optional fixed rows (content.js hero.authorRows, e.g. [8, 7, 8]): each row is one line on wide screens; narrower
+    // screens wrap the names as usual (styles.css .hero-author-row).
+    const rows = Array.isArray(h.authorRows) && h.authorRows.reduce((x, y) => x + y, 0) === tags.length ? h.authorRows : null;
+    let k = 0;
+    const names = rows ? rows.map((n) => `<span class="hero-author-row">${tags.slice(k, k += n).join(" ")}</span>`).join(" ") : tags.join(" ");
     // Affiliations: transparent logos, each with its number(s).
     const list = h.affiliations || [];
     const hasLogos = list.some((f) => f.logo);
@@ -378,13 +383,13 @@
     </div>
     <p class="kr-note">${RW.note}</p>
     <div class="rw-block" data-r>
-      <div class="rw-head"><h3>Real-world footage</h3><span class="badge">Stand-in clips</span></div>
+      <div class="rw-head"><h3>Real-world footage</h3></div>
       <p class="lede">${C.real.body}</p>
       <div class="rw-slider">
         <div class="rw-stage">
           ${C.real.items.map((v, i) => `<figure class="rw-slide"${i ? " hidden" : ""}>
-            <video src="${v.src}" poster="${v.poster}" muted playsinline preload="metadata" aria-label="${v.name}, real-world run, robot head camera"></video>
-            <figcaption><b>${v.name}</b><span>${v.robot} · ${C.real.speed}</span></figcaption>
+            <video src="${v.src}" poster="${v.poster}" muted playsinline preload="metadata" aria-label="${v.name}, real-world run with ${v.robot}, overhead camera"></video>
+            <figcaption><b>${v.name}</b><span>${v.robot} · ${v.mode} · Comm. on · ${C.real.speed}</span></figcaption>
           </figure>`).join("")}
           <button class="rw-nav is-prev" type="button" aria-label="Previous video"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
           <button class="rw-nav is-next" type="button" aria-label="Next video"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
